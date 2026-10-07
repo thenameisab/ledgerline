@@ -49,7 +49,7 @@ export async function sendRoundup(
 /**
  * Daily roundup with a data-readiness gate. The daily cron runs ~45 min after
  * the usage sync; if yesterday never landed (sync failed, or Metabase hadn't
- * populated the day), a digest would report a misleading ₹0. So the roundup is
+ * populated the day), a digest would report a misleading $0. So the roundup is
  * withheld. The roundup does not send its own warning: if the date has still
  * not synced by 17:20 IST, the alerts cron raises F1 ("usage not synced") and
  * emails the "Data and operations" alert list. Weekly/monthly cover

@@ -9,7 +9,7 @@
 import { deriveStatement, listBillingPeriods, type StatementLine } from "./statements";
 import { listAccounts } from "./accounts";
 import { fuzzyFilter } from "@/lib/fuzzy";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { generateSlug } from "@/lib/slug";
 import type { AskResult } from "./ask";
 
@@ -20,7 +20,7 @@ export function isVarianceQuestion(raw: string): boolean {
 
 function signed(n: number): string {
   const sign = n >= 0 ? "+" : "−";
-  return `${sign}${formatINR(Math.abs(n), { compact: true })}`;
+  return `${sign}${formatMoney(Math.abs(n), { compact: true })}`;
 }
 
 const VAR_MONTH_RE =
@@ -80,7 +80,7 @@ export async function answerVariance(
   _opts: { includeSandbox: boolean }
 ): Promise<AskResult> {
   const name = accountNameFrom(raw);
-  if (!name) return { ok: false, message: "Which account? Try “why did Acme change vs last month?”." };
+  if (!name) return { ok: false, message: "Which account? Try “why did Copperleaf CRM change vs last month?”." };
 
   const accounts = await listAccounts();
   const match = pickAccountByName(accounts, name);
@@ -134,7 +134,7 @@ export async function answerVariance(
     ok: true,
     value: signed(total),
     label: `${match.display_name} · ${cur.label} vs ${prev.label} · revenue change`,
-    assumptions: "attributed by API: volume vs price",
+    assumptions: "attributed by SKU: volume vs price",
     drilldown: { href: `/accounts/${generateSlug(match.display_name)}/invoices`, label: "View invoices" },
     rows: factors.slice(0, 6).map((f) => ({ label: f.label, value: signed(f.delta) })),
   };

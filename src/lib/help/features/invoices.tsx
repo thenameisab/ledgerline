@@ -40,14 +40,15 @@ export default function Body() {
         </li>
         <li>
           <strong>The receipt</strong> — header (invoice number or draft placeholder, period,
-          generated timestamp), a bill-to block (legal name, GSTIN, billing entity), and line
-          items: date, API, hits, successful hits, price per hit, revenue, vendor cost, margin.
+          generated timestamp), a bill-to block (legal name, Tax ID, billing entity), and line
+          items: date, SKU, units, successful units, price per unit, revenue, vendor cost, margin.
           Negative-margin lines are tinted red; manual-entry lines carry a <em>MANUAL</em> chip.
           Totals close with subtotal, adjustments, final revenue, vendor cost, and margin.
         </li>
         <li>
-          <strong>Stitched bundles appear as one line</strong> — APIs stitched into a bundle for
-          this account roll up under the bundle name rather than listing each member API.
+          <strong>Stitched bundles appear as one line</strong> — SKUs stitched into a bundle for
+          this account roll up under the bundle name rather than listing each member SKU. For
+          example, Atlas Pro input and output tokens can bill as one Atlas Pro line.
         </li>
       </ul>
 
@@ -77,7 +78,7 @@ export default function Body() {
       </ul>
 
       <Callout variant="warn" title="Finalized pairs lock pricing">
-        Once a (account, API) pair appears on a finalized invoice, its history is part of an issued
+        Once a (account, SKU) pair appears on a finalized invoice, its history is part of an issued
         number. Later price edits for that pair <em>supersede</em> — they apply from their
         effective date forward and never rewrite the finalized lines.
       </Callout>
@@ -106,7 +107,7 @@ export default function Body() {
         links={[
           { href: "/help/features/invoice-adjustments", label: "Adjustments" },
           { href: "/help/features/invoice-exports", label: "PDF & CSV exports" },
-          { href: "/help/features/stitched-bundles", label: "Stitched API bundles" },
+          { href: "/help/features/stitched-bundles", label: "Stitched SKU bundles" },
           { href: "/help/math", label: "How line amounts are computed" },
         ]}
       />

@@ -233,7 +233,7 @@ export async function DELETE(req: Request) {
 
   if (await isBilledPair(client_id, api_code)) {
     return NextResponse.json(
-      { ok: false, error: "this (account, api) pair has been billed on a finalized invoice — pricing history is locked" },
+      { ok: false, error: "This (account, SKU) pair has been billed on a finalized invoice. Its pricing history is locked." },
       { status: 409 }
     );
   }

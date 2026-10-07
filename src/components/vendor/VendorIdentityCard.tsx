@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, Check, Loader2, Pencil, Plus, X } from "lucide-react";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { useSettleAfterSave } from "./useSettleAfterSave";
 
 // The vendor's registry entry, and the editor for it.
@@ -31,7 +31,7 @@ export function VendorIdentityCard({
   vendorId: number;
   canonicalName: string;
   status: "active" | "inactive";
-  /** Does this vendor invoice us for sandbox calls? */
+  /** Does this vendor invoice us for sandbox usage? */
   chargesSandbox: boolean;
   /** Sandbox traffic this vendor served in the period, and what it costs today. */
   sandbox: { hits: number; cost: number };
@@ -85,7 +85,7 @@ export function VendorIdentityCard({
             {!chargesSandbox && (
               <span
                 className="text-[10px] uppercase tracking-widest text-ink-faint border border-border rounded px-1.5 py-0.5"
-                title="This vendor does not invoice us for sandbox calls, so sandbox traffic carries no cost from it."
+                title="This vendor does not invoice us for sandbox usage, so sandbox traffic carries no cost from it."
               >
                 No sandbox charge
               </span>
@@ -202,9 +202,9 @@ export function VendorIdentityCard({
           </div>
 
           <label className="block text-[10px] uppercase tracking-wide text-ink-faint mb-1">
-            Charges for sandbox calls
+            Charges for sandbox usage
           </label>
-          <div className="flex gap-1 mb-1" role="group" aria-label="Charges for sandbox calls">
+          <div className="flex gap-1 mb-1" role="group" aria-label="Charges for sandbox usage">
             {([true, false] as const).map((v) => (
               <button
                 key={String(v)}
@@ -229,14 +229,14 @@ export function VendorIdentityCard({
               </>
             ) : chargesSandbox ? (
               <>
-                {formatNumber(sandbox.hits)} sandbox hit{sandbox.hits === 1 ? "" : "s"} in this
-                period carry {formatINR(sandbox.cost, { precision: 0 })} of this vendor&rsquo;s
+                {formatNumber(sandbox.hits)} sandbox unit{sandbox.hits === 1 ? "" : "s"} in this
+                period carry {formatMoney(sandbox.cost, { precision: 0 })} of this vendor&rsquo;s
                 cost. Set this to <em>does not charge</em> only from the contract — while the
                 answer is unknown, charging is the safer error.
               </>
             ) : (
               <>
-                {formatNumber(sandbox.hits)} sandbox hit{sandbox.hits === 1 ? "" : "s"} in this
+                {formatNumber(sandbox.hits)} sandbox unit{sandbox.hits === 1 ? "" : "s"} in this
                 period carry no cost from {canonicalName}. This is not effective-dated: it
                 corrects every period at once, because the contract always said so.
               </>

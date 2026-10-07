@@ -208,7 +208,7 @@ export async function slabRevenueByPeriod(
 export type SlabBandAgg = {
   min_hits: number;
   max_hits: number | null;
-  price: number; // the tier's successful rate (the headline ₹/hit)
+  price: number; // the tier's successful rate (the headline $/unit)
   hits: number;
   revenue: number;
 };

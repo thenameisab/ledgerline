@@ -12,9 +12,9 @@ import { fuzzyFilter } from "@/lib/fuzzy";
 const SORTS: { key: string; label: string; dir: "asc" | "desc" | null }[] = [
   { key: "revenue.desc", label: "Revenue", dir: "desc" },
   { key: "revenue.asc", label: "Revenue", dir: "asc" },
-  { key: "hits.desc", label: "Hits", dir: "desc" },
-  { key: "hits.asc", label: "Hits", dir: "asc" },
-  { key: "apis_used.desc", label: "APIs used", dir: "desc" },
+  { key: "hits.desc", label: "Units", dir: "desc" },
+  { key: "hits.asc", label: "Units", dir: "asc" },
+  { key: "apis_used.desc", label: "SKUs used", dir: "desc" },
   { key: "display_name.asc", label: "Name A→Z", dir: null },
 ];
 

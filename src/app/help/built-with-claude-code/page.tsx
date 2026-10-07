@@ -139,7 +139,7 @@ export default function BuiltWithClaudeCodePage() {
           {
             name: "Fictional seed data",
             type: "first run",
-            desc: "On an empty database the launcher applies the schema and seeds about three months of fictional accounts, APIs, vendors, usage, and invoices. The public demo runs the same reseed every night.",
+            desc: "On an empty database the launcher applies the schema and seeds about three months of fictional accounts, SKUs, vendors, usage, and invoices. The public demo runs the same reseed every night.",
           },
           {
             name: "Mocked integrations",
@@ -160,7 +160,7 @@ export default function BuiltWithClaudeCodePage() {
       <Callout variant="info" title="A bug the checks found">
         Finalizing an invoice failed, but only on the first day of a month. The seed put unmapped
         usage rows in the last few days. On the 1st, those days fall in a <em>finalized</em>{" "}
-        period, which produced a statement line with no API code. Mid-month the bug did not
+        period, which produced a statement line with no SKU code. Mid-month the bug did not
         appear. A browser check on the 1st found it. The fix keeps those rows in the current open
         period.
       </Callout>

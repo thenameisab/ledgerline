@@ -42,7 +42,7 @@ export type VendorSyncResult = {
  * Built from code, name and aliases, lowercased. When two APIs claim the same
  * identifier the first wins and the second is skipped: an ambiguous name must
  * not silently attach vendor volume to one of two candidates, so it is left
- * unmatched and shows up in the queue. `/admin/api-review` already surfaces
+ * unmatched and shows up in the queue. `/admin/sku-review` already surfaces
  * catalog duplicates as their own worklist.
  */
 async function catalogIndex(): Promise<Map<string, string>> {

@@ -13,7 +13,7 @@
 // needs vendor allocation we don't have (see StatusChip note).
 
 import { generateSlug } from "@/lib/slug";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { mtdRange, prevMonthRange } from "@/lib/repos/periods";
 import { getAccountSummaries, getGroupSummaries, type AccountSummary, type GroupSummary } from "@/lib/repos/accounts";
 import { fuzzyFilter } from "@/lib/fuzzy";
@@ -133,11 +133,11 @@ export function parseQuestion(raw: string): AskSpec | null {
   }
 
   const isRevenue = /\b(revenue|bill|billed|billing|made|earn|earned|charged)\b/.test(t);
-  const isHits = /\b(hits|calls|usage|volume|traffic)\b/.test(t);
+  const isHits = /\b(hits|units|calls|usage|volume|traffic)\b/.test(t);
   const entityName = stripNoise(raw);
 
   // Default to revenue when a plausible entity is named, even without a metric
-  // verb ("Acme", "how is Acme doing"). Only give up when nothing is left.
+  // verb ("Copperleaf", "how is Copperleaf doing"). Only give up when nothing is left.
   if (!isRevenue && !isHits && !entityName) return null;
 
   const metric: AskMetric = isHits && !isRevenue ? "hits" : "revenue";
@@ -149,7 +149,7 @@ export function parseQuestion(raw: string): AskSpec | null {
 function stripNoise(raw: string): string {
   return raw
     .toLowerCase()
-    .replace(/\b(how much|how many|how|many|number|did|does|do|what'?s|what is|whats|the|revenue|bill|billed|billing|make|made|earn|earned|charged|hits|calls|usage|volume|traffic|in|for|of|group|group|this|last|previous|month|mtd|quarter|year|top \d+|accounts?|by|total|all|overall|combined|across|show|me|us|is|are|was|were|doing|stats?|summary|tell|give|about|currently)\b/g, " ")
+    .replace(/\b(how much|how many|how|many|number|did|does|do|what'?s|what is|whats|the|revenue|bill|billed|billing|make|made|earn|earned|charged|hits|units|calls|usage|volume|traffic|in|for|of|group|group|this|last|previous|month|mtd|quarter|year|top \d+|accounts?|by|total|all|overall|combined|across|show|me|us|is|are|was|were|doing|stats?|summary|tell|give|about|currently)\b/g, " ")
     .replace(MONTH_RE_G, " ")
     .replace(/\b20\d{2}\b/g, " ")
     .replace(/[?]/g, " ")
@@ -158,16 +158,16 @@ function stripNoise(raw: string): string {
 }
 
 // Resolve a name to an account. When several accounts share a brand token (the
-// many "Acme …" rows), match-sorter's first hit is arbitrary and often a ₹0
+// many "Copperleaf …" rows), match-sorter's first hit is arbitrary and often a $0
 // row — so among genuine substring matches prefer non-sandbox, then highest
-// revenue (what "how much did Acme bill" actually means).
+// revenue (what "how much did Copperleaf bill" actually means).
 function pickAccount(summaries: AccountSummary[], name: string): AccountSummary | null {
   const tokens = name.toLowerCase().split(/\s+/).filter(Boolean);
   if (!tokens.length) return null;
   const strong = summaries.filter((c) => tokens.every((t) => c.display_name.toLowerCase().includes(t)));
   if (strong.length) return [...strong].sort((a, b) => a.is_sandbox - b.is_sandbox || b.revenue - a.revenue)[0];
   // Looser fuzzy, but only if it genuinely shares a token — otherwise a
-  // non-existent name ("Maya", "PAN API") would resolve to a garbage account.
+  // non-existent name ("Maya", "Atlas SKU") would resolve to a garbage account.
   const fuzzy = fuzzyFilter(summaries, name, ["display_name"])[0];
   if (fuzzy && tokens.some((t) => t.length >= 3 && fuzzy.display_name.toLowerCase().includes(t))) return fuzzy;
   return null;
@@ -200,13 +200,13 @@ export async function answerSpec(
     return {
       ok: true,
       value: `${formatNumber(totalPairs)} pairs`,
-      label: `Unpriced (account, API) pairs · ${formatNumber(totalHits)} hits at risk`,
+      label: `Unpriced (account, SKU) pairs · ${formatNumber(totalHits)} units at risk`,
       assumptions,
       drilldown: { href: "/accounts", label: "View accounts" },
       rows: flagged.slice(0, 8).map((c) => ({
         label: c.display_name,
         value: `${c.unpriced_pairs} pair${c.unpriced_pairs === 1 ? "" : "s"}`,
-        sub: `${formatNumber(c.unpriced_hits)} hits`,
+        sub: `${formatNumber(c.unpriced_hits)} units`,
         href: `/accounts/${generateSlug(c.display_name)}`,
       })),
     };
@@ -219,7 +219,7 @@ export async function answerSpec(
     if (!match) return { ok: false, message: "Couldn't find that group. Try the group name." };
     return {
       ok: true,
-      value: formatINR(match.revenue, { compact: true }),
+      value: formatMoney(match.revenue, { compact: true }),
       label: `${match.name} · ${periodLabel} · revenue`,
       assumptions,
       drilldown: { href: `/accounts/groups/${match.id}`, label: "View group" },
@@ -239,8 +239,8 @@ export async function answerSpec(
       drilldown: { href: "/dashboard", label: "View dashboard" },
       rows: top.map((c) => ({
         label: c.display_name,
-        value: formatINR(c.revenue, { compact: true }),
-        sub: `${formatNumber(c.hits)} hits`,
+        value: formatMoney(c.revenue, { compact: true }),
+        sub: `${formatNumber(c.hits)} units`,
         href: `/accounts/${generateSlug(c.display_name)}`,
       })),
       series: { points: sumSeries(top), label: `Top ${spec.topN} daily revenue` },
@@ -254,16 +254,16 @@ export async function answerSpec(
     const isHits = spec.metric === "hits";
     return {
       ok: true,
-      value: isHits ? formatNumber(match.hits) : formatINR(match.revenue, { compact: true }),
-      label: `${match.display_name} · ${periodLabel} · ${isHits ? "hits" : "revenue"}`,
+      value: isHits ? formatNumber(match.hits) : formatMoney(match.revenue, { compact: true }),
+      label: `${match.display_name} · ${periodLabel} · ${isHits ? "units" : "revenue"}`,
       assumptions,
       drilldown: { href: `/accounts/${generateSlug(match.display_name)}`, label: "View account" },
       series: isHits ? undefined : { points: match.spark, label: "Daily revenue" },
       rows: match.top_apis.slice(0, 5).map((a) => ({
         label: a.api_name ?? a.api_code,
-        value: formatINR(a.revenue, { compact: true }),
-        sub: `${formatNumber(a.hits)} hits`,
-        href: `/apis/${encodeURIComponent(a.api_code)}`,
+        value: formatMoney(a.revenue, { compact: true }),
+        sub: `${formatNumber(a.hits)} units`,
+        href: `/skus/${encodeURIComponent(a.api_code)}`,
       })),
     };
   }
@@ -274,8 +274,8 @@ export async function answerSpec(
   const totalHits = summaries.reduce((n, c) => n + c.hits, 0);
   return {
     ok: true,
-    value: isHits ? formatNumber(totalHits) : formatINR(totalRevenue, { compact: true }),
-    label: `All accounts · ${periodLabel} · ${isHits ? "hits" : "revenue"}`,
+    value: isHits ? formatNumber(totalHits) : formatMoney(totalRevenue, { compact: true }),
+    label: `All accounts · ${periodLabel} · ${isHits ? "units" : "revenue"}`,
     assumptions,
     drilldown: { href: "/dashboard", label: "View dashboard" },
     series: isHits ? undefined : { points: sumSeries(summaries), label: "Daily revenue" },
@@ -296,7 +296,7 @@ function sumSeries(rows: { spark: number[] }[]): number[] {
 
 const CANT_ANSWER: AskResult = {
   ok: false,
-  message: "I can answer revenue, hits, and unpriced questions — try “revenue for Acme in May” or “top 5 accounts”.",
+  message: "I can answer revenue, units, and unpriced questions — try “revenue for Copperleaf CRM in May” or “top 5 accounts”.",
 };
 
 export async function answerQuestion(

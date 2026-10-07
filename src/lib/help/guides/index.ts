@@ -6,7 +6,7 @@ import * as readTheDashboard from "./read-the-dashboard";
 import * as filterByDateRange from "./filter-by-date-range";
 import * as investigateAAccount from "./investigate-an-account";
 import * as editAAccountProfile from "./edit-an-account-profile";
-import * as investigateAnApi from "./investigate-an-api";
+import * as investigateAnApi from "./investigate-a-sku";
 import * as askThePalette from "./ask-the-palette";
 import * as setAccountPricing from "./set-account-pricing";
 import * as createAStitchedBundle from "./create-a-stitched-bundle";
@@ -25,7 +25,7 @@ import * as manageRolesAndAccess from "./manage-roles-and-access";
 import * as editYourProfile from "./edit-your-profile";
 import * as manageVendorCosts from "./manage-vendor-costs";
 import * as readTheAuditLog from "./read-the-audit-log";
-import * as createOrEditAnApi from "./create-or-edit-an-api";
+import * as createOrEditAnApi from "./create-or-edit-a-sku";
 
 /**
  * How-to guide registry. Each guide is a module in this folder exporting

@@ -33,7 +33,7 @@ export default function Body() {
           / <strong>Final</strong> / <strong>Issued</strong>.
         </Step>
         <Step title="Select the period">
-          The right pane shows the receipt: bill-to details, line items with hits, price per hit
+          The right pane shows the receipt: bill-to details, line items with units, price per unit
           and revenue, and totals. Drafts are labelled “Draft — derives live from usage”. Click the
           invoice number to open the full-page view.
         </Step>

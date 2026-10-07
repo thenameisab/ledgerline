@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { StatusBar } from "@/components/StatusBar";
 import { getManualEntry } from "@/lib/repos/manual-entries";
 import { requireCan, canApprove } from "@/lib/access";
-import { formatINR, formatNumber, formatDate, formatDateTime } from "@/lib/format";
+import { formatMoney, formatNumber, formatDate, formatDateTime } from "@/lib/format";
 import { ManualEntryActions } from "@/components/ManualEntryActions";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 
@@ -31,7 +31,7 @@ export default async function ManualEntryDetailPage({
     <main>
       <StatusBar
         title={`Manual entry · ${entry.client_name}`}
-        subtitle={`${entry.line_count} ${entry.line_count === 1 ? "line" : "lines"} · ${formatINR(
+        subtitle={`${entry.line_count} ${entry.line_count === 1 ? "line" : "lines"} · ${formatMoney(
           entry.total_revenue,
           { precision: 2 }
         )} · ${formatDate(entry.effective_date)}`}
@@ -94,7 +94,7 @@ export default async function ManualEntryDetailPage({
                 className="block font-serif text-2xl text-ink leading-none tnum landmark-wipe"
                 style={{ fontWeight: 600 }}
               >
-                {formatINR(entry.total_revenue, { precision: 2 })}
+                {formatMoney(entry.total_revenue, { precision: 2 })}
               </span>
               <span className="block h-px bg-accent mt-1.5 landmark-rail" aria-hidden="true" />
             </span>
@@ -102,10 +102,10 @@ export default async function ManualEntryDetailPage({
           <table className="w-full text-sm">
             <thead className="bg-bg-sunken text-ink-muted">
               <tr>
-                <th className="text-left font-medium px-4 py-2.5">API</th>
+                <th className="text-left font-medium px-4 py-2.5">SKU</th>
                 <th className="text-left font-medium px-4 py-2.5">Channel</th>
                 <th className="text-left font-medium px-4 py-2.5">Vendor</th>
-                <th className="text-right font-medium px-4 py-2.5 tnum">Hits</th>
+                <th className="text-right font-medium px-4 py-2.5 tnum">Units</th>
                 <th className="text-right font-medium px-4 py-2.5 tnum">Revenue</th>
               </tr>
             </thead>
@@ -127,7 +127,7 @@ export default async function ManualEntryDetailPage({
                   </td>
                   <td className="px-4 py-2.5 text-right tnum text-ink font-mono">
                     {l.has_pricing ? (
-                      formatINR(l.revenue, { precision: 2 })
+                      formatMoney(l.revenue, { precision: 2 })
                     ) : (
                       <span className="text-warn-ink">no rate</span>
                     )}

@@ -45,6 +45,7 @@ export default async function PricingPage({
     ...unpricedUsage.map((u) => ({
       api_code: u.api_code,
       api_name: u.api_name,
+      unit: u.unit,
       price_successful: 0,
       price_successful_no_data: 0,
       price_failed: 0,
@@ -63,7 +64,7 @@ export default async function PricingPage({
   const shownCodes = new Set([...rows.map((r) => r.api_code), ...bundledCodes]);
   const availableApis = (allApis as any[])
     .filter((a) => !shownCodes.has(a.product_code))
-    .map((a) => ({ product_code: a.product_code as string, name: a.name as string }));
+    .map((a) => ({ product_code: a.product_code as string, name: a.name as string, unit: a.unit as string }));
 
   return (
     <main>

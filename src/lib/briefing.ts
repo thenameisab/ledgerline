@@ -1,4 +1,4 @@
-import { formatINR, formatNumber, formatPercent } from "./format";
+import { formatMoney, formatNumber, formatPercent, formatPrice } from "./format";
 import { formatShare, LOW_CONFIDENCE_PCT } from "./vendor-confidence";
 
 // Deterministic briefing composer for v0.1.
@@ -54,10 +54,10 @@ export interface BriefingComposer {
 export class DeterministicComposer implements BriefingComposer {
   composeAccountBriefing(o: AccountBriefingInput): string {
     if (o.is_sandbox) {
-      return `${o.display_name} is a sandbox account. ${formatNumber(o.hits)} hits across ${o.apis_used} APIs this period — excluded from headline revenue and margin.`;
+      return `${o.display_name} is a sandbox account. ${formatNumber(o.hits)} units across ${o.apis_used} SKUs this period — excluded from headline revenue and margin.`;
     }
     if (o.hits === 0) {
-      return `${o.display_name} has no traffic this period. The account is configured but quiet — pricing rows exist for ${o.apis_used} APIs.`;
+      return `${o.display_name} has no traffic this period. The account is configured but quiet — pricing rows exist for ${o.apis_used} SKUs.`;
     }
 
     const sentences: string[] = [];
@@ -65,8 +65,8 @@ export class DeterministicComposer implements BriefingComposer {
     // Sentence 1 — headline number + scale.
     sentences.push(
       o.revenue > 0
-        ? `${o.display_name} drove ${formatINR(o.revenue, { precision: 0 })} MTD across ${o.apis_used} API${o.apis_used === 1 ? "" : "s"} on ${formatNumber(o.hits)} hits.`
-        : `${o.display_name} ran ${formatNumber(o.hits)} hits across ${o.apis_used} API${o.apis_used === 1 ? "" : "s"} but produced no billable revenue this period — likely missing pricing.`
+        ? `${o.display_name} drove ${formatMoney(o.revenue, { precision: 0 })} MTD across ${o.apis_used} SKU${o.apis_used === 1 ? "" : "s"} on ${formatNumber(o.hits)} units.`
+        : `${o.display_name} ran ${formatNumber(o.hits)} units across ${o.apis_used} SKU${o.apis_used === 1 ? "" : "s"} but produced no billable revenue this period — likely missing pricing.`
     );
 
     // Margin sentence intentionally omitted at the per-account level — see type doc.
@@ -81,7 +81,7 @@ export class DeterministicComposer implements BriefingComposer {
     // Sentence 3 — leak warning.
     if (o.unpriced_pairs > 0) {
       sentences.push(
-        `${o.unpriced_pairs} (account, api) pair${o.unpriced_pairs === 1 ? "" : "s"} have traffic but no pricing — ${formatNumber(o.unpriced_hits)} hits at risk if not configured.`
+        `${o.unpriced_pairs} (account, SKU) pair${o.unpriced_pairs === 1 ? "" : "s"} have traffic but no pricing — ${formatNumber(o.unpriced_hits)} units at risk if not configured.`
       );
     }
 
@@ -104,11 +104,11 @@ export class DeterministicComposer implements BriefingComposer {
     const sentences: string[] = [];
 
     sentences.push(
-      `${o.name} (${o.product_code}) ran ${formatNumber(o.total_hits)} hits across ${o.unique_accounts} account${o.unique_accounts === 1 ? "" : "s"}, generating ${formatINR(o.revenue, { precision: 0 })} MTD.`
+      `${o.name} (${o.product_code}) ran ${formatNumber(o.total_hits)} units across ${o.unique_accounts} account${o.unique_accounts === 1 ? "" : "s"}, generating ${formatMoney(o.revenue, { precision: 0 })} MTD.`
     );
 
     if (o.revenue > 0) {
-      const price = `Average price is ₹${o.avg_unit_price.toFixed(2)} per successful hit`;
+      const price = `Average price is ${formatPrice(o.avg_unit_price)} per successful unit`;
       // Margin is cost-gated; members get the price sentence without it.
       const lowConfidence =
         o.cost_confirmed_pct != null && o.cost_confirmed_pct < LOW_CONFIDENCE_PCT;
@@ -116,8 +116,8 @@ export class DeterministicComposer implements BriefingComposer {
         o.margin == null || o.margin_pct == null
           ? `${price}.`
           : lowConfidence
-          ? `${price}; margin is not measured — vendor cost is confirmed on ${formatShare(o.cost_confirmed_pct!)} of hits.`
-          : `${price}; margin sits at ${formatPercent(o.margin_pct, 0)} (${formatINR(o.margin, { precision: 0 })}).`
+          ? `${price}; margin is not measured — vendor cost is confirmed on ${formatShare(o.cost_confirmed_pct!)} of units.`
+          : `${price}; margin sits at ${formatPercent(o.margin_pct, 0)} (${formatMoney(o.margin, { precision: 0 })}).`
       );
     }
 
@@ -128,7 +128,7 @@ export class DeterministicComposer implements BriefingComposer {
       o.price_max / o.price_min >= 2
     ) {
       sentences.push(
-        `Pricing varies widely across customers — ₹${o.price_min.toFixed(2)} to ₹${o.price_max.toFixed(2)} (${(o.price_max / o.price_min).toFixed(1)}× spread).`
+        `Pricing varies widely across customers — ${formatPrice(o.price_min)} to ${formatPrice(o.price_max)} (${(o.price_max / o.price_min).toFixed(1)}× spread).`
       );
     }
 

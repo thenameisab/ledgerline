@@ -22,7 +22,7 @@ import { vendorMinimumMonths, vendorCommitments } from "@/lib/repos/vendor-minim
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { resolvePeriod } from "@/lib/period";
 import { requireRole, can } from "@/lib/access";
-import { formatINR, formatNumber, formatPercent, formatDateRange } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent, formatDateRange } from "@/lib/format";
 import { Activity, Layers, BadgeCheck, Ban } from "lucide-react";
 
 /** No outcome on this row has a cost yet. */
@@ -103,7 +103,7 @@ export default async function VendorRateCardPage({
   const unpricedWithTraffic = rows.filter((r) => trulyUnrated(r) && r.hits > 0);
   const pricedRows = rows.filter((r) => r.cost_successful != null && !decidedFree(r));
   // Pairs nobody has to price. They sit in their own band rather than under
-  // "No rate", because ₹0 here is a decision.
+  // "No rate", because $0 here is a decision.
   const noVendorCost = rows.filter(decidedFree);
   const quiet = rows.filter((r) => trulyUnrated(r) && r.hits === 0);
 
@@ -113,7 +113,7 @@ export default async function VendorRateCardPage({
     <main>
       <StatusBar
         title={vendor}
-        subtitle={`${rows.length} API${rows.length === 1 ? "" : "s"} on the rate card · ${formatINR(totalCost, { compact: true })} cost · ${formatDateRange(period.from, period.to)}`}
+        subtitle={`${rows.length} SKU${rows.length === 1 ? "" : "s"} on the rate card · ${formatMoney(totalCost, { compact: true })} cost · ${formatDateRange(period.from, period.to)}`}
       />
 
       <div className="mx-auto w-full max-w-[1600px] px-7 pt-5 space-y-4">
@@ -133,25 +133,25 @@ export default async function VendorRateCardPage({
                 className="block font-serif text-5xl text-ink leading-none tnum landmark-wipe"
                 style={{ fontWeight: 600 }}
               >
-                {formatINR(totalCost, { precision: 0 })}
+                {formatMoney(totalCost, { precision: 0 })}
               </span>
               <span className="block h-px bg-accent mt-2 landmark-rail" aria-hidden="true" />
             </span>
           </div>
           <p className="text-sm text-ink-muted mt-3 max-w-2xl leading-normal">
-            {vendor} served {formatNumber(totalHits)} hits across {trafficked.length} API
+            {vendor} served {formatNumber(totalHits)} units across {trafficked.length} SKU
             {trafficked.length === 1 ? "" : "s"} in this period.{" "}
             {unpricedWithTraffic.length > 0 ? (
               <span className="text-warn-ink">
                 {unpricedWithTraffic.length} of those {unpricedWithTraffic.length === 1 ? "has" : "have"}{" "}
-                no rate, so {formatNumber(unpricedWithTraffic.reduce((s, r) => s + r.hits, 0))} hits
-                cost ₹0 here — unknown, not free.
+                no rate, so {formatNumber(unpricedWithTraffic.reduce((s, r) => s + r.hits, 0))} units
+                cost $0 here — unknown, not free.
               </span>
             ) : trafficked.length > 0 ? (
               noVendorCost.length === rows.length ? (
-                "Nothing here is billed by a vendor, so ₹0 is the answer rather than a gap."
+                "Nothing here is billed by a vendor, so $0 is the answer rather than a gap."
               ) : (
-                "Every API with traffic has a rate, or a decision that it needs none."
+                "Every SKU with traffic has a rate, or a decision that it needs none."
               )
             ) : (
               "No traffic in this period."
@@ -159,17 +159,17 @@ export default async function VendorRateCardPage({
           </p>
           {minimumTopUp > 0 && (
             <p className="text-sm text-ink-muted mt-2 max-w-2xl leading-normal">
-              {formatINR(minimumTopUp, { precision: 0 })} of that is the monthly minimum topping
+              {formatMoney(minimumTopUp, { precision: 0 })} of that is the monthly minimum topping
               light months up to the contracted floor, not metered traffic. The rate card rows
-              below sum to {formatINR(meteredCost, { precision: 0 })}.
+              below sum to {formatMoney(meteredCost, { precision: 0 })}.
             </p>
           )}
           <div className="max-w-sm mt-4">
             <ConfidenceBar confidence={confidence} />
           </div>
           <div className="flex flex-wrap items-end gap-x-8 gap-y-4 mt-6 pt-5 border-t border-border">
-            <Stat icon={<Activity size={12} strokeWidth={1.5} />} label="Hits" value={formatNumber(totalHits)} />
-            <Stat icon={<Layers size={12} strokeWidth={1.5} />} label="APIs on card" value={String(rows.length)} />
+            <Stat icon={<Activity size={12} strokeWidth={1.5} />} label="Units" value={formatNumber(totalHits)} />
+            <Stat icon={<Layers size={12} strokeWidth={1.5} />} label="SKUs on card" value={String(rows.length)} />
             <Stat
               icon={<BadgeCheck size={12} strokeWidth={1.5} />}
               label="Rates known"
@@ -225,8 +225,8 @@ export default async function VendorRateCardPage({
             <table className="w-full text-sm">
               <thead className="bg-bg-sunken text-ink-muted text-xs uppercase tracking-wide sticky top-0 z-10">
                 <tr className="text-left">
-                  <th className="px-4 py-3 font-medium">API</th>
-                  <th className="px-3 py-3 font-medium text-right">Hits</th>
+                  <th className="px-4 py-3 font-medium">SKU</th>
+                  <th className="px-3 py-3 font-medium text-right">Units</th>
                   {/* Full words, not "(S) / (ND) / (F) / (IP)" — finding 8. */}
                   <th className="px-3 py-3 font-medium text-right">Successful</th>
                   <th className="px-3 py-3 font-medium text-right">No data</th>
@@ -240,7 +240,7 @@ export default async function VendorRateCardPage({
               </thead>
               <tbody className="divide-y divide-border">
                 {unpricedWithTraffic.length > 0 && (
-                  <Band label="No rate — traffic costing ₹0" count={unpricedWithTraffic.length} tone="bad" />
+                  <Band label="No rate — traffic costing $0" count={unpricedWithTraffic.length} tone="bad" />
                 )}
                 {unpricedWithTraffic.map((r, i) => (
                   <Row key={r.api_code} r={r} i={i} vendor={vendor} editable={editable} maxCost={maxCost} />
@@ -252,7 +252,7 @@ export default async function VendorRateCardPage({
                 ))}
 
                 {noVendorCost.length > 0 && (
-                  <Band label="No vendor cost — ₹0 by decision" count={noVendorCost.length} />
+                  <Band label="No vendor cost — $0 by decision" count={noVendorCost.length} />
                 )}
                 {noVendorCost.map((r, i) => (
                   <Row key={r.api_code} r={r} i={i} vendor={vendor} editable={editable} maxCost={maxCost} />
@@ -336,7 +336,7 @@ function Row({
     >
       <td className="px-4 py-3">
         <div className="font-mono text-xs text-ink-faint">{r.api_code}</div>
-        <Link href={`/apis/${r.api_code}`} className="block text-sm text-ink hover:text-accent-ink">
+        <Link href={`/skus/${r.api_code}`} className="block text-sm text-ink hover:text-accent-ink">
           <TruncateTooltip as="div" text={r.api_name} />
         </Link>
         {/* A pair on flat rates gets a quiet way into volume pricing. A pair
@@ -359,14 +359,14 @@ function Row({
           className="px-3 py-3 text-center text-xs text-ink-muted"
           title={
             r.cost_basis === "components"
-              ? "A stitched or journey product: its cost sits on the component APIs, which are costed on their own rows."
+              ? "A stitched or journey product: its cost sits on the component SKUs, which are costed on their own rows."
               : "We serve this call ourselves. No vendor invoice exists for it."
           }
         >
           not billed by {vendor === "InHouse" ? "any vendor" : vendor}
         </td>
       ) : volume ? (
-        // Four cells reading ₹0 would invite someone to type over a ladder.
+        // Four cells reading $0 would invite someone to type over a ladder.
         // One cell states the ladder and opens the editor for it.
         <td colSpan={4} className="px-3 py-3">
           <VolumeCostCell variant="summary" {...volumeProps} />
@@ -418,9 +418,9 @@ function Row({
         )}
       </td>
       <td className="px-3 py-3 text-right">
-        <div className="font-mono tnum text-ink">{formatINR(r.period_cost, { precision: 0 })}</div>
+        <div className="font-mono tnum text-ink">{formatMoney(r.period_cost, { precision: 0 })}</div>
         {r.period_cost > 0 && (
-          <div className="mt-1 h-[4px] rounded bg-bg-sunken overflow-hidden" title={`${formatPercent((r.period_cost / maxCost) * 100, 0)} of this vendor's largest API cost`}>
+          <div className="mt-1 h-[4px] rounded bg-bg-sunken overflow-hidden" title={`${formatPercent((r.period_cost / maxCost) * 100, 0)} of this vendor's largest SKU cost`}>
             <div
               className="h-full rounded bg-accent bar-grow"
               style={{ width: `${Math.max(2, (r.period_cost / maxCost) * 100)}%`, "--i": Math.min(i, 12) } as React.CSSProperties}

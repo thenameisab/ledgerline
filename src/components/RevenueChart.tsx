@@ -20,7 +20,7 @@ export function RevenueChart({ data, height = 200 }: { data: Row[]; height?: num
           <XAxis
             dataKey="date"
             tickFormatter={(d) =>
-              new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+              new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "short" })
             }
             stroke="var(--color-ink-faint)"
             fontSize={11}
@@ -32,7 +32,7 @@ export function RevenueChart({ data, height = 200 }: { data: Row[]; height?: num
             fontSize={11}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`}
+            tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`}
           />
           <Tooltip
             contentStyle={{
@@ -45,10 +45,10 @@ export function RevenueChart({ data, height = 200 }: { data: Row[]; height?: num
             }}
             formatter={(value: any, name: string) => {
               const labels: Record<string, string> = { revenue: "Revenue", margin: "Margin", vendor_cost: "Vendor cost" };
-              return [`₹${Math.round(value).toLocaleString("en-IN")}`, labels[name] ?? name];
+              return [`$${Math.round(value).toLocaleString("en-US")}`, labels[name] ?? name];
             }}
             labelFormatter={(d) =>
-              new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+              new Date(d).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })
             }
           />
           <Line

@@ -43,9 +43,9 @@ export default function Body() {
 
       <Callout variant="info" title="The sandbox default moved">
         &ldquo;Include sandbox traffic in reports&rdquo; used to sit on this page, one screen away
-        from the per-account·API rules that override it. It now sits at the top of{" "}
+        from the per-account·SKU rules that override it. It now sits at the top of{" "}
         <a href="/help/features/sandbox-controls">Sandbox billing</a>, so the whole precedence
-        chain — app-wide default, account-wide rule, per-API rule — reads top to bottom on one
+        chain — app-wide default, account-wide rule, per-SKU rule — reads top to bottom on one
         page. The on-demand data refresh moved to Data &amp; sync for the same reason: the run
         history it reports against is already there.
       </Callout>
@@ -65,7 +65,7 @@ export default function Body() {
       <ul>
         <li>
           <strong>Editors</strong> — see no Settings entry. Their work is in the Review section:
-          aliases, API review, manual entries, sandbox rules.
+          aliases, SKU review, manual entries, sandbox rules.
         </li>
         <li>
           <strong>Old links</strong> — every tab route is unchanged, so bookmarks and notification

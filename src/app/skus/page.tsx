@@ -6,7 +6,7 @@ import { ApisFilterBar } from "./ApisFilterBar";
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { getApiSummaries } from "@/lib/repos/apis";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatNumber, formatDateRange } from "@/lib/format";
+import { formatMoney, formatNumber, formatPrice, formatDateRange } from "@/lib/format";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { ApiHoverCard } from "@/components/ApiHoverCard";
 import { getSessionUser, canViewCost } from "@/lib/access";
@@ -61,17 +61,18 @@ export default async function ApisPage({
   return (
     <main>
       <StatusBar
-        title="APIs"
-        subtitle={`${sorted.length} of ${all.length} APIs · ${formatDateRange(period.from, period.to)} · ranked by ${(searchParams.sort ?? "revenue.desc").replace(".", " ")}`}
+        title="SKUs"
+        subtitle={`${sorted.length} of ${all.length} SKUs · ${formatDateRange(period.from, period.to)} · ranked by ${(searchParams.sort ?? "revenue.desc").replace(".", " ")}`}
       />
       <div className="mx-auto w-full max-w-[1600px] px-7 py-6 space-y-4">
         <DateRangePicker from={period.from} to={period.to} />
         <ApisFilterBar active={searchParams} showCost={showCost} />
 
         <div className="bg-bg-raised border border-border rounded-lg overflow-x-auto">
-          <table className="w-full text-sm" style={{ tableLayout: "fixed", minWidth: 880 }}>
+          <table className="w-full text-sm" style={{ tableLayout: "fixed", minWidth: 990 }}>
             <colgroup>
-              <col style={{ width: "30%" }} />
+              <col style={{ width: "28%" }} />
+              <col style={{ width: 110 }} />
               <col style={{ width: 96 }} />
               <col style={{ width: 80 }} />
               <col style={{ width: 96 }} />
@@ -81,10 +82,11 @@ export default async function ApisPage({
             </colgroup>
             <thead className="bg-bg-sunken text-ink-faint text-[11px] uppercase tracking-wide">
               <tr className="text-left">
-                <th className="px-4 py-3 font-medium"><SortHeader column="name" label="API" /></th>
-                <th className="px-3 py-3 font-medium text-right"><SortHeader column="total_hits" label="Hits" align="right" /></th>
+                <th className="px-4 py-3 font-medium"><SortHeader column="name" label="SKU" /></th>
+                <th className="px-3 py-3 font-medium"><SortHeader column="unit" label="Unit" /></th>
+                <th className="px-3 py-3 font-medium text-right"><SortHeader column="total_hits" label="Units" align="right" /></th>
                 <th className="px-3 py-3 font-medium text-right"><SortHeader column="unique_accounts" label="Accounts" align="right" /></th>
-                <th className="px-3 py-3 font-medium text-right"><SortHeader column="avg_unit_price" label="Avg ₹/hit" align="right" /></th>
+                <th className="px-3 py-3 font-medium text-right"><SortHeader column="avg_unit_price" label="Avg price" align="right" /></th>
                 <th className="px-3 py-3 font-medium text-right"><SortHeader column="revenue" label="Revenue" align="right" /></th>
                 <th className="px-3 py-3 font-medium">Share</th>
                 {showCost && (
@@ -114,7 +116,7 @@ export default async function ApisPage({
                     >
                       <td className="px-4 py-3 min-w-0">
                         <ApiHoverCard code={a.product_code} side="right">
-                        <Link href={`/apis/${a.product_code}`} className="block min-w-0 hover:text-accent-ink">
+                        <Link href={`/skus/${a.product_code}`} className="block min-w-0 hover:text-accent-ink">
                           <TruncateTooltip
                             as="div"
                             text={a.name}
@@ -124,19 +126,22 @@ export default async function ApisPage({
                           <div className="text-[11px] font-mono text-ink-faint mt-[2px]">
                             {a.product_code}
                             {silent && (
-                              <span className="text-warn-ink"> · earns nothing on {formatNumber(a.total_hits)} hits</span>
+                              <span className="text-warn-ink"> · earns nothing on {formatNumber(a.total_hits)} units</span>
                             )}
                           </div>
                         </Link>
                         </ApiHoverCard>
                       </td>
+                      <td className="px-3 py-3 text-ink-muted">
+                        <TruncateTooltip as="div" text={a.unit} className="text-sm" />
+                      </td>
                       <td className="px-3 py-3 text-right font-mono tabular-nums text-ink">{formatNumber(a.total_hits)}</td>
                       <td className="px-3 py-3 text-right font-mono tabular-nums text-ink-muted">{a.unique_accounts}</td>
                       <td className="px-3 py-3 text-right font-mono tabular-nums text-ink">
-                        {a.avg_unit_price > 0 ? `₹${a.avg_unit_price.toFixed(2)}` : <span className="text-ink-faint">—</span>}
+                        {a.avg_unit_price > 0 ? formatPrice(a.avg_unit_price) : <span className="text-ink-faint">—</span>}
                       </td>
                       <td className="px-3 py-3 text-right font-mono tabular-nums text-ink" style={{ fontWeight: a.revenue > 0 ? 500 : 400 }}>
-                        {a.revenue > 0 ? formatINR(a.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
+                        {a.revenue > 0 ? formatMoney(a.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
                       </td>
                       <td className="px-3 py-3">
                         <div className={`h-[8px] rounded overflow-hidden ${negative ? "bg-bad-bg-hover" : silent ? "bg-warn-bg-hover" : "bg-bg-sunken"}`}>
@@ -162,7 +167,7 @@ export default async function ApisPage({
                               className="text-ink-faint"
                               title={
                                 a.total_hits > 0
-                                  ? `No vendor rate covers this API's ${formatNumber(a.total_hits)} hits, so its cost computes to ₹0 and a margin cannot be stated.`
+                                  ? `No vendor rate covers this SKU's ${formatNumber(a.total_hits)} units, so its cost computes to $0 and a margin cannot be stated.`
                                   : "No traffic in this period."
                               }
                             >
@@ -171,7 +176,7 @@ export default async function ApisPage({
                           ) : (
                             <>
                               <span className={negative ? "text-bad-ink" : coverage(a) < 1 ? "text-ink-muted" : "text-ink"}>
-                                {formatINR(a.margin ?? 0, { compact: true })}
+                                {formatMoney(a.margin ?? 0, { compact: true })}
                               </span>
                               {marginPct != null && (
                                 <span className={`text-[11px] ml-1 ${negative ? "text-bad-ink" : "text-ink-faint"}`}>
@@ -181,9 +186,9 @@ export default async function ApisPage({
                               {coverage(a) < 1 && (
                                 <div
                                   className="text-[10px] text-ink-faint mt-[2px]"
-                                  title={`A rate covers ${formatNumber(a.cost_known_hits ?? 0)} of ${formatNumber(a.total_hits)} hits; the rest cost ₹0 in this figure.`}
+                                  title={`A rate covers ${formatNumber(a.cost_known_hits ?? 0)} of ${formatNumber(a.total_hits)} units; the rest cost $0 in this figure.`}
                                 >
-                                  rate on {(coverage(a) * 100).toFixed(0)}% of hits
+                                  rate on {(coverage(a) * 100).toFixed(0)}% of units
                                 </div>
                               )}
                             </>
@@ -196,27 +201,27 @@ export default async function ApisPage({
               })()}
               {sorted.length === 0 && (
                 <tr>
-                  <td colSpan={showCost ? 7 : 6} className="px-6 py-12 text-center text-sm text-ink-muted">
+                  <td colSpan={showCost ? 8 : 7} className="px-6 py-12 text-center text-sm text-ink-muted">
                     {searchParams.filter === "low-margin" && showCost ? (
                       // An empty low-margin list reads as "nothing is
                       // unprofitable". At this coverage it means "almost
                       // nothing can be checked", which is a different fact.
                       <>
-                        No API with a known vendor rate has margin under 25%.
+                        No SKU with a known vendor rate has margin under 25%.
                         <div className="text-xs text-ink-faint mt-2">
-                          A rate covers {measuredCount} of {trafficked.length} APIs with traffic
+                          A rate covers {measuredCount} of {trafficked.length} SKUs with traffic
                           this period, so this filter can only see {measuredCount}
                           {measuredCount === 1 ? " of them" : " of them"}.{" "}
-                          <Link href="/apis?filter=cost-unknown" className="text-accent-ink underline">
+                          <Link href="/skus?filter=cost-unknown" className="text-accent-ink underline">
                             See the {trafficked.length - measuredCount} it cannot
                           </Link>
                           .
                         </div>
                       </>
                     ) : searchParams.filter === "cost-unknown" && showCost ? (
-                      <>Every API with traffic this period has a vendor rate.</>
+                      <>Every SKU with traffic this period has a vendor rate.</>
                     ) : (
-                      <>No APIs matched your filters.</>
+                      <>No SKUs matched your filters.</>
                     )}
                   </td>
                 </tr>

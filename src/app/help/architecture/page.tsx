@@ -229,7 +229,7 @@ GET /
               <code>apis</code>, <code>api_bundles</code>,{" "}
               <code>api_bundle_members</code>
             </td>
-            <td>Accounts, groups, the API catalog, and stitched bundles.</td>
+            <td>Accounts, groups, the SKU catalog, and stitched bundles.</td>
           </tr>
           <tr>
             <td>Pricing</td>
@@ -252,7 +252,7 @@ GET /
               <code>vendor_usage_daily</code>
             </td>
             <td>
-              Daily hits from the usage sync (<code>source=&apos;log&apos;</code>),
+              Daily units from the usage sync (<code>source=&apos;log&apos;</code>),
               manual entries, and the vendor side for reconciliation.
             </td>
           </tr>
@@ -285,7 +285,7 @@ GET /
         and vendor cost per row. KPIs, charts, account summaries, and
         statement derivation read from it, so per-day pricing logic is in one
         place. Volume pricing (tier and slab) depends on a whole
-        period&rsquo;s hits, so the view returns 0 for those rows and{" "}
+        period&rsquo;s units, so the view returns 0 for those rows and{" "}
         <code>deriveStatement</code> and{" "}
         <code>lib/repos/slab-revenue.ts</code> compute it per period. See the{" "}
         <a href="/help/api/database">database schema</a> for every table.
@@ -294,7 +294,7 @@ GET /
       <H2 id="daily-usage-sync">Usage sync</H2>
       <p>
         In the demo, <code>MOCK_INTEGRATIONS=true</code>. The usage pull
-        generates each day&apos;s usage from the account and API pairs already
+        generates each day&apos;s usage from the account and SKU pairs already
         in the database and calls no external service. An admin runs it with
         Refresh now (<code>POST /api/sync/refresh</code>) or a backfill (
         <code>POST /api/sync/backfill</code>, up to 31 days). The route{" "}
@@ -310,11 +310,11 @@ GET /
         </li>
         <li>
           Resolves accounts by <code>display_name</code> and{" "}
-          <code>log_aliases</code>, and APIs by <strong>product code</strong>{" "}
+          <code>log_aliases</code>, and SKUs by <strong>SKU code</strong>{" "}
           only, with <code>api_code_overrides</code> as the only fallback.
           Unresolved rows keep a NULL id and appear on{" "}
           <FilePath>/admin/aliases</FilePath> or{" "}
-          <FilePath>/admin/api-review</FilePath>.
+          <FilePath>/admin/sku-review</FilePath>.
         </li>
         <li>
           In one transaction, deletes that date&apos;s{" "}

@@ -2,7 +2,7 @@
 import { useState, useTransition } from "react";
 import { Plus, X, Loader2, Minus } from "lucide-react";
 import type { StatementAdjustment } from "@/lib/repos/statements";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { addInvoiceAdjustment, removeInvoiceAdjustment } from "./actions";
 
@@ -69,7 +69,7 @@ export function AdjustmentsSection({
               }`}
               style={{ fontWeight: 500 }}
             >
-              {formatINR(subtotal, { precision: 2 })}
+              {formatMoney(subtotal, { precision: 2 })}
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ function AdjustmentRow({
         }`}
         style={{ fontWeight: 500 }}
       >
-        {formatINR(adj.amount, { precision: 2 })}
+        {formatMoney(adj.amount, { precision: 2 })}
       </div>
       <div className="col-span-1 text-right">
         {editable && (
@@ -245,7 +245,7 @@ function AddForm({
           />
         </div>
         <div className="col-span-5">
-          <label className="block text-[11px] uppercase tracking-wider text-ink-faint mb-1">Amount (₹)</label>
+          <label className="block text-[11px] uppercase tracking-wider text-ink-faint mb-1">Amount ($)</label>
           <div className="flex">
             <div className="inline-flex rounded-l overflow-hidden border border-r-0 border-border">
               <button
@@ -268,7 +268,7 @@ function AddForm({
             <input
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="4500.00"
+              placeholder="250.00"
               inputMode="decimal"
               className="flex-1 bg-bg-raised border border-border rounded-r px-2.5 py-1.5 text-sm font-mono tnum focus:outline-none focus:border-accent transition-colors duration-fast ease-expo"
             />

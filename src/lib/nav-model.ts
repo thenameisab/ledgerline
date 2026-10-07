@@ -22,7 +22,7 @@
 import {
   LayoutDashboard,
   Users,
-  Plug,
+  Boxes,
   Truck,
   Unlink,
   UserCog,
@@ -47,7 +47,7 @@ export type Role = "admin" | "editor" | "member";
 export const ICONS = {
   LayoutDashboard,
   Users,
-  Plug,
+  Boxes,
   Truck,
   Unlink,
   UserCog,
@@ -92,7 +92,7 @@ const ADMIN: Role[] = ["admin"];
 const MAIN: NavEntry[] = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard", shortcut: "⌘1" },
   { label: "Accounts", href: "/accounts", icon: "Users", shortcut: "⌘2" },
-  { label: "APIs", href: "/apis", icon: "Plug", shortcut: "⌘3" },
+  { label: "SKUs", href: "/skus", icon: "Boxes", shortcut: "⌘3" },
   { label: "Manual entries", href: "/admin/manual-entries", icon: "FileEdit", shortcut: "⌘4", roles: EDITS },
 ];
 
@@ -107,7 +107,7 @@ const MAIN: NavEntry[] = [
 const REVIEW: NavEntry[] = [
   { label: "Alerts", href: "/alerts", icon: "BellRing", roles: EDITS, count: "alerts" },
   { label: "Aliases", href: "/admin/aliases", icon: "Unlink", roles: EDITS, count: "aliases" },
-  { label: "API review", href: "/admin/api-review", icon: "ListChecks", roles: EDITS, count: "apiReview" },
+  { label: "SKU review", href: "/admin/sku-review", icon: "ListChecks", roles: EDITS, count: "apiReview" },
   { label: "Unpriced", href: "/admin/pricing", icon: "CircleDollarSign", roles: ADMIN, count: "unpriced" },
   { label: "Sandbox billing", href: "/admin/sandbox", icon: "FlaskConical", roles: EDITS },
   { label: "Approvals", href: "/admin/approvals", icon: "ShieldCheck", roles: ADMIN, count: "approvals" },

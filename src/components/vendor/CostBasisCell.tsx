@@ -15,12 +15,12 @@ const OPTIONS: { value: CostBasis; label: string; hint: string }[] = [
   {
     value: "in_house",
     label: "In-house — no vendor bill",
-    hint: "We serve this call ourselves. No invoice exists for it, so the cost is ₹0 by decision.",
+    hint: "We serve this call ourselves. No invoice exists for it, so the cost is $0 by decision.",
   },
   {
     value: "components",
     label: "Counted on its components",
-    hint: "A stitched or journey product. Its cost is real but sits on the APIs it calls, which are costed on their own rows.",
+    hint: "A stitched or journey product. Its cost is real but sits on the SKUs it calls, which are costed on their own rows.",
   },
 ];
 

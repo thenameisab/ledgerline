@@ -33,6 +33,7 @@ import {
   MOCK_VENDORS,
   MOCK_VENDOR_ALIASES,
   MOCK_INACTIVE_VENDOR,
+  MOCK_FREE_SANDBOX_VENDOR,
   type MockApi,
 } from "./seed-data/mock-catalog";
 
@@ -149,25 +150,25 @@ async function main() {
   }
   console.log(`  accounts: ${accountId.size}`);
 
-  // ── apis ──────────────────────────────────────────────────────────────────────
+  // ── SKUs (stored in the apis table) ─────────────────────────────────────────
   for (const api of MOCK_APIS) {
     await sql`
-      INSERT INTO apis (product_code, name, log_aliases, category, entity_type, vendor_type, default_vendor, is_active)
+      INSERT INTO apis (product_code, name, log_aliases, category, unit, vendor_type, default_vendor, is_active)
       VALUES (${api.product_code}, ${api.name}, ${JSON.stringify([api.name])},
-              ${api.category}, ${api.entity_type}, ${api.vendor_type}, ${api.default_vendor}, ${api.is_active})
+              ${api.category}, ${api.unit}, ${api.vendor_type}, ${api.default_vendor}, ${api.is_active})
     `;
   }
-  console.log(`  apis: ${MOCK_APIS.length}`);
+  console.log(`  skus: ${MOCK_APIS.length}`);
 
   // ── vendor registry ──────────────────────────────────────────────────────────
-  // One row per vendor, each with its own name as an alias. Verisys also has
-  // two old spellings merged into it. NovaCheck has told us it does not charge
-  // for sandbox calls; every other vendor keeps the default (charges).
+  // One row per vendor, each with its own name as an alias. Cumulus Cloud also
+  // has two old spellings merged into it. Tessel Labs does not charge for
+  // sandbox calls; every other vendor keeps the default (charges).
   const vendorId = new Map<string, number>();
   for (const name of MOCK_VENDORS) {
     const [row] = await sql`
       INSERT INTO vendors (canonical_name, status, charges_sandbox)
-      VALUES (${name}, ${name === MOCK_INACTIVE_VENDOR ? "inactive" : "active"}, ${name !== "NovaCheck"})
+      VALUES (${name}, ${name === MOCK_INACTIVE_VENDOR ? "inactive" : "active"}, ${name !== MOCK_FREE_SANDBOX_VENDOR})
       RETURNING id`;
     vendorId.set(name, Number(row.id));
     await sql`INSERT INTO vendor_aliases (vendor_id, alias) VALUES (${Number(row.id)}, ${name})`;
@@ -177,23 +178,23 @@ async function main() {
       await sql`INSERT INTO vendor_aliases (vendor_id, alias) VALUES (${vendorId.get(name)!}, ${alias})`;
     }
   }
-  console.log(`  vendors: ${vendorId.size} (aliases merged into Verisys: ${MOCK_VENDOR_ALIASES.Verisys.length})`);
+  console.log(`  vendors: ${vendorId.size} (aliases merged into Cumulus Cloud: ${MOCK_VENDOR_ALIASES["Cumulus Cloud"].length})`);
 
   // ── vendor rate card ──────────────────────────────────────────────────────────
   // Cost = 45–70% of the list band. Every rate state appears somewhere:
   //   • a known rate, with status contracted, quoted or estimated (by rotation)
   //   • failures and in-progress hits "not charged" (a confirmed 0, not unknown)
-  //   • FR5001: no rate at all (unknown, so its cost counts as missing)
-  //   • IN4004: a rate for successful hits only; the other outcomes unknown
-  //   • KY1001: an effective-dated change at the start of last month
-  //   • BV3004: costed in-house (known and zero)
-  //   • AD6001: a graduated (tier) volume rate
-  //   • Sentinel Data: an old contracted rate, no current traffic
-  const UNKNOWN_RATE = "FR5001";
-  const PARTIAL_RATE = "IN4004";
-  const RATE_CHANGE = "KY1001";
-  const IN_HOUSE = "BV3004";
-  const VOLUME_RATE = "AD6001";
+  //   • PRM-VID-1080: no rate at all (unknown, so its cost counts as missing)
+  //   • AGT-BROWSER: a rate for successful units only; the other outcomes unknown
+  //   • ATL-PRO-IN: an effective-dated change at the start of last month
+  //   • ATL-EMBED: costed in-house (known and zero)
+  //   • DAT-GEOCODE: a graduated (tier) volume rate
+  //   • Ferro Compute: an old contracted rate, no current traffic
+  const UNKNOWN_RATE = "PRM-VID-1080";
+  const PARTIAL_RATE = "AGT-BROWSER";
+  const RATE_CHANGE = "ATL-PRO-IN";
+  const IN_HOUSE = "ATL-EMBED";
+  const VOLUME_RATE = "DAT-GEOCODE";
   const STATUSES = ["contracted", "quoted", "estimated"] as const;
   let vpCount = 0;
   for (let ai = 0; ai < MOCK_APIS.length; ai++) {
@@ -210,12 +211,12 @@ async function main() {
         -- A volume rate keeps 0 in the flat columns; the brackets hold the cost
         -- (the same shape /api/vendor-cost writes).
         VALUES (${vid}, ${api.product_code}, 0, 0, 0, 0, ${"2026-01-01"}, 'contracted',
-                ${"Lumen ID rate card 2026"}, 'tier')
+                ${"Mapline rate card 2026"}, 'tier')
         RETURNING id`;
       await sql`
         INSERT INTO vendor_pricing_slab (vendor_pricing_id, min_hits, max_hits, cost_successful, cost_successful_no_data, cost_failed, cost_in_progress)
-        VALUES (${Number(vp.id)}, 0, 20000, ${c}, ${+(c * 0.2).toFixed(4)}, 0, 0),
-               (${Number(vp.id)}, 20000, NULL, ${+(c * 0.75).toFixed(4)}, ${+(c * 0.15).toFixed(4)}, 0, 0)`;
+        VALUES (${Number(vp.id)}, 0, 5000, ${c}, ${+(c * 0.2).toFixed(4)}, 0, 0),
+               (${Number(vp.id)}, 5000, NULL, ${+(c * 0.75).toFixed(4)}, ${+(c * 0.15).toFixed(4)}, 0, 0)`;
       vpCount++;
       continue;
     }
@@ -234,16 +235,16 @@ async function main() {
         INSERT INTO vendor_pricing (vendor_id, api_code, cost_successful, cost_successful_no_data, cost_failed, cost_in_progress,
                                     effective_from, status, source)
         VALUES (${vid}, ${api.product_code}, ${+(c * 0.9).toFixed(4)}, ${+(c * 0.18).toFixed(4)}, 0, 0,
-                ${addMonths(CUR_MONTH_START, -1)}, 'quoted', ${"Quantal revised quote"})`;
+                ${addMonths(CUR_MONTH_START, -1)}, 'quoted', ${"Cumulus Cloud revised quote"})`;
       vpCount++;
     }
   }
-  // The inactive vendor: an old rate on an API it no longer serves.
+  // The inactive vendor: an old rate on a SKU it no longer serves.
   await sql`
     INSERT INTO vendor_pricing (vendor_id, api_code, cost_successful, cost_successful_no_data, cost_failed, cost_in_progress,
                                 effective_from, status, source)
-    VALUES (${vendorId.get(MOCK_INACTIVE_VENDOR)!}, 'FR5006', 0.9, 0.2, 0, 0, ${"2025-10-01"}, 'contracted',
-            ${"Sentinel Data MSA 2025 (ended)"})`;
+    VALUES (${vendorId.get(MOCK_INACTIVE_VENDOR)!}, 'GPU-A100', 0.95, 0.2, 0, 0, ${"2025-10-01"}, 'contracted',
+            ${"Ferro Compute MSA 2025 (ended)"})`;
   vpCount++;
   console.log(`  vendor_pricing: ${vpCount}`);
 
@@ -283,14 +284,15 @@ async function main() {
       INSERT INTO clients (account_id, display_name, slug, log_aliases, billing_entity, gstin, status, is_sandbox,
                            client_code, website, cs_owner, sales_owner, logo_data_url)
       VALUES (${accountId.get(c.account) ?? null}, ${c.display_name}, ${slug}, ${JSON.stringify(aliases)},
-              ${c.billing_entity}, ${c.gstin}, ${c.status}, ${c.is_sandbox ? 1 : 0},
+              ${c.billing_entity}, ${c.tax_id || null}, ${c.status}, ${c.is_sandbox ? 1 : 0},
               ${clientCode}, ${website}, ${csOwner}, ${salesOwner}, ${logoDataUrl})
       RETURNING id
     `;
-    // Deterministic API subset: stride through the active catalog from an offset.
-    const offset = pick(activeApis.length);
+    // Deterministic SKU subset: stride through the customer's product lines from an offset.
+    const pool = activeApis.filter((a) => c.lines.includes(a.category));
+    const offset = pick(pool.length);
     const apis: MockApi[] = [];
-    for (let i = 0; i < c.apiCount; i++) apis.push(activeApis[(offset + i * 3) % activeApis.length]);
+    for (let i = 0; i < Math.min(c.skuCount, pool.length); i++) apis.push(pool[(offset + i * 3) % pool.length]);
     const uniq = Array.from(new Map(apis.map((a) => [a.product_code, a])).values());
     clients.push({ id: Number(row.id), name: c.display_name, scale: c.scale, apis: uniq, sandbox: !!c.is_sandbox });
   }
@@ -311,16 +313,16 @@ async function main() {
   // Two largest → graduated 'tier'; third → whole-volume 'slab'. Both share the
   // pricing_slab bracket storage and differ only in the billing math.
   bigClients.slice(0, 2).forEach((bc) => {
-    const t = bc.apis.find((a) => a.category === "KYC") ?? bc.apis[0];
+    const t = bc.apis.find((a) => a.category === "Models") ?? bc.apis[0];
     if (t) volumeModel.set(`${bc.id}:${t.product_code}`, "tier");
   });
   if (bigClients[2]) {
     const sc = bigClients[2];
-    const t = sc.apis.find((a) => a.category === "KYC") ?? sc.apis[0];
+    const t = sc.apis.find((a) => a.category === "Models") ?? sc.apis[0];
     if (t) volumeModel.set(`${sc.id}:${t.product_code}`, "slab");
   }
 
-  // Historical-leak demo pair: a mid-size billable client's 2nd API, priced only
+  // Historical-leak demo pair: a mid-size billable client's 2nd SKU, priced only
   // from the current month. Usage in earlier months is therefore unpriced *in the
   // past* — a historical leak — which we acknowledge via leak_dismissals below.
   const histClient = clients.find(
@@ -328,12 +330,19 @@ async function main() {
   );
   const histKey = histClient ? `${histClient.id}:${histClient.apis[1].product_code}` : null;
 
-  // Insert graduated/whole-volume brackets for a pricing row.
-  const insertBrackets = async (pid: number, ps: number) => {
+  // Insert graduated/whole-volume brackets for a pricing row. Bracket edges
+  // follow the pair's expected monthly volume, so every bracket gets used.
+  const roundNice = (n: number) => {
+    const mag = 10 ** Math.max(0, Math.floor(Math.log10(Math.max(n, 1))) - 1);
+    return Math.max(10, Math.round(n / mag) * mag);
+  };
+  const insertBrackets = async (pid: number, ps: number, monthly: number) => {
+    const b1 = roundNice(monthly * 0.4);
+    const b2 = roundNice(monthly * 1.2);
     const brackets = [
-      { min: 0, max: 50000, p: +(ps * 1.0).toFixed(4) },
-      { min: 50000, max: 200000, p: +(ps * 0.8).toFixed(4) },
-      { min: 200000, max: null as number | null, p: +(ps * 0.6).toFixed(4) },
+      { min: 0, max: b1, p: +(ps * 1.0).toFixed(4) },
+      { min: b1, max: b2, p: +(ps * 0.8).toFixed(4) },
+      { min: b2, max: null as number | null, p: +(ps * 0.6).toFixed(4) },
     ];
     for (const b of brackets) {
       await sql`
@@ -361,7 +370,7 @@ async function main() {
           VALUES (${c.id}, ${api.product_code}, 0, 0, 0, 0, ${"2026-01-01"}, ${model})
           RETURNING id
         `;
-        await insertBrackets(Number(row.id), ps);
+        await insertBrackets(Number(row.id), ps, api.daily * c.scale * 30);
         if (model === "tier") tierCount++;
         else slabCount++;
         pricingCount++;
@@ -378,7 +387,7 @@ async function main() {
         continue;
       }
 
-      // Flat. Give the first API of the big clients a mid-range price change
+      // Flat. Give the first SKU of the big clients a mid-range price change
       // (history) so effective-dated pricing is demonstrable.
       await sql`
         INSERT INTO pricing (client_id, api_code, price_successful, price_successful_no_data, price_failed, price_in_progress, effective_from, pricing_model)
@@ -398,7 +407,7 @@ async function main() {
   console.log(`  pricing rows: ${pricingCount} (tier: ${tierCount}, slab: ${slabCount})`);
 
   // ── stitched bundle for one client ────────────────────────────────────────────
-  // Bundle three onboarding APIs into one billed product on the largest client.
+  // Bundle three SKUs into one billed product on the largest client.
   const bundleClient = bigClients[0];
   if (bundleClient && bundleClient.apis.length >= 3) {
     const members = bundleClient.apis.slice(0, 3);
@@ -406,7 +415,7 @@ async function main() {
     const anchor = members.find((m) => !volumeModel.has(`${bundleClient.id}:${m.product_code}`)) ?? members[0];
     const [b] = await sql`
       INSERT INTO api_bundles (client_id, name, anchor_api_code)
-      VALUES (${bundleClient.id}, ${"Onboarding Suite"}, ${anchor.product_code})
+      VALUES (${bundleClient.id}, ${"Creator Suite"}, ${anchor.product_code})
       RETURNING id
     `;
     const bundleId = Number(b.id);
@@ -424,12 +433,12 @@ async function main() {
       INSERT INTO bundle_pricing (bundle_id, price_successful, price_successful_no_data, price_failed, price_in_progress, effective_from)
       VALUES (${bundleId}, ${bundlePrice}, ${+(bundlePrice * 0.3).toFixed(4)}, 0, 0, ${RANGE_START})
     `;
-    console.log(`  bundle: "Onboarding Suite" on ${bundleClient.name} (anchor ${anchor.product_code})`);
+    console.log(`  bundle: "Creator Suite" on ${bundleClient.name} (anchor ${anchor.product_code})`);
   }
 
   // ── usage_daily (log source) ──────────────────────────────────────────────────
   const days = dateRange(RANGE_START, TODAY);
-  // Per-api popularity weight so volumes differ across the catalog.
+  // Per-SKU popularity weight so volumes differ across the catalog.
   const apiVol = new Map<string, number>();
   for (const a of MOCK_APIS) apiVol.set(a.product_code, between(0.4, 1.6));
 
@@ -445,7 +454,7 @@ async function main() {
 
   for (const c of clients) {
     for (const api of c.apis) {
-      const base = 120 * c.scale * (apiVol.get(api.product_code) ?? 1);
+      const base = api.daily * c.scale * (apiVol.get(api.product_code) ?? 1);
       const phase = rand() * Math.PI * 2;
       for (let di = 0; di < days.length; di++) {
         const day = days[di];
@@ -468,11 +477,11 @@ async function main() {
           raw_api_name: api.name,
           raw_api_code: api.product_code,
           hits_via: "Integration",
-          // Before last month, Verisys rows carry an old spelling. The registry
-          // resolves both to one vendor_id, so /vendors shows one Verisys.
+          // Before last month, Cumulus Cloud rows carry an old spelling. The
+          // registry resolves both to one vendor_id, so /vendors shows one vendor.
           vendor:
-            api.default_vendor === "Verisys" && day < addMonths(CUR_MONTH_START, -1)
-              ? MOCK_VENDOR_ALIASES.Verisys[0]
+            api.default_vendor === "Cumulus Cloud" && day < addMonths(CUR_MONTH_START, -1)
+              ? MOCK_VENDOR_ALIASES["Cumulus Cloud"][0]
               : api.default_vendor,
           vendor_id: vendorId.get(api.default_vendor)!,
           successful,
@@ -488,9 +497,9 @@ async function main() {
   await flush();
   console.log(`  usage_daily rows: ${usageRows}`);
 
-  // ── API-review scenarios (code-only matching) ───────────────────────────────
+  // ── SKU-review scenarios (code-only matching) ───────────────────────────────
   // The synthetic catalog is clean, so deliberately inject the four data-quality
-  // anomalies the API-review page surfaces — otherwise every queue is empty:
+  // anomalies the SKU-review page surfaces — otherwise every queue is empty:
   //   1. retired-with-usage  2. unknown code  3. no code  4. name drift
   const scn = clients[0];
   // Data-quality anomalies are "needs attention now" items, so they must live in
@@ -503,8 +512,8 @@ async function main() {
 
   // A deactivated catalog code that still carries traffic.
   await sql`
-    INSERT INTO apis (product_code, name, log_aliases, category, entity_type, vendor_type, default_vendor, is_active)
-    VALUES ('RV1099', 'Risk Score (legacy v1)', '["Risk Score (legacy v1)"]', 'Risk', 'individual', 'direct', ${driftApi.default_vendor}, 0)
+    INSERT INTO apis (product_code, name, log_aliases, category, unit, vendor_type, default_vendor, is_active)
+    VALUES ('ATL-2-OUT', 'Atlas 2 · output tokens (legacy)', '["Atlas 2 · output tokens (legacy)"]', 'Models', '1M tokens', 'Direct', ${driftApi.default_vendor}, 0)
     ON CONFLICT (product_code) DO NOTHING`;
 
   const scnRows: any[] = [];
@@ -512,38 +521,38 @@ async function main() {
     const date = recent[i];
     const baseRow = { date, client_id: scn.id, raw_client_name: scn.name, hits_via: "Integration", vendor: driftApi.default_vendor, vendor_id: vendorId.get(driftApi.default_vendor)!, successful_no_data: 1, in_progress: 0, source: "log" as const };
     // 1. retired-with-usage: matched to an inactive code
-    scnRows.push({ ...baseRow, api_code: "RV1099", raw_api_name: "Risk Score (legacy v1)", raw_api_code: "RV1099", successful: 42 + i, failed: 3 });
+    scnRows.push({ ...baseRow, api_code: "ATL-2-OUT", raw_api_name: "Atlas 2 · output tokens (legacy)", raw_api_code: "ATL-2-OUT", successful: 42 + i, failed: 3 });
     // 2. unknown code: a Product Code not in the catalog
-    scnRows.push({ ...baseRow, api_code: null, raw_api_name: "Sanctions Screening (beta)", raw_api_code: "SANC2", successful: 26 + i, failed: 2 });
+    scnRows.push({ ...baseRow, api_code: null, raw_api_name: "Atlas Vision · image input (beta)", raw_api_code: "ATL-VIS-IN", successful: 26 + i, failed: 2 });
     // 3. no code at all: blank Product Code, can't auto-match
     scnRows.push({ ...baseRow, api_code: null, raw_api_name: "Partner Webhook (uncoded)", raw_api_code: null, hits_via: "Webhook", successful: 14 + i, failed: 1 });
     // 4. name drift: matched code, but raw name differs from catalog name + aliases
     scnRows.push({ ...baseRow, api_code: driftApi.product_code, raw_api_name: `${driftApi.name} v2`, raw_api_code: driftApi.product_code, successful: 31 + i, failed: 2 });
   }
   await sql`INSERT INTO usage_daily ${sql(scnRows)}`;
-  console.log(`  api-review scenario rows: ${scnRows.length}`);
+  console.log(`  sku-review scenario rows: ${scnRows.length}`);
 
   // ── alert scenarios ───────────────────────────────────────────────────────────
   // The alert engine evaluates the last three synced dates. Shape the recent
   // usage so each kind of alert has something to say:
-  //   • Vertex Merchant Services sends nothing yesterday       → A1 (critical)
-  //   • Helios Capital drops to 30% for two days                → A2d (high)
-  //   • Orbit Cards spikes to 4× yesterday                     → A3 (medium)
-  //   • Acme Lending Co starts a new API six days ago          → D2 (good news)
+  //   • Harbor Last Mile sends nothing yesterday               → A1 (critical)
+  //   • Brightline Clinics drops to 30% for two days           → A2d (high)
+  //   • Quillmark News spikes to 4× yesterday                  → A3 (medium)
+  //   • Kestrel Store starts a new SKU six days ago             → D2 (good news)
   const yday = shift(TODAY, -1);
   const clientNamed = (n: string) => clients.find((c) => c.name === n)!;
-  await sql`DELETE FROM usage_daily WHERE client_id = ${clientNamed("Vertex Merchant Services").id} AND date = ${yday}`;
+  await sql`DELETE FROM usage_daily WHERE client_id = ${clientNamed("Harbor Last Mile").id} AND date = ${yday}`;
   await sql`
     UPDATE usage_daily
     SET successful = ROUND(successful * 0.3), successful_no_data = ROUND(successful_no_data * 0.3),
         failed = ROUND(failed * 0.3), in_progress = ROUND(in_progress * 0.3)
-    WHERE client_id = ${clientNamed("Helios Capital").id} AND date IN (${shift(TODAY, -2)}, ${yday})`;
+    WHERE client_id = ${clientNamed("Brightline Clinics").id} AND date IN (${shift(TODAY, -2)}, ${yday})`;
   await sql`
     UPDATE usage_daily
     SET successful = successful * 4, successful_no_data = successful_no_data * 4, failed = failed * 4
-    WHERE client_id = ${clientNamed("Orbit Cards").id} AND date = ${yday}`;
-  const growth = clientNamed("Acme Lending Co");
-  const newApi = activeApis.find((a) => !growth.apis.some((x) => x.product_code === a.product_code) && a.category === "Fraud")!;
+    WHERE client_id = ${clientNamed("Quillmark News").id} AND date = ${yday}`;
+  const growth = clientNamed("Kestrel Store");
+  const newApi = activeApis.find((a) => !growth.apis.some((x) => x.product_code === a.product_code) && a.category === "Agents")!;
   await sql`
     INSERT INTO pricing (client_id, api_code, price_successful, price_successful_no_data, price_failed, price_in_progress, effective_from, pricing_model)
     VALUES (${growth.id}, ${newApi.product_code}, ${newApi.priceBand}, ${+(newApi.priceBand * 0.5).toFixed(2)}, 0, 0, ${shift(TODAY, -6)}, 'flat')`;
@@ -551,33 +560,33 @@ async function main() {
     date, client_id: growth.id, api_code: newApi.product_code, raw_client_name: growth.name,
     raw_api_name: newApi.name, raw_api_code: newApi.product_code, hits_via: "Integration",
     vendor: newApi.default_vendor, vendor_id: vendorId.get(newApi.default_vendor)!,
-    successful: 160 + i * 25, successful_no_data: 8, failed: 6, in_progress: 0, source: "log" as const,
+    successful: Math.round(newApi.daily * (0.3 + i * 0.08)), successful_no_data: 8, failed: 6, in_progress: 0, source: "log" as const,
   }));
   await sql`INSERT INTO usage_daily ${sql(growthRows)}`;
   growth.apis.push(newApi);
-  console.log(`  alert scenarios: silent, drop, spike, new API (${newApi.product_code} on ${growth.name})`);
+  console.log(`  alert scenarios: silent, drop, spike, new SKU (${newApi.product_code} on ${growth.name})`);
 
   // ── unmapped account names (alias queue) ──────────────────────────────────────
   // Two names the sync could not map to an account: one with traffic, one that
-  // only ever appeared with 0 hits. Current month only, like the API anomalies.
+  // only ever appeared with 0 units. Current month only, like the SKU anomalies.
   const unmappedApi = activeApis[0];
   const unmappedRows = recent.map((date, i) => ({
-    date, client_id: null, api_code: unmappedApi.product_code, raw_client_name: "Northwind Retail Desk",
+    date, client_id: null, api_code: unmappedApi.product_code, raw_client_name: "Copperleaf Retail Desk",
     raw_api_name: unmappedApi.name, raw_api_code: unmappedApi.product_code, hits_via: "Integration",
     vendor: unmappedApi.default_vendor, vendor_id: vendorId.get(unmappedApi.default_vendor)!,
     successful: 18 + i, successful_no_data: 1, failed: 1, in_progress: 0, source: "log" as const,
   }));
   unmappedRows.push({
-    ...unmappedRows[0], raw_client_name: "Orbit Cards UAT", successful: 0, successful_no_data: 0, failed: 0,
+    ...unmappedRows[0], raw_client_name: "Quillmark News UAT", successful: 0, successful_no_data: 0, failed: 0,
   });
   await sql`INSERT INTO usage_daily ${sql(unmappedRows)}`;
-  console.log(`  unmapped account names: 2 (one with 0 hits)`);
+  console.log(`  unmapped account names: 2 (one with 0 units)`);
 
   // ── sandbox classifications ───────────────────────────────────────────────────
-  // Granular, effective-dated sandbox: a BILLABLE client is trialling one API,
+  // Granular, effective-dated sandbox: a BILLABLE client is trialling one SKU,
   // so its usage for that pair shouldn't be billed. From effective_from onward,
   // the view's effective_is_sandbox diverges from the client's is_sandbox flag,
-  // and that API drops out of headline revenue / margin / invoices.
+  // and that SKU drops out of headline revenue / margin / invoices.
   let sandboxRules = 0;
   const sbClient = bigClients[1] ?? bigClients[0];
   if (sbClient) {
@@ -587,7 +596,7 @@ async function main() {
       await sql`
         INSERT INTO sandbox_classifications (client_id, api_code, effective_from, is_sandbox, note, created_by)
         VALUES (${sbClient.id}, ${sbApi.product_code}, ${addMonths(CUR_MONTH_START, -1)}, 1,
-                ${"Trialling this API — exclude from billing until GA."}, ${ADMIN})
+                ${"Trialling this SKU. Exclude from billing until general availability."}, ${ADMIN})
       `;
       sandboxRules++;
     }
@@ -711,7 +720,7 @@ async function main() {
   // ── a few extra audit entries for a fuller trail ──────────────────────────────
   await recordAudit({ user_id: ADMIN, action: "pricing.update", entity_type: "pricing", entity_id: `${bigClients[0]?.id}:${bigClients[0]?.apis[0]?.product_code}`, before: { price_successful: 1.5 }, after: { price_successful: 1.65 } });
   await recordAudit({ user_id: ADMIN, action: "account.create", entity_type: "client", entity_id: String(clients[0].id), after: { display_name: clients[0].name } });
-  await recordAudit({ user_id: userId.get("ops@ledgerline.local")!, action: "alias.resolve", entity_type: "alias", entity_id: "NORTHWND-FIN", after: { mapped_to: clients[0].name } });
+  await recordAudit({ user_id: userId.get("ops@ledgerline.local")!, action: "alias.resolve", entity_type: "alias", entity_id: "COPPERLEAF-CRM", after: { mapped_to: clients[0].name } });
 
   // ── app settings ──────────────────────────────────────────────────────────────
   // Roundup digest recipients, so the admin Settings section renders populated.
@@ -739,23 +748,23 @@ async function main() {
 
   // ── sandbox billing rules ─────────────────────────────────────────────────────
   // The sandbox client bills a capped slice of its traffic: the contract covers
-  // the first 500 hits/day on one API while it trials the rest for free.
+  // the first 50 units/day on one SKU while it trials the rest for free.
   let sandboxBillingRules = 0;
   const capClient = clients.find((c) => c.sandbox);
   if (capClient && capClient.apis[0]) {
     await sql`
       INSERT INTO sandbox_billing_rules (client_id, api_code, effective_from, billable_hits, note, created_by)
-      VALUES (${capClient.id}, ${capClient.apis[0].product_code}, ${RANGE_START}, 500,
-              ${"Pilot contract: first 500 hits/day billable, remainder free."}, ${"admin@ledgerline.local"})
+      VALUES (${capClient.id}, ${capClient.apis[0].product_code}, ${RANGE_START}, 50,
+              ${"Pilot contract: first 50 units/day billable, remainder free."}, ${"admin@ledgerline.local"})
     `;
     sandboxBillingRules++;
   }
   console.log(`  sandbox_billing_rules: ${sandboxBillingRules}`);
 
   // ── MSA fields ────────────────────────────────────────────────────────────────
-  // Every billable account has an MSA except Pinnacle NBFC, so exactly one row
+  // Every billable account has an MSA except Pinnacle Markets, so exactly one row
   // carries the "No MSA" flag on the accounts list.
-  const msaClients = clients.filter((c) => !c.sandbox && c.name !== "Pinnacle NBFC");
+  const msaClients = clients.filter((c) => !c.sandbox && c.name !== "Pinnacle Markets");
   for (let i = 0; i < msaClients.length; i++) {
     const c = msaClients[i];
     await sql`
@@ -778,7 +787,7 @@ async function main() {
   const renamed = clients[0];
   await sql`
     INSERT INTO client_slugs (client_id, slug)
-    VALUES (${renamed.id}, ${generateSlug("Northwind Fincorp")})
+    VALUES (${renamed.id}, ${generateSlug("Copperleaf Systems")})
     ON CONFLICT DO NOTHING
   `;
   console.log(`  client_slugs: backfilled + 1 legacy`);
@@ -788,13 +797,13 @@ async function main() {
 
   // 1. An executed, still-reversible delete: a duplicate account soft-deleted
   //    ten days ago. Restorable from the account page until the deadline.
-  const dupSlug = generateSlug("Acme Lending Co (duplicate)");
+  const dupSlug = generateSlug("Kestrel Store (duplicate)");
   const [dup] = await sql`
     INSERT INTO clients (display_name, slug, log_aliases, billing_entity, status, is_sandbox,
                          deleted_at, deleted_by, deleted_reason)
-    VALUES (${"Acme Lending Co (duplicate)"}, ${dupSlug}, ${JSON.stringify([])},
-            ${"Acme Lending Private Limited"}, ${"paused"}, 0,
-            NOW() - INTERVAL '10 days', ${ADMIN}, ${"Duplicate of Acme Lending Co — created twice during onboarding."})
+    VALUES (${"Kestrel Store (duplicate)"}, ${dupSlug}, ${JSON.stringify([])},
+            ${"Kestrel Commerce Ltd"}, ${"paused"}, 0,
+            NOW() - INTERVAL '10 days', ${ADMIN}, ${"Duplicate of Kestrel Store. Created twice during onboarding."})
     RETURNING id
   `;
   await sql`
@@ -802,24 +811,24 @@ async function main() {
                                    decided_by, decided_at, executed_at, reverse_deadline, note)
     VALUES ('delete', 'executed', ${dup.id}, ${EDITOR}, NOW() - INTERVAL '11 days',
             ${ADMIN}, NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days',
-            NOW() + INTERVAL '20 days', ${"Duplicate of Acme Lending Co."})
+            NOW() + INTERVAL '20 days', ${"Duplicate of Kestrel Store."})
   `;
 
   // 2. A merge request awaiting admin approval (shows in /admin/approvals).
-  const mergeSrc = clients.find((c) => c.name === "Northwind Insurance Brokers");
-  const mergeTgt = clients.find((c) => c.name === "Northwind Home Loans");
+  const mergeSrc = clients.find((c) => c.name === "Copperleaf Labs");
+  const mergeTgt = clients.find((c) => c.name === "Copperleaf Support");
   if (mergeSrc && mergeTgt) {
     await sql`
       INSERT INTO client_operations (kind, status, source_client_id, target_client_id, requested_by, requested_at, note)
       VALUES ('merge', 'pending', ${mergeSrc.id}, ${mergeTgt.id}, ${EDITOR}, NOW() - INTERVAL '2 days',
-              ${"Same signing entity since the Northwind restructure — usage should roll up together."})
+              ${"Same signing entity since the Copperleaf restructure. Usage should roll up together."})
     `;
   }
 
   // Notifications for the flows above plus routine product events.
   const notifRows = [
-    { user_id: ADMIN, kind: "account_op.requested", title: "Merge requested: Northwind Insurance Brokers → Northwind Home Loans", body: "Dev Kapoor requested a merge. Review it in Approvals.", link: "/admin/approvals", entity_type: "client_operation", entity_id: "merge:northwind" },
-    { user_id: EDITOR, kind: "account_op.approved", title: "Delete approved: Acme Lending Co (duplicate)", body: "Maya Sharma approved your delete request. Reversible for 20 more days.", link: `/accounts/${dupSlug}`, entity_type: "client_operation", entity_id: String(dup.id) },
+    { user_id: ADMIN, kind: "account_op.requested", title: "Merge requested: Copperleaf Labs → Copperleaf Support", body: "Dev Kapoor requested a merge. Review it in Approvals.", link: "/admin/approvals", entity_type: "client_operation", entity_id: "merge:copperleaf" },
+    { user_id: EDITOR, kind: "account_op.approved", title: "Delete approved: Kestrel Store (duplicate)", body: "Maya Sharma approved your delete request. Reversible for 20 more days.", link: `/accounts/${dupSlug}`, entity_type: "client_operation", entity_id: String(dup.id) },
     { user_id: ADMIN, kind: "sync.completed", title: "Usage sync complete", body: "Yesterday's usage synced from the log source.", link: "/admin/sync", entity_type: "sync_run", entity_id: "latest" },
   ];
   await sql`INSERT INTO notifications ${sql(notifRows, "user_id", "kind", "title", "body", "link", "entity_type", "entity_id")}`;
@@ -857,17 +866,17 @@ async function main() {
   console.log(`  vendor_usage_daily: ${recon.rows_written} rows (${recon.unmatched_rows} unmatched), 1 dismissal`);
 
   // ── vendor minimum ────────────────────────────────────────────────────────────
-  // Lumen ID has a monthly minimum set above what its traffic costs, so the
+  // Mapline has a monthly minimum set above what its traffic costs, so the
   // vendor page shows a shortfall for the month.
-  const lumen = vendorId.get("Lumen ID")!;
+  const lumen = vendorId.get("Mapline")!;
   const [lumenHits] = await sql`
     SELECT COALESCE(SUM(successful + successful_no_data), 0)::int AS hits
     FROM usage_daily WHERE vendor_id = ${lumen} AND date >= ${lastMonth} AND date < ${CUR_MONTH_START}`;
-  const minimum = Math.ceil((Number(lumenHits.hits) * 4) / 10000) * 10000;
+  const minimum = Math.ceil((Number(lumenHits.hits) * 5) / 1000) * 1000;
   await sql`
     INSERT INTO vendor_commitments (vendor_id, effective_from, monthly_minimum, status, source)
-    VALUES (${lumen}, ${"2026-01-01"}, ${minimum}, 'contracted', ${"Lumen ID MSA 2026, clause 4.2"})`;
-  console.log(`  vendor_commitments: Lumen ID minimum ₹${minimum.toLocaleString("en-IN")}/month`);
+    VALUES (${lumen}, ${"2026-01-01"}, ${minimum}, 'contracted', ${"Mapline MSA 2026, clause 4.2"})`;
+  console.log(`  vendor_commitments: Mapline minimum $${minimum.toLocaleString("en-US")}/month`);
 
   // ── alerts ────────────────────────────────────────────────────────────────────
   // The same engine the cron runs: it evaluates the last three synced dates and

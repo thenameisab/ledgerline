@@ -30,7 +30,7 @@ import { prevMonthOf } from "@/lib/repos/periods";
 import { resolvePeriod } from "@/lib/period";
 import { getSessionUser, canEdit, canViewCost, can } from "@/lib/access";
 import { briefingComposer } from "@/lib/briefing";
-import { formatINR, formatNumber, formatDay, formatDateRange } from "@/lib/format";
+import { formatMoney, formatNumber, formatDay, formatDateRange } from "@/lib/format";
 import { ApiStatusChart } from "@/components/charts/ApiStatusChart";
 import { FileText, ArrowRight, Plus, ChevronRight, FlaskConical } from "lucide-react";
 import { buttonClass } from "@/components/ui/Button";
@@ -118,12 +118,12 @@ export default async function AccountProfilePage({
       ? (summary?.revenue ?? 0) / breakdown.reduce((s, b) => s + b.successful, 0)
       : 0;
 
-  // Tiered (slab) revenue is a per-month total priced at ₹0 in the daily view,
+  // Tiered (slab) revenue is a per-month total priced at $0 in the daily view,
   // so the chart bars exclude it and won't sum to the account total. Flag it.
   const tieredRevenue = (summary?.revenue ?? 0) - series.reduce((s, d) => s + d.revenue, 0);
   const chartCaption =
     tieredRevenue >= 1
-      ? `Excludes ${formatINR(tieredRevenue, { compact: true })} tiered revenue (billed per calendar month, not per day) — daily bars won't sum to the total.`
+      ? `Excludes ${formatMoney(tieredRevenue, { compact: true })} tiered revenue (billed per calendar month, not per day) — daily bars won't sum to the total.`
       : undefined;
 
   // Leak state (per-day truth, dismissal-aware) comes from the summary. Active
@@ -182,7 +182,12 @@ export default async function AccountProfilePage({
         subtitle={[
           account.group_name ? `${account.group_name}` : null,
           account.billing_entity ?? null,
-          account.gstin ? `GSTIN ${account.gstin}` : null,
+          // Stored values carry their own scheme prefix ("EIN …", "VAT GB …").
+          account.gstin
+            ? /^[A-Z]{2,}\s/.test(account.gstin)
+              ? account.gstin
+              : `Tax ID ${account.gstin}`
+            : null,
         ]
           .filter(Boolean)
           .join(" · ")}
@@ -279,7 +284,7 @@ export default async function AccountProfilePage({
               style={{ "--i": 5 } as React.CSSProperties}
             >
               <h2 className="font-serif text-base text-ink mb-3" style={{ fontWeight: 600 }}>
-                Call status
+                Usage outcome
               </h2>
               <ApiStatusChart breakdown={statusBreakdown} size="md" />
             </section>
@@ -292,7 +297,7 @@ export default async function AccountProfilePage({
         <section className="dash-enter" style={{ "--i": 7 } as React.CSSProperties}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-serif text-xl text-ink" style={{ fontWeight: 600 }}>
-              API breakdown
+              SKU breakdown
             </h2>
             {editable && (
               <Link
@@ -325,7 +330,7 @@ export default async function AccountProfilePage({
             </h2>
             {sandboxUsage.length > 0 && (
               <span className="text-sm text-ink-muted">
-                {formatINR(
+                {formatMoney(
                   sandboxUsage.reduce((s, r) => s + r.suppressed_revenue, 0),
                   { compact: true }
                 )}{" "}
@@ -344,9 +349,9 @@ export default async function AccountProfilePage({
                 <table className="w-full text-sm">
                   <thead className="bg-bg-sunken text-ink-faint text-[11px] uppercase tracking-wide">
                     <tr className="text-left">
-                      <th className="px-4 py-3 font-medium">API</th>
+                      <th className="px-4 py-3 font-medium">SKU</th>
                       <th className="px-3 py-3 font-medium">Active</th>
-                      <th className="px-3 py-3 font-medium text-right">Hits</th>
+                      <th className="px-3 py-3 font-medium text-right">Units</th>
                       <th className="px-3 py-3 font-medium text-right">Excluded revenue</th>
                     </tr>
                   </thead>
@@ -366,7 +371,7 @@ export default async function AccountProfilePage({
                           {formatNumber(r.hits)}
                         </td>
                         <td className="px-3 py-3 text-right text-ink font-mono tnum">
-                          {formatINR(r.suppressed_revenue)}
+                          {formatMoney(r.suppressed_revenue)}
                         </td>
                       </tr>
                     ))}

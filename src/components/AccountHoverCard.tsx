@@ -5,7 +5,7 @@ import { EntityHoverCard, SkelBar } from "@/components/ui/EntityHoverCard";
 import { AccountLogo } from "@/components/accounts/AccountLogo";
 import { StatusChip } from "@/components/chips/StatusChip";
 import { Sparkline } from "@/components/Sparkline";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import type { AccountHoverCard as Data } from "@/lib/repos/hover";
 
 // Rich hover for any account name. Wrap the existing name link:
@@ -57,7 +57,7 @@ function Card({ d }: { d: Data }) {
         <div>
           <div className="text-[11px] uppercase tracking-wide text-ink-faint">{d.periodLabel} revenue</div>
           <div className="font-serif text-2xl text-ink tnum leading-none mt-1">
-            {d.revenue > 0 ? formatINR(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
+            {d.revenue > 0 ? formatMoney(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
           </div>
         </div>
         <Sparkline data={d.spark} width={96} height={30} stroke={sparkStroke} />
@@ -65,8 +65,8 @@ function Card({ d }: { d: Data }) {
 
       {/* Metric strip */}
       <div className="grid grid-cols-3 border-t border-border divide-x divide-border text-center">
-        <Metric label="Hits" value={formatNumber(d.hits)} />
-        <Metric label="APIs" value={String(d.apisUsed)} />
+        <Metric label="Units" value={formatNumber(d.hits)} />
+        <Metric label="SKUs" value={String(d.apisUsed)} />
         <Metric label="Active days" value={String(d.activeDays)} />
       </div>
 
@@ -75,7 +75,7 @@ function Card({ d }: { d: Data }) {
         <div className="flex items-start gap-2 px-4 py-2.5 bg-bad-bg text-bad-ink border-t border-border">
           <AlertOctagon size={13} strokeWidth={1.5} className="mt-px shrink-0" />
           <span className="text-[11px] leading-snug">
-            {d.unpricedPairs} unpriced pair{d.unpricedPairs === 1 ? "" : "s"} · {formatNumber(d.unpricedHits)} hits at risk
+            {d.unpricedPairs} unpriced pair{d.unpricedPairs === 1 ? "" : "s"} · {formatNumber(d.unpricedHits)} units at risk
           </span>
         </div>
       )}
@@ -83,7 +83,7 @@ function Card({ d }: { d: Data }) {
       {/* Top APIs */}
       {d.topApis.length > 0 && (
         <div className="px-4 py-3 border-t border-border">
-          <div className="text-[11px] uppercase tracking-wide text-ink-faint mb-2">Top APIs</div>
+          <div className="text-[11px] uppercase tracking-wide text-ink-faint mb-2">Top SKUs</div>
           <ul className="space-y-1.5">
             {d.topApis.map((a) => (
               <li key={a.api_code}>

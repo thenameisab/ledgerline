@@ -9,7 +9,7 @@
 // Accounts and groups reuse the cached MTD summary reads (same data the
 // /accounts and /accounts/groups pages show). The rest are light direct
 // queries. Every query is token-ANDed: each whitespace-separated token must
-// match the row's searchable text, so "Acme May" finds Acme's May statement.
+// match the row's searchable text, so "Copperleaf May" finds Copperleaf's May statement.
 
 import postgres from "postgres";
 import getSql from "@/lib/db";
@@ -258,7 +258,7 @@ function toks(term: string): string[] {
   return term.split(/\s+/).filter(Boolean);
 }
 
-/** De-slugify a retired slug for display: "acme-ltd" → "Acme Ltd". */
+/** De-slugify a retired slug for display: "copperleaf-crm" → "Copperleaf Crm". */
 function unslug(slug: string): string {
   return slug
     .split("-")
@@ -290,7 +290,7 @@ export async function searchEntities(
   const month = f.month ? resolveMonth(f.month) : null;
 
   // Per-corpus search terms: a field operator contributes only to the corpus it
-  // names, so `account:acme api:KY1001` narrows both sides instead of looking
+  // names, so `account:copperleaf api:ATL-PRO-IN` narrows both sides instead of looking
   // for one string containing all of it.
   const accountTerm = termOf(q, f.account, f.group);
   const apiTerm = termOf(q, f.api);

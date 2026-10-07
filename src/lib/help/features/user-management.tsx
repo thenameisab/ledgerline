@@ -57,7 +57,7 @@ export default function Body() {
         <li>
           <strong>Change roles</strong> — set member, editor, or admin straight from the dropdown.
           <em>Editor</em> is the admin-minus role: it can edit pricing, manage manual entries,
-          resolve aliases and API review, set sandbox billing rules, and read margin — pricing an
+          resolve aliases and SKU review, set sandbox billing rules, and read margin — pricing an
           account blind to its cost is the mistake the role most needs to avoid. It cannot touch
           users, syncs, or the vendor rate card that produces those costs.
         </li>

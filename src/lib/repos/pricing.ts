@@ -19,6 +19,8 @@ export type SlabTier = {
 export type PricingRow = {
   api_code: string;
   api_name: string;
+  /** The SKU's billing unit, e.g. "1M tokens". Prices are per one unit. */
+  unit: string;
   price_successful: number;
   price_successful_no_data: number;
   price_failed: number;
@@ -87,12 +89,13 @@ export async function getEffectiveSlabSchedules(
  * "Add API" step.
  */
 export async function getAccountUnpricedUsage(accountId: number): Promise<
-  { api_code: string; api_name: string; hits: number; first_used: string }[]
+  { api_code: string; api_name: string; unit: string; hits: number; first_used: string }[]
 > {
   const sql = getSql();
   const rows = await sql`
     SELECT u.api_code,
            COALESCE(a.name, u.api_code) AS api_name,
+           COALESCE(a.unit, 'call') AS unit,
            SUM(u.successful + u.successful_no_data + u.failed + u.in_progress) AS hits,
            MIN(u.date) AS first_used
     FROM usage_daily u
@@ -106,12 +109,13 @@ export async function getAccountUnpricedUsage(accountId: number): Promise<
         SELECT 1 FROM api_bundle_members bm
         WHERE bm.client_id = ${accountId} AND bm.api_code = u.api_code
       )
-    GROUP BY u.api_code, a.name
+    GROUP BY u.api_code, a.name, a.unit
     ORDER BY hits DESC
   `;
   return (rows as any[]).map((r) => ({
     api_code: r.api_code,
     api_name: r.api_name,
+    unit: r.unit,
     hits: Number(r.hits ?? 0),
     first_used: r.first_used,
   }));
@@ -203,6 +207,8 @@ export type PricingPair = {
   slug: string | null;
   api_code: string;
   api_name: string;
+  /** The SKU's billing unit, e.g. "1M tokens". */
+  unit: string;
   price_successful: number;
   price_successful_no_data: number;
   price_failed: number;
@@ -229,6 +235,7 @@ export async function getUnpricedPairs(): Promise<PricingPair[]> {
   const rows = await sql`
     SELECT v.client_id, c.slug, c.display_name AS client_name,
            v.api_code, COALESCE(a.name, v.api_code) AS api_name,
+           COALESCE(a.unit, 'call') AS unit,
            SUM(v.successful + v.successful_no_data + v.failed + v.in_progress) AS hits,
            MIN(v.date) AS first_used
     FROM usage_daily_with_revenue v
@@ -243,7 +250,7 @@ export async function getUnpricedPairs(): Promise<PricingPair[]> {
         SELECT 1 FROM leak_dismissals d
         WHERE d.client_id = v.client_id AND d.api_code = v.api_code
       )
-    GROUP BY v.client_id, c.slug, c.display_name, v.api_code, a.name
+    GROUP BY v.client_id, c.slug, c.display_name, v.api_code, a.name, a.unit
     ORDER BY hits DESC
   `;
   return (rows as any[]).map((r) => ({
@@ -252,6 +259,7 @@ export async function getUnpricedPairs(): Promise<PricingPair[]> {
     slug: r.slug,
     api_code: r.api_code,
     api_name: r.api_name,
+    unit: r.unit,
     price_successful: 0,
     price_successful_no_data: 0,
     price_failed: 0,
@@ -276,6 +284,7 @@ export async function getAllPricingPairs(): Promise<PricingPair[]> {
     SELECT DISTINCT ON (p.client_id, p.api_code)
       p.client_id, c.slug, c.display_name AS client_name,
       p.api_code, COALESCE(a.name, p.api_code) AS api_name,
+      COALESCE(a.unit, 'call') AS unit,
       p.price_successful, p.price_successful_no_data,
       p.price_failed, p.price_in_progress,
       p.pricing_model, p.effective_from
@@ -299,6 +308,7 @@ export async function getAllPricingPairs(): Promise<PricingPair[]> {
     slug: r.slug,
     api_code: r.api_code,
     api_name: r.api_name,
+    unit: r.unit,
     price_successful: toNumber(r.price_successful),
     price_successful_no_data: toNumber(r.price_successful_no_data),
     price_failed: toNumber(r.price_failed),
@@ -322,6 +332,7 @@ export async function getAccountPricing(accountId: number): Promise<PricingRow[]
       p.id,
       p.api_code,
       COALESCE(a.name, p.api_code) AS api_name,
+      COALESCE(a.unit, 'call') AS unit,
       p.price_successful,
       p.price_successful_no_data,
       p.price_failed,
@@ -366,6 +377,7 @@ export async function getAccountPricing(accountId: number): Promise<PricingRow[]
   const base = (rows as any[]).map((r) => ({
     api_code: r.api_code as string,
     api_name: r.api_name as string,
+    unit: r.unit as string,
     price_successful: toNumber(r.price_successful),
     price_successful_no_data: toNumber(r.price_successful_no_data),
     price_failed: toNumber(r.price_failed),

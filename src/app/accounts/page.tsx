@@ -13,7 +13,7 @@ import {
 } from "@/lib/repos/accounts";
 import { getSessionUser, can } from "@/lib/access";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 
 export default async function AccountsPage({
   searchParams,
@@ -70,7 +70,7 @@ export default async function AccountsPage({
     <main>
       <StatusBar
         title="Accounts"
-        subtitle={`${sorted.length} account${sorted.length === 1 ? "" : "s"} · ${formatINR(totalRev, { compact: true })} MTD revenue · ${flagged} flagged`}
+        subtitle={`${sorted.length} account${sorted.length === 1 ? "" : "s"} · ${formatMoney(totalRev, { compact: true })} MTD revenue · ${flagged} flagged`}
         actions={can(user?.role ?? "member", "account.create") ? <AccountCreateModal groups={groups} /> : undefined}
       />
 
@@ -106,7 +106,7 @@ export default async function AccountsPage({
                       {group.length}
                     </span>
                     <span className="font-mono tnum text-ink-muted normal-case tracking-normal">
-                      {formatINR(groupRev, { compact: true })}
+                      {formatMoney(groupRev, { compact: true })}
                       {share >= 1 && (
                         <span className="text-ink-muted"> · {share.toFixed(0)}% of visible</span>
                       )}

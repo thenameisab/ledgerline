@@ -2,10 +2,10 @@
 import { EntityHoverCard, SkelBar } from "@/components/ui/EntityHoverCard";
 import { Footer } from "@/components/AccountHoverCard";
 import { isLowConfidence, confirmedShare, formatShare } from "@/lib/vendor-confidence";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber, formatPrice } from "@/lib/format";
 import type { ApiHoverCard as Data } from "@/lib/repos/hover";
 
-// Rich hover for any API name. Wrap the existing name link:
+// Rich hover for any SKU name. Wrap the existing name link:
 //   <ApiHoverCard code={code}><Link …>…</Link></ApiHoverCard>
 export function ApiHoverCard({
   code,
@@ -39,7 +39,7 @@ function Card({ d }: { d: Data }) {
 
   return (
     <div>
-      {/* Header — name + code + category */}
+      {/* Header — name + code + category + billing unit */}
       <div className="p-4 pb-3">
         <div className="font-serif text-lg leading-tight text-ink">{d.name}</div>
         <div className="flex items-center gap-2 mt-1">
@@ -49,6 +49,7 @@ function Card({ d }: { d: Data }) {
               {d.category}
             </span>
           )}
+          <span className="text-[11px] text-ink-faint">per {d.unit}</span>
         </div>
       </div>
 
@@ -57,13 +58,13 @@ function Card({ d }: { d: Data }) {
         <div>
           <div className="text-[11px] uppercase tracking-wide text-ink-faint">{d.periodLabel} revenue</div>
           <div className="font-serif text-2xl text-ink tnum leading-none mt-1">
-            {d.revenue > 0 ? formatINR(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
+            {d.revenue > 0 ? formatMoney(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[11px] uppercase tracking-wide text-ink-faint">Avg ₹/hit</div>
+          <div className="text-[11px] uppercase tracking-wide text-ink-faint">Avg price</div>
           <div className="font-mono tnum text-sm text-ink mt-1">
-            {d.avgUnitPrice > 0 ? `₹${d.avgUnitPrice.toFixed(2)}` : "—"}
+            {d.avgUnitPrice > 0 ? `${formatPrice(d.avgUnitPrice)} / ${d.unit}` : "—"}
           </div>
         </div>
       </div>
@@ -72,7 +73,7 @@ function Card({ d }: { d: Data }) {
       <div
         className={`grid ${d.margin != null ? "grid-cols-3" : "grid-cols-2"} border-t border-border divide-x divide-border text-center`}
       >
-        <Metric label="Hits" value={formatNumber(d.hits)} />
+        <Metric label="Units" value={formatNumber(d.hits)} />
         <Metric label="Accounts" value={String(d.uniqueAccounts)} />
         {d.margin != null && (
           // A margin computed against placeholder rates takes the muted token,
@@ -81,11 +82,11 @@ function Card({ d }: { d: Data }) {
           // title carries the figure instead.
           <Metric
             label="Margin"
-            value={marginPct != null ? `${marginPct.toFixed(0)}%` : formatINR(d.margin, { compact: true })}
+            value={marginPct != null ? `${marginPct.toFixed(0)}%` : formatMoney(d.margin, { compact: true })}
             tone={negative ? "bad" : lowConfidence ? "muted" : "default"}
             title={
               lowConfidence && d.costConfidence
-                ? `Vendor cost is confirmed on ${formatShare(confirmedShare(d.costConfidence))} of this period's hits — this margin is not a measurement`
+                ? `Vendor cost is confirmed on ${formatShare(confirmedShare(d.costConfidence))} of this period's usage — this margin is not a measurement`
                 : undefined
             }
           />
@@ -118,7 +119,7 @@ function Card({ d }: { d: Data }) {
         </div>
       )}
 
-      <Footer href={`/apis/${encodeURIComponent(d.productCode)}`} label="Open API view" />
+      <Footer href={`/skus/${encodeURIComponent(d.productCode)}`} label="Open SKU page" />
     </div>
   );
 }

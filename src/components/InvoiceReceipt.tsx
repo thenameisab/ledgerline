@@ -1,6 +1,6 @@
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { AdjustmentsSection } from "@/app/accounts/[slug]/invoices/[period]/AdjustmentsSection";
-import { formatINR, formatPrice, formatPercent, formatNumber, formatDateLong } from "@/lib/format";
+import { formatMoney, formatPrice, formatPercent, formatNumber, formatDateLong } from "@/lib/format";
 import type { StatementData } from "@/lib/repos/statements";
 import { CostConfidence } from "@/components/vendor/CostConfidence";
 import { isLowConfidence, type CostConfidence as Confidence } from "@/lib/vendor-confidence";
@@ -79,7 +79,7 @@ export function InvoiceReceipt({
           )}
           {data.header.account.gstin && (
             <div className="font-mono text-sm text-ink-muted tnum">
-              GSTIN {data.header.account.gstin}
+              {data.header.account.gstin}
             </div>
           )}
         </div>
@@ -102,24 +102,24 @@ export function InvoiceReceipt({
       <div className={`grid ${showCost ? "grid-cols-3" : "grid-cols-1"} gap-0 bg-bg-sunken rounded px-5 py-5 mb-6`}>
         <TotalsCell
           label="Revenue"
-          value={formatINR(data.totals.revenue)}
+          value={formatMoney(data.totals.revenue)}
           sub={
             showCost
-              ? `${formatNumber(data.totals.hits)} hits`
-              : `${formatNumber(data.totals.hits)} hits · ${data.totals.lines} API${data.totals.lines === 1 ? "" : "s"} billed`
+              ? `${formatNumber(data.totals.hits)} units`
+              : `${formatNumber(data.totals.hits)} units · ${data.totals.lines} SKU${data.totals.lines === 1 ? "" : "s"} billed`
           }
         />
         {showCost && (
           <>
             <TotalsCell
               label="Vendor cost"
-              value={formatINR(data.totals.vendor_cost)}
-              sub={`${data.totals.lines} API${data.totals.lines === 1 ? "" : "s"} billed`}
+              value={formatMoney(data.totals.vendor_cost)}
+              sub={`${data.totals.lines} SKU${data.totals.lines === 1 ? "" : "s"} billed`}
               divider
             />
             <TotalsCell
               label="Margin"
-              value={formatINR(data.totals.margin)}
+              value={formatMoney(data.totals.margin)}
               sub={`${formatPercent(data.totals.margin_pct, 1)} of revenue`}
               divider
               muted={isLowConfidence(confidence)}
@@ -138,8 +138,8 @@ export function InvoiceReceipt({
             className="grid grid-cols-12 gap-2 bg-bg-sunken px-3 py-2 border-b border-border text-xs uppercase tracking-wider text-ink-muted"
             style={{ fontWeight: 500 }}
           >
-            <div className={showCost ? "col-span-3" : "col-span-4"}>API</div>
-            <div className={`${showCost ? "col-span-1" : "col-span-2"} text-right`}>Hits</div>
+            <div className={showCost ? "col-span-3" : "col-span-4"}>SKU</div>
+            <div className={`${showCost ? "col-span-1" : "col-span-2"} text-right`}>Units</div>
             <div className={`${showCost ? "col-span-2" : "col-span-3"} text-right`}>Unit price</div>
             <div className={`${showCost ? "col-span-2" : "col-span-3"} text-right`}>Subtotal</div>
             {showCost && <div className="col-span-2 text-right">Cost</div>}
@@ -165,7 +165,7 @@ export function InvoiceReceipt({
                     <div className="flex items-center gap-1.5">
                       {l.is_bundle ? (
                         <span
-                          title="Stitched product — billed once per call of the anchor API at the agreed price; vendor cost covers all stitched APIs"
+                          title="Stitched product. It is billed once per unit of the anchor SKU at the agreed price. Vendor cost covers all stitched SKUs."
                           className="inline-flex items-center text-[11px] text-accent-ink px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-accent/30"
                         >
                           stitched
@@ -191,16 +191,16 @@ export function InvoiceReceipt({
                     {formatPrice(unitPrice)}
                   </div>
                   <div className={`${showCost ? "col-span-2" : "col-span-3"} text-right font-mono text-sm text-ink tnum`}>
-                    {formatINR(l.revenue, { precision: 2 })}
+                    {formatMoney(l.revenue, { precision: 2 })}
                   </div>
                   {showCost && (
                     <div className="col-span-2 text-right font-mono text-sm text-ink tnum">
-                      {formatINR(l.vendor_cost, { precision: 2 })}
+                      {formatMoney(l.vendor_cost, { precision: 2 })}
                     </div>
                   )}
                   {showCost && (
                     <div className="col-span-2 text-right font-mono text-sm text-ink tnum">
-                      {formatINR(l.margin, { precision: 2 })}
+                      {formatMoney(l.margin, { precision: 2 })}
                     </div>
                   )}
                 </div>
@@ -218,16 +218,16 @@ export function InvoiceReceipt({
             </div>
             <div className={showCost ? "col-span-2" : "col-span-3"} />
             <div className={`${showCost ? "col-span-2" : "col-span-3"} text-right font-mono text-base text-ink tnum`} style={{ fontWeight: 500 }}>
-              {formatINR(data.totals.revenue, { precision: 2 })}
+              {formatMoney(data.totals.revenue, { precision: 2 })}
             </div>
             {showCost && (
               <div className="col-span-2 text-right font-mono text-base text-ink tnum" style={{ fontWeight: 500 }}>
-                {formatINR(data.totals.vendor_cost, { precision: 2 })}
+                {formatMoney(data.totals.vendor_cost, { precision: 2 })}
               </div>
             )}
             {showCost && (
               <div className="col-span-2 text-right font-mono text-base text-ink tnum" style={{ fontWeight: 500 }}>
-                {formatINR(data.totals.margin, { precision: 2 })}
+                {formatMoney(data.totals.margin, { precision: 2 })}
               </div>
             )}
           </div>
@@ -251,7 +251,7 @@ export function InvoiceReceipt({
             Grand total
           </div>
           <div className="font-mono tnum text-lg text-ink" style={{ fontWeight: 600 }}>
-            {formatINR(data.totals.grand_total, { precision: 2 })}
+            {formatMoney(data.totals.grand_total, { precision: 2 })}
           </div>
         </div>
       )}

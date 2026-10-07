@@ -23,7 +23,7 @@ export default function Body() {
       <Figure
         src="/help/shots/command-palette.png"
         alt="The command palette open over the dashboard, showing grouped results"
-        caption="Results group into Accounts, Invoices, Groups, APIs, Pages, and more."
+        caption="Results group into Accounts, Invoices, Groups, SKUs, Pages, and more."
       />
 
       <H2 id="open">Open and search</H2>
@@ -32,9 +32,9 @@ export default function Body() {
           The palette opens on top of whatever page you are on. Clicking the search box at the top
           of the sidebar does the same thing.
         </Step>
-        <Step title="Type a name, group, API code, or invoice">
+        <Step title="Type a name, group, SKU code, or invoice">
           Results group under <strong>Accounts</strong>, <strong>Invoices</strong>,{" "}
-          <strong>Groups</strong>, <strong>APIs</strong>, and <strong>Manual entries</strong>,
+          <strong>Groups</strong>, <strong>SKUs</strong>, and <strong>Manual entries</strong>,
           each row carrying its revenue, status, and other at-a-glance detail. Search is debounced,
           so results settle a beat after you stop typing.
         </Step>
@@ -45,10 +45,10 @@ export default function Body() {
           the month from real lists. <Kbd>⌫</Kbd> steps back, <Kbd>Tab</Kbd> skips an optional step.
         </Step>
         <Step title="Narrow it with an operator">
-          Add <code>field:value</code> to scope the search — <code>account:acme</code>,{" "}
+          Add <code>field:value</code> to scope the search — <code>account:copperleaf</code>,{" "}
           <code>is:pending</code>, <code>in:june</code>,{" "}
           <code>type:invoice</code>. <code>@name</code> and <code>#CODE</code> are shorthand for
-          account and API; <code>-word</code> excludes a term. Each one shows as a chip you can click
+          account and SKU; <code>-word</code> excludes a term. Each one shows as a chip you can click
           to remove.
         </Step>
         <Step title="Or jump straight to a filtered list">
@@ -69,7 +69,7 @@ export default function Body() {
       <H2 id="recents">Start from where you left off</H2>
       <p>
         Open the palette with an empty box and it shows <strong>Recent</strong> — the accounts,
-        invoices, and APIs you last opened, most recent first. It remembers from browsing, not just
+        invoices, and SKUs you last opened, most recent first. It remembers from browsing, not just
         from past palette picks, so the entities you actually work on are one keystroke away.
       </p>
 
@@ -81,7 +81,7 @@ export default function Body() {
           results.
         </Step>
         <Step title="Select it">
-          <strong>Refresh usage</strong> runs inline and toasts the result. Create flows, invites, vendor costs, alias resolution, API
+          <strong>Refresh usage</strong> runs inline and toasts the result. Create flows, invites, vendor costs, alias resolution, SKU
           review, sandbox rules, approvals, the audit log, and settings open their form or tool,
           ready to go. You only ever see the verbs your role can actually run.
         </Step>
@@ -89,11 +89,11 @@ export default function Body() {
 
       <H2 id="on-this-page">Act on the page you&rsquo;re viewing</H2>
       <p>
-        Open the palette on an account, invoice, or API and it leads with an{" "}
+        Open the palette on an account, invoice, or SKU and it leads with an{" "}
         <strong>On this page</strong> strip — scoped shortcuts for exactly what you&rsquo;re looking
         at: export an invoice&rsquo;s PDF or CSV, add a manual entry, edit pricing or the profile,
-        jump to its relations (&ldquo;APIs used by this account&rdquo;, &ldquo;accounts using this
-        API&rdquo;).
+        jump to its relations (&ldquo;SKUs used by this account&rdquo;, &ldquo;accounts using this
+        SKU&rdquo;).
       </p>
 
       <H2 id="shortcuts">Global shortcuts</H2>
@@ -103,7 +103,7 @@ export default function Body() {
       <ul>
         <li><Kbd>⌘1</Kbd> — Dashboard</li>
         <li><Kbd>⌘2</Kbd> — Accounts</li>
-        <li><Kbd>⌘3</Kbd> — APIs</li>
+        <li><Kbd>⌘3</Kbd> — SKUs</li>
         <li><Kbd>⌘4</Kbd> — Manual entries (needs edit rights)</li>
         <li><Kbd>⌘[</Kbd> / <Kbd>⌘]</Kbd> — back / forward</li>
       </ul>
@@ -117,7 +117,7 @@ export default function Body() {
         links={[
           { href: "/help/guides/ask-the-palette", label: "Ask the palette a question" },
           { href: "/help/guides/investigate-an-account", label: "Investigate an account" },
-          { href: "/help/guides/investigate-an-api", label: "Investigate an API" },
+          { href: "/help/guides/investigate-a-sku", label: "Investigate a SKU" },
         ]}
       />
     </>

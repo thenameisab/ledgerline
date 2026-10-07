@@ -15,7 +15,7 @@ import type {
   QuadrantAccount,
 } from "../roundup";
 import type { RoundupKind } from "../repos/settings";
-import { formatINR, formatNumber } from "../format";
+import { formatMoney, formatNumber, formatPrice } from "../format";
 
 // The design tokens as literal hex. Email clients have no CSS custom
 // properties, so this is a hand-kept mirror of src/styles/design-tokens.css —
@@ -107,7 +107,7 @@ function barChart(series: { label: string; revenue: number }[]): string {
               <td style="font-size:1px;line-height:8px;">&nbsp;</td>
             </tr></table>
           </td>
-          <td style="padding:2px 0 2px 8px;font-family:${FONT};font-size:11px;color:${C.muted};white-space:nowrap;text-align:right;width:70px;">${formatINR(s.revenue, { compact: true })}</td>
+          <td style="padding:2px 0 2px 8px;font-family:${FONT};font-size:11px;color:${C.muted};white-space:nowrap;text-align:right;width:70px;">${formatMoney(s.revenue, { compact: true })}</td>
         </tr>`;
     })
     .join("");
@@ -123,7 +123,7 @@ function moversColumn(title: string, movers: RoundupMover[], positive: boolean):
       (m) => `
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
         <td style="padding:3px 0;font-family:${FONT};font-size:12px;color:${C.ink};">${esc(m.name)}</td>
-        <td style="padding:3px 0;font-family:${FONT};font-size:12px;font-weight:600;color:${positive ? C.good : C.bad};text-align:right;white-space:nowrap;">${positive ? "+" : "−"}${formatINR(Math.abs(m.delta), { compact: true })}</td>
+        <td style="padding:3px 0;font-family:${FONT};font-size:12px;font-weight:600;color:${positive ? C.good : C.bad};text-align:right;white-space:nowrap;">${positive ? "+" : "−"}${formatMoney(Math.abs(m.delta), { compact: true })}</td>
       </tr></table>`
     )
     .join("");
@@ -175,7 +175,7 @@ function concentrationBar(segments: ConcentrationSegment[], topShare: number): s
         <td style="padding:3px 8px 3px 0;width:12px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background-color:${color};"></span></td>
         <td style="padding:3px 0;font-family:${FONT};font-size:12px;color:${C.ink};">${esc(s.name)}</td>
         <td style="padding:3px 8px;font-family:${FONT};font-size:12px;color:${C.muted};text-align:right;white-space:nowrap;">${s.share.toFixed(0)}%</td>
-        <td style="padding:3px 0;font-family:${FONT};font-size:12px;font-weight:600;color:${C.ink};text-align:right;white-space:nowrap;">${formatINR(s.revenue, { compact: true })}</td>
+        <td style="padding:3px 0;font-family:${FONT};font-size:12px;font-weight:600;color:${C.ink};text-align:right;white-space:nowrap;">${formatMoney(s.revenue, { compact: true })}</td>
       </tr>`;
     })
     .join("");
@@ -244,18 +244,18 @@ export function buildRoundupEmail(
     data.deltaPct === null
       ? ""
       : ` (${data.deltaPct >= 0 ? "▲" : "▼"}${Math.abs(data.deltaPct).toFixed(0)}% vs ${data.compareLabel})`;
-  const subject = `${title} — ${formatINR(data.revenue, { compact: true })} · ${data.periodLabel}${deltaTxt}`;
+  const subject = `${title} — ${formatMoney(data.revenue, { compact: true })} · ${data.periodLabel}${deltaTxt}`;
 
   const text = [
     `${title} · ${data.periodLabel}`,
     ``,
-    `Revenue: ${formatINR(data.revenue)}${data.deltaPct === null ? "" : ` (${data.deltaPct >= 0 ? "+" : ""}${data.deltaPct.toFixed(1)}% vs ${data.compareLabel})`}${data.prior && data.prior.deltaPct !== null ? ` (${data.prior.deltaPct >= 0 ? "+" : ""}${data.prior.deltaPct.toFixed(1)}% vs ${data.prior.label})` : ""}`,
-    `Hits: ${formatNumber(data.hits)} · Active accounts: ${data.activeAccounts} · Avg ₹/hit: ${data.avgPerHit.toFixed(2)} · Success rate: ${data.successRate.pct.toFixed(0)}%`,
-    ...(data.mtd ? [`${data.mtd.label}: ${formatINR(data.mtd.revenue)}${data.mtd.deltaPct === null ? "" : ` (${data.mtd.deltaPct >= 0 ? "+" : ""}${data.mtd.deltaPct.toFixed(1)}%)`}`] : []),
+    `Revenue: ${formatMoney(data.revenue)}${data.deltaPct === null ? "" : ` (${data.deltaPct >= 0 ? "+" : ""}${data.deltaPct.toFixed(1)}% vs ${data.compareLabel})`}${data.prior && data.prior.deltaPct !== null ? ` (${data.prior.deltaPct >= 0 ? "+" : ""}${data.prior.deltaPct.toFixed(1)}% vs ${data.prior.label})` : ""}`,
+    `Units: ${formatNumber(data.hits)} · Active accounts: ${data.activeAccounts} · Avg revenue per unit: ${formatPrice(data.avgPerHit)} · Success rate: ${data.successRate.pct.toFixed(0)}%`,
+    ...(data.mtd ? [`${data.mtd.label}: ${formatMoney(data.mtd.revenue)}${data.mtd.deltaPct === null ? "" : ` (${data.mtd.deltaPct >= 0 ? "+" : ""}${data.mtd.deltaPct.toFixed(1)}%)`}`] : []),
     `Top account is ${data.concentration.topShare.toFixed(0)}% of revenue.`,
     ``,
     `Top accounts:`,
-    ...data.topAccounts.map((c) => `  ${c.name} — ${formatINR(c.revenue)}`),
+    ...data.topAccounts.map((c) => `  ${c.name} — ${formatMoney(c.revenue)}`),
     ``,
     `Open Ledgerline: ${appUrl}`,
   ].join("\n");
@@ -273,7 +273,7 @@ export function buildRoundupEmail(
       <tr>
         <td style="padding:6px 10px 6px 0;width:28px;">${accountMark(c)}</td>
         <td style="padding:6px 0;font-family:${FONT};font-size:13px;color:${C.ink};">${esc(c.name)}</td>
-        <td style="padding:6px 0;font-family:${FONT};font-size:13px;font-weight:600;color:${C.ink};text-align:right;white-space:nowrap;">${formatINR(c.revenue, { compact: true })}</td>
+        <td style="padding:6px 0;font-family:${FONT};font-size:13px;font-weight:600;color:${C.ink};text-align:right;white-space:nowrap;">${formatMoney(c.revenue, { compact: true })}</td>
         <td style="padding:6px 0 6px 10px;text-align:right;width:56px;font-family:${FONT};">${smallDelta(c.deltaPct)}</td>
       </tr>`
     )
@@ -316,7 +316,7 @@ export function buildRoundupEmail(
           <tr>
             <td style="padding:22px 32px 0 32px;">
               <div style="font-family:${FONT};font-size:13px;color:${C.muted};">${esc(data.periodLabel)}</div>
-              <div style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:40px;font-weight:600;color:${C.ink};letter-spacing:-0.02em;margin-top:4px;">${formatINR(data.revenue, { compact: true })}</div>
+              <div style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:40px;font-weight:600;color:${C.ink};letter-spacing:-0.02em;margin-top:4px;">${formatMoney(data.revenue, { compact: true })}</div>
               <div style="margin-top:8px;">${deltaChip(data.deltaPct, data.compareLabel)}${
                 data.prior
                   ? `&nbsp;&nbsp;${deltaChip(data.prior.deltaPct, data.prior.label)}`
@@ -329,15 +329,15 @@ export function buildRoundupEmail(
           <tr>
             <td style="padding:20px 32px 0 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="6"><tr>
-                ${kpiCell("Hits", formatNumber(data.hits))}
+                ${kpiCell("Units", formatNumber(data.hits))}
                 ${kpiCell("Active accounts", String(data.activeAccounts))}
-                ${kpiCell("Avg ₹ / hit", `₹${data.avgPerHit.toFixed(2)}`)}
+                ${kpiCell("Avg $ / unit", formatPrice(data.avgPerHit))}
                 ${kpiCell("Success rate", `${data.successRate.pct.toFixed(0)}%`, smallDeltaPoints(data.successRate.pct, data.successRate.prevPct))}
               </tr></table>
               ${
                 data.mtd
                   ? `<div style="margin-top:10px;font-family:${FONT};font-size:12px;color:${C.muted};">
-                       ${esc(data.mtd.label)}: <span style="font-weight:600;color:${C.ink};">${formatINR(data.mtd.revenue, { compact: true })}</span>
+                       ${esc(data.mtd.label)}: <span style="font-weight:600;color:${C.ink};">${formatMoney(data.mtd.revenue, { compact: true })}</span>
                        &nbsp;${smallDelta(data.mtd.deltaPct)}
                      </div>`
                   : ""

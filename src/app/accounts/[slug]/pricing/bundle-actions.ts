@@ -43,7 +43,7 @@ export async function createBundle(
   const c = parsed.data;
 
   if (!c.member_codes.includes(c.anchor_api_code)) {
-    return { ok: false, error: "The billing anchor must be one of the stitched APIs." };
+    return { ok: false, error: "The billing anchor must be one of the stitched SKUs." };
   }
 
   const sql = getSql();

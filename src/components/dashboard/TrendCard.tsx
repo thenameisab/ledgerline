@@ -92,7 +92,7 @@ export function TrendCard({
               tickLine={false}
               axisLine={false}
               width={48}
-              tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`}
+              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`}
             />
             <Tooltip
               contentStyle={{
@@ -107,7 +107,7 @@ export function TrendCard({
               itemStyle={{ padding: 0 }}
               formatter={(value: any, name: string) => {
                 const labels: Record<string, string> = { revenue: "Revenue", margin: "Margin" };
-                return [`₹${Math.round(value).toLocaleString("en-IN")}`, labels[name] ?? name];
+                return [`$${Math.round(value).toLocaleString("en-US")}`, labels[name] ?? name];
               }}
               labelFormatter={fmtDay}
             />

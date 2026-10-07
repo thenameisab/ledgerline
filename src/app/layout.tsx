@@ -18,7 +18,7 @@ import { THEME_COOKIE, isThemePref, resolvedAttr } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "Ledgerline",
-  description: "Revenue, margin, pricing, and invoices for your API customers.",
+  description: "Usage-based billing for companies that sell many SKUs. Track revenue, margin, pricing, and invoices for each customer.",
 };
 
 /**

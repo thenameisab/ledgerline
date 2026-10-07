@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 
 export type MoverRow = {
   key: string;
@@ -55,7 +55,7 @@ export function Movers({ rows }: { rows: MoverRow[] }) {
                   <span className="shrink-0 text-[13px] font-mono tnum">
                     <span className={up ? "text-success-ink" : "text-bad-ink"}>
                       {up ? "+" : "−"}
-                      {formatINR(Math.abs(r.delta), { compact: true })}
+                      {formatMoney(Math.abs(r.delta), { compact: true })}
                     </span>
                     <span className="text-ink-faint ml-1.5 text-[11px]">
                       {r.delta_pct == null

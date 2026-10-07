@@ -39,7 +39,7 @@ export type SlotOption = {
   /** What gets sent — an exact account name, an API product code, a YYYY-MM. */
   value: string;
   label: string;
-  /** Secondary text on the row (an API code, "last month"). */
+  /** Secondary text on the row (a SKU code, "last month"). */
   sub?: string;
 };
 
@@ -155,7 +155,7 @@ export const ALL_CUES: CmdCue[] = [
   {
     id: "cue-hits-account",
     icon: Activity,
-    lead: "Hits for",
+    lead: "Units for",
     slots: [
       { kind: "account", label: "an account" },
       { kind: "month", label: "a month", optional: true },
@@ -164,7 +164,7 @@ export const ALL_CUES: CmdCue[] = [
     build: ([account, month]) => ({
       kind: "ask-spec",
       spec: { metric: "hits", entityType: "account", entityName: account?.value, period: month?.value },
-      echo: `Hits for ${account?.label}${month ? ` in ${month.label}` : ""}`,
+      echo: `Units for ${account?.label}${month ? ` in ${month.label}` : ""}`,
     }),
   },
   {
@@ -210,20 +210,20 @@ export const ALL_CUES: CmdCue[] = [
     }),
   },
   {
-    // Relations take prose: they're separate handlers, not an AskSpec. The API
-    // slot passes the product *code*, which no noise-stripper can mangle.
+    // Relations take prose: they're separate handlers, not an AskSpec. The SKU
+    // slot passes the SKU *code*, which no noise-stripper can mangle.
     id: "cue-accounts-using",
     icon: Users,
     lead: "Accounts using",
-    slots: [{ kind: "api", label: "an API" }],
+    slots: [{ kind: "api", label: "a SKU" }],
     build: ([api]) => ({ kind: "ask-text", text: `accounts using ${api?.value}` }),
   },
   {
     id: "cue-apis-used-by",
     icon: Zap,
-    lead: "APIs used by",
+    lead: "SKUs used by",
     slots: [{ kind: "account", label: "an account" }],
-    build: ([account]) => ({ kind: "ask-text", text: `apis used by ${account?.value}` }),
+    build: ([account]) => ({ kind: "ask-text", text: `skus used by ${account?.value}` }),
   },
   {
     id: "cue-variance",
@@ -262,8 +262,8 @@ export function cuePreview(cue: CmdCue, values: (SlotOption | null)[]): string {
  */
 export function placeholderExamples(): string[] {
   return [
-    "Revenue for Acme in May…",
-    "Accounts using KY1001…",
+    "Revenue for Copperleaf CRM in May…",
+    "Accounts using ATL-PRO-IN…",
     "Top 5 accounts by revenue…",
     "What traffic is unpriced right now?",
   ];

@@ -109,7 +109,7 @@ async function listVendorsImpl(from: string, to: string): Promise<VendorListRow[
     ORDER BY COALESCE(u.total_cost, 0) DESC, COALESCE(u.total_hits, 0) DESC,
              vd.canonical_name
   `;
-  // A volume-priced pair costs ₹0 per day in the view — the month's bracket is
+  // A volume-priced pair costs $0 per day in the view — the month's bracket is
   // only decided by the month's total. Vendor surfaces count sandbox traffic,
   // because the vendor billed for it.
   //
@@ -158,7 +158,7 @@ export type RateStatus = "estimated" | "quoted" | "contracted";
  * Where a pair's cost comes from.
  *
  * `vendor` is the default and means the four cost columns apply. The other two
- * both mean ₹0, and differ only in why: `in_house` because we served the call
+ * both mean $0, and differ only in why: `in_house` because we served the call
  * ourselves and no invoice exists, `components` because the cost is real but
  * sits on the component APIs of a stitched or journey product and charging it
  * twice would double-count. Both count as *known* — a decided zero is an
@@ -297,7 +297,7 @@ async function rateCardImpl(vendor: string, from: string, to: string): Promise<R
     ) br ON true
     ORDER BY COALESCE(pe.hits, 0) DESC, p.api_code
   `;
-  // Same per-day blind spot as everywhere else: a bracketed rate costs ₹0 in
+  // Same per-day blind spot as everywhere else: a bracketed rate costs $0 in
   // the view. Sandbox included — this is the vendor's own bill.
   const volumeByApi = await vendorVolumeCostByApi({ from, to, vendor, includeSandbox: true });
   const num = (v: unknown) => (v == null ? null : toNumber(v));

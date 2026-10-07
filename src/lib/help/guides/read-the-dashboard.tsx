@@ -52,16 +52,16 @@ export default function Body() {
       <p>The risk panel flags revenue that is earning less than it should, in three buckets:</p>
       <ul>
         <li>
-          <strong>Revenue leak · unpriced billable pairs</strong> — traffic from account × API pairs
-          that have no price row, so every hit bills ₹0.
+          <strong>Revenue leak · unpriced billable pairs</strong> — traffic from account × SKU pairs
+          that have no price row, so every unit bills $0.
         </li>
         <li>
-          <strong>Silent loss · unmapped log names</strong> — usage whose raw account or API name
+          <strong>Silent loss · unmapped log names</strong> — usage whose raw account or SKU name
           could not be matched to the catalog. It earns nothing until resolved in Aliases.
         </li>
         <li>
           <strong>Margin watch · selling below cost</strong> — pairs where the negotiated price is
-          below the vendor cost, so each hit loses money.
+          below the vendor cost, so each unit loses money.
         </li>
       </ul>
       <Callout variant="tip">
@@ -86,10 +86,10 @@ export default function Body() {
           month, with up/down deltas and a “new” tag for first-time billers.
         </li>
         <li>
-          <strong>Volume</strong> — daily API hits as bars, independent of pricing.
+          <strong>Volume</strong> — daily units as bars, independent of pricing.
         </li>
         <li>
-          <strong>Top accounts / Top APIs by revenue</strong> — the top seven of each; click any row
+          <strong>Top accounts / Top SKUs by revenue</strong> — the top seven of each; click any row
           to open its detail page.
         </li>
       </ul>

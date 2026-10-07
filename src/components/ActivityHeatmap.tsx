@@ -106,7 +106,7 @@ export function ActivityHeatmap({
           Activity
         </h2>
         <div className="text-xs text-ink-faint font-mono">
-          {formatNumber(totalHits)} hits · {activeDays}/{windowDays} active days
+          {formatNumber(totalHits)} units · {activeDays}/{windowDays} active days
         </div>
       </div>
 
@@ -147,8 +147,8 @@ export function ActivityHeatmap({
             if (d.hits < 0) return null; // pad
             const b = bucket(d.hits);
             const titleText =
-              `${d.date} · ${formatNumber(d.hits)} hit${d.hits === 1 ? "" : "s"}` +
-              (d.revenue > 0 ? ` · ₹${formatNumber(Math.round(d.revenue))}` : "");
+              `${d.date} · ${formatNumber(d.hits)} unit${d.hits === 1 ? "" : "s"}` +
+              (d.revenue > 0 ? ` · $${formatNumber(Math.round(d.revenue))}` : "");
             return (
               <rect
                 key={d.date}
@@ -160,7 +160,7 @@ export function ActivityHeatmap({
                 ry={2}
                 className={`${CELL_CLASS[b]} heat-in`}
                 style={{ "--i": d.col } as React.CSSProperties}
-                aria-label={`${d.date}: ${d.hits} hits`}
+                aria-label={`${d.date}: ${d.hits} units`}
               >
                 <title>{titleText}</title>
               </rect>

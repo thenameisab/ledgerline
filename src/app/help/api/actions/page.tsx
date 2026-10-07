@@ -52,15 +52,15 @@ export default function ServerActionsPage() {
       </p>
       <ParamTable
         rows={[
-          { name: "api_code", type: "string", required: true, desc: "API product code the price applies to." },
-          { name: "price_successful", type: "number", required: true, desc: "Non-negative. Per successful hit." },
-          { name: "price_successful_no_data", type: "number", required: true, desc: "Non-negative. Per successful-no-data hit." },
-          { name: "price_failed", type: "number", required: true, desc: "Non-negative. Per failed hit." },
-          { name: "price_in_progress", type: "number", required: true, desc: "Non-negative. Per in-progress hit." },
-          { name: "pricing_model", type: '"flat" | "tier" | "slab"', desc: <>Defaults to <code>flat</code>. <code>tier</code> is graduated (each bracket prices only the hits inside it). <code>slab</code> is whole-volume (the bracket the period total lands in prices every hit). Both volume models store the four flat prices as 0 and write a bracket set instead.</> },
+          { name: "api_code", type: "string", required: true, desc: "SKU code the price applies to." },
+          { name: "price_successful", type: "number", required: true, desc: "Non-negative. Per successful unit." },
+          { name: "price_successful_no_data", type: "number", required: true, desc: "Non-negative. Per successful-no-data unit." },
+          { name: "price_failed", type: "number", required: true, desc: "Non-negative. Per failed unit." },
+          { name: "price_in_progress", type: "number", required: true, desc: "Non-negative. Per in-progress unit." },
+          { name: "pricing_model", type: '"flat" | "tier" | "slab"', desc: <>Defaults to <code>flat</code>. <code>tier</code> is graduated (each bracket prices only the units inside it). <code>slab</code> is whole-volume (the bracket the period total lands in prices every unit). Both volume models store the four flat prices as 0 and write a bracket set instead.</> },
           { name: "slabs", type: "SlabTier[]", desc: <>Required for <code>tier</code> and <code>slab</code>: brackets <code>{`{ min_hits, max_hits|null, price_* }`}</code>. Validated on the server (start at 0, contiguous, one open top bracket, non-negative).</> },
-          { name: "is_new", type: "boolean", desc: "True for a brand-new pricing row (the add-API flow) rather than an edit of the latest row." },
-          { name: "effective_from", type: "string", desc: <>YYYY-MM-DD, only honored when <code>is_new</code>; defaults to today. Duplicate (account, api, effective_from) rows are rejected per-row.</> },
+          { name: "is_new", type: "boolean", desc: "True for a brand-new pricing row (the add-SKU flow) rather than an edit of the latest row." },
+          { name: "effective_from", type: "string", desc: <>YYYY-MM-DD, only honored when <code>is_new</code>; defaults to today. Duplicate (account, SKU, effective_from) rows are rejected per-row.</> },
         ]}
       />
       <CodeBlock
@@ -110,13 +110,13 @@ export default function ServerActionsPage() {
       <ParamTable
         rows={[
           { name: "name", type: "string", required: true, desc: "Trimmed, 1–80 chars. Unique per account (duplicate name → error)." },
-          { name: "member_codes", type: "string[]", required: true, desc: "At least 2 API product codes. An API can belong to only one stitch per account — conflicts list the offending codes." },
-          { name: "anchor_api_code", type: "string", required: true, desc: "The API whose hits carry the bundle price. Must be one of member_codes." },
-          { name: "price_successful", type: "number", required: true, desc: "Non-negative bundle rate per successful anchor hit." },
+          { name: "member_codes", type: "string[]", required: true, desc: "At least 2 SKU codes. A SKU can belong to only one stitch per account — conflicts list the offending codes." },
+          { name: "anchor_api_code", type: "string", required: true, desc: "The SKU whose units carry the bundle price. Must be one of member_codes." },
+          { name: "price_successful", type: "number", required: true, desc: "Non-negative bundle rate per successful anchor unit." },
           { name: "price_successful_no_data", type: "number", required: true, desc: "Non-negative." },
           { name: "price_failed", type: "number", required: true, desc: "Non-negative." },
           { name: "price_in_progress", type: "number", required: true, desc: "Non-negative." },
-          { name: "effective_from", type: "string", required: true, desc: "YYYY-MM-DD. Usage before this date keeps billing at individual API pricing." },
+          { name: "effective_from", type: "string", required: true, desc: "YYYY-MM-DD. Usage before this date keeps billing at individual SKU pricing." },
         ]}
       />
       <p>
@@ -133,7 +133,7 @@ export default function ServerActionsPage() {
       <p>
         Re-prices an existing stitch. <code>input</code> is the four non-negative price tiers
         (same fields as above, no <code>effective_from</code>). The billing lock keys off the{" "}
-        <em>anchor</em> API: if the (account, anchor) pair is on a finalized invoice, the latest{" "}
+        <em>anchor</em> SKU: if the (account, anchor) pair is on a finalized invoice, the latest{" "}
         <code>bundle_pricing</code> row is locked and a supersede row is written with{" "}
         <code>effective_from</code> = today; otherwise the latest row is updated in place.
       </p>
@@ -148,13 +148,13 @@ export default function ServerActionsPage() {
         <RoleChip role="editor" />
       </Endpoint>
       <p>
-        Removes a stitch entirely. Refused with an error when the anchor API has been billed on a
+        Removes a stitch entirely. Refused with an error when the anchor SKU has been billed on a
         finalized invoice — issued history must keep resolving the bundle.
       </p>
       <p>
         <strong>Side effects:</strong> deletes the <code>api_bundles</code> row;{" "}
         <code>api_bundle_members</code> and <code>bundle_pricing</code> follow via{" "}
-        <code>ON DELETE CASCADE</code>. Member APIs immediately fall back to their individual{" "}
+        <code>ON DELETE CASCADE</code>. Member SKUs immediately fall back to their individual{" "}
         <code>pricing</code> rows. Records audit action <code>bundle.delete</code> with the member
         list as the before-snapshot.
       </p>
@@ -253,7 +253,7 @@ export default function ServerActionsPage() {
         Lives in <FilePath>src/app/admin/sandbox/actions.ts</FilePath>. Guard:{" "}
         <code>vendor_pricing.edit</code>. Toggles whether sandbox usage is included in dashboard,
         account-list and invoice numbers. It is the app-wide default, stored in{" "}
-        <code>app_settings</code>; per-(account, API) rules override it.
+        <code>app_settings</code>; per-(account, SKU) rules override it.
       </p>
       <ParamTable
         rows={[
@@ -277,7 +277,7 @@ export default function ServerActionsPage() {
       <ParamTable
         nameHeader="Action"
         rows={[
-          { name: "saveSandboxRule", type: "sandbox_billing.edit", desc: <><FilePath>src/app/admin/sandbox/actions.ts</FilePath>. Sets how many sandbox hits an (account, API) pair bills: <code>none</code>, <code>all</code>, or a <code>cap</code>.</> },
+          { name: "saveSandboxRule", type: "sandbox_billing.edit", desc: <><FilePath>src/app/admin/sandbox/actions.ts</FilePath>. Sets how many sandbox units an (account, SKU) pair bills: <code>none</code>, <code>all</code>, or a <code>cap</code>.</> },
           { name: "saveAccountProfile", type: "account.update", desc: <><FilePath>src/app/accounts/[slug]/profile/actions.ts</FilePath>. Saves the account profile fields.</> },
           { name: "dismissHistoricalLeak / restoreHistoricalLeak", type: "pricing.edit", desc: <><FilePath>src/app/accounts/[slug]/leak-actions.ts</FilePath>. Adds or removes a <code>leak_dismissals</code> row. Audit actions <code>leak.dismiss</code> and <code>leak.restore</code>.</> },
           { name: "acknowledgeAlertAction / acknowledgeAlertsAction / snoozeAlertAction / restoreAlertAction", type: "alert.act", desc: <><FilePath>src/app/alerts/actions.ts</FilePath>. Acknowledge one or many alerts, snooze an alert for a number of days, or restore it.</> },

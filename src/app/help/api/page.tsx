@@ -91,8 +91,8 @@ if (!guard.ok) {
         rows={[
           { name: "pricing.edit", type: "admin, editor", desc: "Account pricing, bundles, leak dismissals, invoice finalize, issue, and adjust." },
           { name: "manual_entry.edit / manual_entry.approve", type: "admin, editor", desc: "Preview, create, submit, void, and approve manual entries." },
-          { name: "alias.resolve", type: "admin, editor", desc: "Map raw log names to catalog accounts and APIs, and clear the API review queue." },
-          { name: "sandbox_billing.edit", type: "admin, editor", desc: "Per-account and per-API sandbox billing rules." },
+          { name: "alias.resolve", type: "admin, editor", desc: "Map raw log names to catalog accounts and SKUs, and clear the SKU review queue." },
+          { name: "sandbox_billing.edit", type: "admin, editor", desc: "Per-account and per-SKU sandbox billing rules." },
           { name: "api.create / api.update", type: "admin, editor", desc: "Catalog changes." },
           { name: "account.create / account.update", type: "admin, editor", desc: "Create accounts, edit profiles, move an account to a group." },
           { name: "account.merge / account.delete", type: "admin, editor", desc: "Request a merge or delete. An admin must approve it." },

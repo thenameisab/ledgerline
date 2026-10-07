@@ -99,7 +99,7 @@ export default function EnvironmentPage() {
           {
             name: "MOCK_INTEGRATIONS",
             type: "optional",
-            desc: <>The exact string <code>true</code> turns on the simulated usage pull and vendor-side pull. Usage is generated from the account and API pairs already in <code>usage_daily</code>, and the vendor side is derived from local usage. No external service is called. Set to <code>true</code> in the demo and in <FilePath>.env.local.example</FilePath>. <FilePath>scripts/seed-mock.ts</FilePath> also sets it for its own run.</>,
+            desc: <>The exact string <code>true</code> turns on the simulated usage pull and vendor-side pull. Usage is generated from the account and SKU pairs already in <code>usage_daily</code>, and the vendor side is derived from local usage. No external service is called. Set to <code>true</code> in the demo and in <FilePath>.env.local.example</FilePath>. <FilePath>scripts/seed-mock.ts</FilePath> also sets it for its own run.</>,
           },
           {
             name: "METABASE_URL",
@@ -180,7 +180,7 @@ export default function EnvironmentPage() {
           {
             name: "MANUAL_ENTRY_APPROVAL_THRESHOLD",
             type: "optional",
-            desc: <>Revenue total above which a manual entry always needs explicit approval, even when an admin creates it with <code>submit: true</code>. Default <code>50000</code>. A non-numeric value falls back to the default.</>,
+            desc: <>Revenue total above which a manual entry always needs explicit approval, even when an admin creates it with <code>submit: true</code>. Default <code>500</code>. A non-numeric value falls back to the default.</>,
           },
           {
             name: "ACCOUNT_OP_UNDO_DAYS",

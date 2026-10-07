@@ -18,9 +18,9 @@ const QuerySchema = z.object({
 
 // Columns for the internal variant:
 const HEADERS_INTERNAL = [
-  "api_code",
-  "api_name",
-  "hits",
+  "sku_code",
+  "sku_name",
+  "units",
   "successful",
   "successful_no_data",
   "failed",
@@ -36,9 +36,9 @@ const HEADERS_INTERNAL = [
 ];
 
 const HEADERS_CUSTOMER = [
-  "api_code",
-  "api_name",
-  "hits",
+  "sku_code",
+  "sku_name",
+  "units",
   "successful",
   "successful_no_data",
   "failed",
@@ -184,7 +184,7 @@ export async function GET(
     "",
     "# Totals",
     csvRow(["metric", "value"]),
-    csvRow(["hits", data.totals.hits]),
+    csvRow(["units", data.totals.hits]),
     csvRow(["revenue", r2(data.totals.revenue)]),
   ];
   if (isInternal) {
@@ -200,8 +200,8 @@ export async function GET(
     const c = data.cost_confidence;
     if (c) {
       totalsRows.push(
-        csvRow(["cost_confirmed_hits", confirmedHits(c)]),
-        csvRow(["cost_measured_hits", c.hits]),
+        csvRow(["cost_confirmed_units", confirmedHits(c)]),
+        csvRow(["cost_measured_units", c.hits]),
         csvRow(["cost_confirmed_pct", r2(confirmedShare(c))])
       );
     }

@@ -3,12 +3,12 @@
 // `usage_daily_with_revenue` costs one day at a time, and a volume bracket is
 // decided by a month's total — a single day cannot know which bracket it falls
 // in. So a volume-priced (vendor, API) pair keeps its four flat cost columns at
-// 0, the view yields ₹0 for it, and this module computes the cost the view
+// 0, the view yields $0 for it, and this module computes the cost the view
 // could not and hands it back to be added on. Same arrangement
 // `slab-revenue.ts` has on the client side, for the same reason.
 //
 // **One entry point, on purpose.** The client side grew eight separate add-back
-// sites and still has surfaces that report volume-priced rows at ₹0 (the
+// sites and still has surfaces that report volume-priced rows at $0 (the
 // revenue-truth register lists it). Cost has ten readers, so instead of ten
 // bespoke corrections every caller asks this module for the grain it needs.
 // Adding a reader means calling one function; it does not mean re-deriving the

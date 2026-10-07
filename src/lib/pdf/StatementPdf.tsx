@@ -2,7 +2,7 @@ import React from "react";
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 import { pdf } from "./tokens";
 import { registerPdfFonts } from "./fonts";
-import { formatINR, formatPrice, formatPercent, formatNumber, formatDateLong } from "../format";
+import { formatMoney, formatPrice, formatPercent, formatNumber, formatDateLong } from "../format";
 import type { StatementData, StatementLine, StatementAdjustment } from "../repos/statements";
 import { confirmedShare, formatShare } from "../vendor-confidence";
 
@@ -151,7 +151,7 @@ const s = StyleSheet.create({
     marginBottom: pdf.space[2],
   },
   totalsValue: {
-    // Inter, not Display: TASA Orbiter has no ₹ glyph (see fonts.ts).
+    // Inter, not Display: currency figures stay off display type (see fonts.ts).
     fontFamily: "Inter",
     fontWeight: 600,
     fontSize:   pdf.text["2xl"],
@@ -265,7 +265,7 @@ const s = StyleSheet.create({
   },
   // The internal table fits six columns into the width the customer table
   // gives four, so its totals read at the body's size rather than a step up.
-  // At md a 12-character rupee total is wider than the column holding it and
+  // At md a 12-character dollar total is wider than the column holding it and
   // prints over its neighbour. The weight and the rule
   // above mark the row, not the point size.
   totalsValueInternal: { fontSize: pdf.text.sm },
@@ -375,7 +375,7 @@ const s = StyleSheet.create({
     textTransform: "uppercase",
   },
   grandTotalValue: {
-    // Inter, not Display: TASA Orbiter has no ₹ glyph (see fonts.ts).
+    // Inter, not Display: currency figures stay off display type (see fonts.ts).
     fontFamily: "Inter",
     fontWeight: 600,
     fontSize:   pdf.text.lg,
@@ -471,7 +471,8 @@ function BillToPeriod({ data }: { data: StatementData }) {
           <Text style={s.metaLine}>Group · {data.header.account.group_name}</Text>
         )}
         {data.header.account.gstin && (
-          <Text style={s.metaMono}>GSTIN {data.header.account.gstin}</Text>
+          // The stored tax ID carries its own prefix ("EIN 84-2917365").
+          <Text style={s.metaMono}>{data.header.account.gstin}</Text>
         )}
       </View>
       <View style={[s.billCol, { alignItems: "flex-end" }]}>
@@ -492,17 +493,17 @@ function TotalsStripInternal({ data }: { data: StatementData }) {
     <View style={s.totalsStrip}>
       <View style={s.totalsCell}>
         <Text style={s.totalsLabel}>Revenue</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.revenue)}</Text>
-        <Text style={s.totalsSubvalue}>{formatNumber(data.totals.hits)} hits</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.revenue)}</Text>
+        <Text style={s.totalsSubvalue}>{formatNumber(data.totals.hits)} units</Text>
       </View>
       <View style={[s.totalsCell, s.totalsCellDivider]}>
         <Text style={s.totalsLabel}>Vendor cost</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.vendor_cost)}</Text>
-        <Text style={s.totalsSubvalue}>{data.totals.lines} APIs billed</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.vendor_cost)}</Text>
+        <Text style={s.totalsSubvalue}>{data.totals.lines} SKUs billed</Text>
       </View>
       <View style={[s.totalsCell, s.totalsCellDivider]}>
         <Text style={s.totalsLabel}>Margin</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.margin)}</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.margin)}</Text>
         <Text style={s.totalsSubvalue}>{formatPercent(data.totals.margin_pct, 1)} of revenue</Text>
       </View>
     </View>
@@ -515,16 +516,16 @@ function TotalsStripCustomer({ data }: { data: StatementData }) {
     <View style={s.totalsStrip}>
       <View style={s.totalsCell}>
         <Text style={s.totalsLabel}>Total due</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.revenue)}</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.revenue)}</Text>
         <Text style={s.totalsSubvalue}>Excl. taxes</Text>
       </View>
       <View style={[s.totalsCell, s.totalsCellDivider]}>
-        <Text style={s.totalsLabel}>API calls</Text>
+        <Text style={s.totalsLabel}>Units</Text>
         <Text style={s.totalsValue}>{formatNumber(data.totals.hits)}</Text>
-        <Text style={s.totalsSubvalue}>{data.totals.lines} APIs</Text>
+        <Text style={s.totalsSubvalue}>{data.totals.lines} SKUs</Text>
       </View>
       <View style={[s.totalsCell, s.totalsCellDivider]}>
-        <Text style={s.totalsLabel}>Avg per call</Text>
+        <Text style={s.totalsLabel}>Avg per unit</Text>
         <Text style={s.totalsValue}>{formatPrice(asp)}</Text>
         <Text style={s.totalsSubvalue}>Blended</Text>
       </View>
@@ -550,8 +551,8 @@ function CoverageNote({ data }: { data: StatementData }) {
   return (
     <Text style={s.coverageNote}>
       {share <= 0
-        ? `Vendor cost is confirmed on none of this period's ${formatNumber(c.hits)} hits — the margin above is arithmetic, not a measurement.`
-        : `Vendor cost is confirmed on ${formatShare(share)} of this period's ${formatNumber(c.hits)} hits. The rest is estimated or has no rate on file.`}
+        ? `Vendor cost is confirmed on none of this period's ${formatNumber(c.hits)} units — the margin above is arithmetic, not a measurement.`
+        : `Vendor cost is confirmed on ${formatShare(share)} of this period's ${formatNumber(c.hits)} units. The rest is estimated or has no rate on file.`}
     </Text>
   );
 }
@@ -560,8 +561,8 @@ function InternalLines({ lines }: { lines: StatementLine[] }) {
   return (
     <View>
       <View style={s.tableHeader}>
-        <Text style={[s.th, { flex: 2.4 }]}>API</Text>
-        <Text style={[s.th, { flex: 1.0, textAlign: "right" }]}>Hits</Text>
+        <Text style={[s.th, { flex: 2.4 }]}>SKU</Text>
+        <Text style={[s.th, { flex: 1.0, textAlign: "right" }]}>Units</Text>
         <Text style={[s.th, { flex: 1.2, textAlign: "right" }]}>Unit price</Text>
         <Text style={[s.th, { flex: 1.6, textAlign: "right" }]}>Subtotal</Text>
         <Text style={[s.th, { flex: 1.6, textAlign: "right" }]}>Vendor cost</Text>
@@ -585,9 +586,9 @@ function InternalLines({ lines }: { lines: StatementLine[] }) {
             </View>
             <Text style={[s.tdMono, { flex: 1.0, textAlign: "right" }]}>{formatNumber(l.hits)}</Text>
             <Text style={[s.tdMono, { flex: 1.2, textAlign: "right" }]}>{formatPrice(unitPrice)}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.revenue, { precision: 2 })}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.vendor_cost, { precision: 2 })}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.margin, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.revenue, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.vendor_cost, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.margin, { precision: 2 })}</Text>
           </View>
         );
       })}
@@ -599,8 +600,8 @@ function CustomerLines({ lines }: { lines: StatementLine[] }) {
   return (
     <View>
       <View style={s.tableHeader}>
-        <Text style={[s.th, { flex: 3.4 }]}>API</Text>
-        <Text style={[s.th, { flex: 1.2, textAlign: "right" }]}>Calls</Text>
+        <Text style={[s.th, { flex: 3.4 }]}>SKU</Text>
+        <Text style={[s.th, { flex: 1.2, textAlign: "right" }]}>Units</Text>
         <Text style={[s.th, { flex: 1.4, textAlign: "right" }]}>Unit price</Text>
         <Text style={[s.th, { flex: 1.6, textAlign: "right" }]}>Subtotal</Text>
       </View>
@@ -614,7 +615,7 @@ function CustomerLines({ lines }: { lines: StatementLine[] }) {
             </View>
             <Text style={[s.tdMono, { flex: 1.2, textAlign: "right" }]}>{formatNumber(l.hits)}</Text>
             <Text style={[s.tdMono, { flex: 1.4, textAlign: "right" }]}>{formatPrice(unitPrice)}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.revenue, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.revenue, { precision: 2 })}</Text>
           </View>
         );
       })}
@@ -639,13 +640,13 @@ function InternalTotalsRow({
       </Text>
       <View style={{ flex: 1.2 }} />
       <Text style={[s.totalsValueCell, s.totalsValueInternal, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.revenue, { precision: 2 })}
+        {formatMoney(totals.revenue, { precision: 2 })}
       </Text>
       <Text style={[s.totalsValueCell, s.totalsValueInternal, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.vendor_cost, { precision: 2 })}
+        {formatMoney(totals.vendor_cost, { precision: 2 })}
       </Text>
       <Text style={[s.totalsValueCell, s.totalsValueInternal, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.margin, { precision: 2 })}
+        {formatMoney(totals.margin, { precision: 2 })}
       </Text>
     </View>
   );
@@ -668,7 +669,7 @@ function CustomerTotalsRow({
       </Text>
       <View style={{ flex: 1.4 }} />
       <Text style={[s.totalsValueCell, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.revenue, { precision: 2 })}
+        {formatMoney(totals.revenue, { precision: 2 })}
       </Text>
     </View>
   );
@@ -710,7 +711,7 @@ function AdjustmentsBlock({
                   isCredit ? s.adjustmentAmountCredit : s.adjustmentAmountCharge,
                 ]}
               >
-                {formatINR(adj.amount, { precision: 2 })}
+                {formatMoney(adj.amount, { precision: 2 })}
               </Text>
             </View>
           );
@@ -725,7 +726,7 @@ function AdjustmentsBlock({
               subtotal < 0 ? s.adjustmentAmountCredit : s.adjustmentAmountCharge,
             ]}
           >
-            {formatINR(subtotal, { precision: 2 })}
+            {formatMoney(subtotal, { precision: 2 })}
           </Text>
         </View>
       </View>
@@ -737,7 +738,7 @@ function GrandTotalRow({ total }: { total: number }) {
   return (
     <View style={s.grandTotalRow}>
       <Text style={s.grandTotalLabel}>Grand total</Text>
-      <Text style={s.grandTotalValue}>{formatINR(total, { precision: 2 })}</Text>
+      <Text style={s.grandTotalValue}>{formatMoney(total, { precision: 2 })}</Text>
     </View>
   );
 }
@@ -754,7 +755,7 @@ function ThankYou({ data }: { data: StatementData }) {
     <View style={s.thankYou}>
       <Text style={s.thankYouTitle}>Thank you for choosing Ledgerline.</Text>
       <Text style={s.thankYouBody}>
-        This invoice covers API calls completed in the period above. Payments
+        This invoice covers usage recorded in the period above. Payments
         are due within 30 days of issue. For questions about line items or to
         reconcile against your usage logs, reply to billing@ledgerline.example with
         invoice number {data.header.number}.

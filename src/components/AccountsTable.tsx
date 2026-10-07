@@ -5,7 +5,7 @@ import { NoMsaChip } from "@/components/chips/Chips";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { AccountLogo } from "@/components/accounts/AccountLogo";
 import { AccountHoverCard } from "@/components/AccountHoverCard";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { ROW_BAD, ROW_WARN } from "@/lib/row-status";
 import type { AccountSummary } from "@/lib/repos/accounts";
 import { generateSlug } from "@/lib/slug";
@@ -77,11 +77,11 @@ export function AccountsTable({ rows }: { rows: AccountSummary[] }) {
                         />
                         {c.active_unpriced_pairs > 0 ? (
                           <div className="text-[11px] text-bad-ink mt-[2px] truncate">
-                            {c.active_unpriced_pairs} unpriced · {formatNumber(c.active_unpriced_hits)} hits
+                            {c.active_unpriced_pairs} unpriced · {formatNumber(c.active_unpriced_hits)} units
                           </div>
                         ) : c.historical_unpriced_pairs > 0 ? (
                           <div className="text-[11px] text-warn-ink mt-[2px] truncate">
-                            {c.historical_unpriced_pairs} historical · {formatNumber(c.historical_unpriced_hits)} hits
+                            {c.historical_unpriced_pairs} historical · {formatNumber(c.historical_unpriced_hits)} units
                           </div>
                         ) : null}
                       </div>
@@ -108,7 +108,7 @@ export function AccountsTable({ rows }: { rows: AccountSummary[] }) {
                 <td className="px-3 py-3 align-middle text-right font-mono tnum text-sm">
                   {c.revenue > 0 ? (
                     <span className="text-ink" style={{ fontWeight: 500 }}>
-                      {formatINR(c.revenue, { compact: true })}
+                      {formatMoney(c.revenue, { compact: true })}
                     </span>
                   ) : (
                     <span className="text-ink-faint">—</span>

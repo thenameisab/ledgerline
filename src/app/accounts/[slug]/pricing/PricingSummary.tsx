@@ -1,6 +1,6 @@
 "use client";
 
-import { formatINR, formatDate } from "@/lib/format";
+import { formatMoney, formatDate } from "@/lib/format";
 
 // The landmark for the pricing page: one Instrument-Serif sentence that answers
 // "what does this account's pricing look like, and where's the leak?" before the
@@ -37,7 +37,7 @@ export function PricingSummary({
           <>
             {pricedCount > 0 && (
               <span>
-                {pricedCount} {pricedCount === 1 ? "API" : "APIs"} priced
+                {pricedCount} {pricedCount === 1 ? "SKU" : "SKUs"} priced
               </span>
             )}
             {bundledCount > 0 && (
@@ -54,9 +54,9 @@ export function PricingSummary({
                 <button
                   onClick={onJumpToLeak}
                   className="text-bad-ink underline decoration-bad/40 decoration-1 underline-offset-4 hover:decoration-bad transition-colors ease-expo"
-                  title="Jump to the unpriced APIs — traffic on these earns nothing"
+                  title="Jump to the unpriced SKUs — usage on these earns nothing"
                 >
-                  {unpricedCount} leaking ₹0
+                  {unpricedCount} leaking $0
                 </button>
               </>
             )}
@@ -66,7 +66,7 @@ export function PricingSummary({
       <p className="mt-1 text-sm text-ink-muted">
         {totalRevenue > 0 ? (
           <>
-            <span className="tnum text-ink">{formatINR(totalRevenue, { compact: true })}</span>{" "}
+            <span className="tnum text-ink">{formatMoney(totalRevenue, { compact: true })}</span>{" "}
             earned in the last {windowDays} days of traffic
             {latestDate && (
               <span className="text-ink-faint">

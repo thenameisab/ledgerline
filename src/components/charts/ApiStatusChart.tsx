@@ -37,7 +37,7 @@ export function ApiStatusChart({
   if (total === 0) {
     return (
       <div className={`flex items-center justify-center ${size === "sm" ? "h-[100px]" : "h-[140px]"} text-ink-faint text-xs`}>
-        No hits in this period
+        No usage in this period
       </div>
     );
   }
@@ -108,9 +108,9 @@ export function ApiStatusChart({
           does not clip the rows, and the hidden rows added blank scroll below the page. */}
       <div className="sr-only">
         <table>
-          <caption>API call status breakdown</caption>
+          <caption>Usage outcome breakdown</caption>
           <thead>
-            <tr><th>Status</th><th>Hits</th><th>Share</th></tr>
+            <tr><th>Status</th><th>Units</th><th>Share</th></tr>
           </thead>
           <tbody>
             {SEGMENTS.map((s) => (

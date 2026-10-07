@@ -23,14 +23,14 @@ export default function Body() {
 
       <Figure
         src="/help/shots/dashboard-full.png"
-        alt="Dashboard with the Biggest movers card listing accounts with up and down arrows and rupee deltas"
+        alt="Dashboard with the Biggest movers card listing accounts with up and down arrows and dollar deltas"
         caption="Movers complement the top-accounts list: size vs. movement."
       />
 
       <H2 id="what-you-see">What you see</H2>
       <ul>
         <li>
-          <strong>Up to six accounts</strong>, each with an up or down arrow, the rupee change, and
+          <strong>Up to six accounts</strong>, each with an up or down arrow, the dollar change, and
           the percent change.
         </li>
         <li>
@@ -50,7 +50,7 @@ export default function Body() {
       <ul>
         <li>
           <strong>Click a mover</strong> — navigates to that account&rsquo;s profile, where the
-          briefing and API breakdown usually explain the move (a new API ramping, a price change,
+          briefing and SKU breakdown usually explain the move (a new SKU ramping, a price change,
           traffic going quiet).
         </li>
         <li>

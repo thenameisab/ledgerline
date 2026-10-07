@@ -88,7 +88,7 @@ export const NODES: ArchNode[] = [
     title: "Command palette",
     sub: "⌘K · search · act · ask",
     desc:
-      "⌘K opens a cmdk palette with three auto-detected modes. Search: debounced (180 ms) /api/search across accounts, invoices, groups, APIs, manual entries, vendors and audit, with inline metadata. Act: run/jump to verbs (Refresh runs inline). Ask: /api/ask answers revenue/hits/unpriced, variance and relations inline — deterministic templates, optional LLM fallback off by default. /api/context scopes 'on this page' actions; recents persist in localStorage.",
+      "⌘K opens a cmdk palette with three auto-detected modes. Search: debounced (180 ms) /api/search across accounts, invoices, groups, SKUs, manual entries, vendors and audit, with inline metadata. Act: run/jump to verbs (Refresh runs inline). Ask: /api/ask answers revenue/hits/unpriced, variance and relations inline — deterministic templates, optional LLM fallback off by default. /api/context scopes 'on this page' actions; recents persist in localStorage.",
     files: [
       "src/components/cmd/CommandPalette.tsx",
       "src/app/api/search/route.ts",
@@ -103,7 +103,7 @@ export const NODES: ArchNode[] = [
     title: "Charts",
     sub: "recharts",
     desc:
-      "recharts draws the dashboard — area revenue trends, API status bars, activity heatmap and sparklines. All data arrives pre-aggregated from the server; the browser never queries the database directly.",
+      "recharts draws the dashboard — area revenue trends, call-status bars, activity heatmap and sparklines. All data arrives pre-aggregated from the server; the browser never queries the database directly.",
     files: [
       "src/components/RevenueChart.tsx",
       "src/components/charts/ApiStatusChart.tsx",
@@ -234,7 +234,7 @@ export const NODES: ArchNode[] = [
     title: "Usage source",
     sub: "simulated in the demo",
     desc:
-      "Where daily usage comes from. In the demo MOCK_INTEGRATIONS=true, so lib/usage-sync.ts generates each day's usage from the existing account and API pairs, and lib/metabase-vendor.ts derives the vendor side from local usage. No external call is made. With mocking off, lib/metabase.ts queries a Metabase instance one date at a time.",
+      "Where daily usage comes from. In the demo MOCK_INTEGRATIONS=true, so lib/usage-sync.ts generates each day's usage from the existing account and SKU pairs, and lib/metabase-vendor.ts derives the vendor side from local usage. No external call is made. With mocking off, lib/metabase.ts queries a Metabase instance one date at a time.",
     files: ["src/lib/usage-sync.ts", "src/lib/metabase.ts", "src/lib/metabase-vendor.ts"],
   },
   {
@@ -372,7 +372,7 @@ export const FLOWS: Flow[] = [
       },
       {
         edges: [{ id: "routes-mb", rev: true }],
-        text: "Accounts resolve by name and log_aliases, APIs by product code. Unmapped rows are kept with a NULL id and counted.",
+        text: "Accounts resolve by name and log_aliases, SKUs by SKU code. Unmapped rows are kept with a NULL id and counted.",
       },
       {
         edges: [{ id: "routes-neon" }],
@@ -418,7 +418,7 @@ export const FLOWS: Flow[] = [
     steps: [
       {
         edges: [{ id: "ui-mw" }, { id: "mw-routes" }],
-        text: "“Download PDF” hits /api/invoices/[account]/[period]/pdf — rate-limited to 10 per user per minute.",
+        text: "“Download PDF” calls /api/invoices/[account]/[period]/pdf — rate-limited to 10 per user per minute.",
       },
       {
         edges: [{ id: "routes-repos" }],
@@ -426,7 +426,7 @@ export const FLOWS: Flow[] = [
       },
       {
         edges: [{ id: "repos-view" }],
-        text: "Per-API sums, bundle-aware prices and credit notes come back as StatementData.",
+        text: "Per-SKU sums, bundle-aware prices and credit notes come back as StatementData.",
       },
       {
         edges: [{ id: "routes-pdf" }],

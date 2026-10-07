@@ -59,7 +59,7 @@ export function PricingMatrix({
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search account or API…"
+          placeholder="Search account or SKU…"
           className="rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-ink w-[240px] transition-colors duration-fast ease-expo focus:border-accent focus:bg-bg-raised focus:outline-none placeholder:text-ink-faint"
         />
       </div>
@@ -84,13 +84,13 @@ export function PricingMatrix({
             <thead className="bg-bg-sunken text-ink-faint text-[11px] uppercase tracking-wide">
               <tr className="text-left">
                 <th className="px-4 py-3 font-medium">Account</th>
-                <th className="px-4 py-3 font-medium">API</th>
-                <th className="px-3 py-3 font-medium text-right">S (₹/hit)</th>
-                <th className="px-3 py-3 font-medium text-right">ND (₹/hit)</th>
-                <th className="px-3 py-3 font-medium text-right">F (₹/hit)</th>
-                <th className="px-3 py-3 font-medium text-right">IP (₹/hit)</th>
+                <th className="px-4 py-3 font-medium">SKU</th>
+                <th className="px-3 py-3 font-medium text-right">S ($/unit)</th>
+                <th className="px-3 py-3 font-medium text-right">ND ($/unit)</th>
+                <th className="px-3 py-3 font-medium text-right">F ($/unit)</th>
+                <th className="px-3 py-3 font-medium text-right">IP ($/unit)</th>
                 <th className="px-3 py-3 font-medium text-right">
-                  {filter === "unpriced" ? "Hits" : "Effective"}
+                  {filter === "unpriced" ? "Units" : "Effective"}
                 </th>
               </tr>
             </thead>
@@ -135,9 +135,10 @@ export function PricingMatrix({
                       <TruncateTooltip as="div" text={row.api_name} className="text-sm text-ink" />
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-[11px] text-ink-faint font-mono">{row.api_code}</span>
+                        <span className="text-[11px] text-ink-faint">per {row.unit}</span>
                         {row.unpriced && (
                           <span
-                            title={`${formatNumber(row.hits)} hits since ${row.first_used} earn nothing until priced`}
+                            title={`${formatNumber(row.hits)} units since ${row.first_used} earn nothing until priced`}
                             className="inline-flex items-center text-[11px] text-bad-ink px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-bad"
                           >
                             unpriced

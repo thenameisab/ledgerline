@@ -19,7 +19,7 @@ import { getApiSummaries } from "@/lib/repos/apis";
 import { mtdRange, prevMonthOf, defaultRange, isEarlyMonth } from "@/lib/repos/periods";
 import { resolvePeriod } from "@/lib/period";
 import { generateSlug } from "@/lib/slug";
-import { formatINR, formatPercent, formatDateRange } from "@/lib/format";
+import { formatMoney, formatPercent, formatDateRange } from "@/lib/format";
 import { getSessionUser, canViewCost } from "@/lib/access";
 import { costConfidence } from "@/lib/repos/vendor-cost";
 import { confirmedShare, formatShare, isLowConfidence } from "@/lib/vendor-confidence";
@@ -57,7 +57,7 @@ export default async function DashboardPage({
     includeCost ? costConfidence({ from, to, includeSandbox }) : Promise.resolve(null),
   ]);
 
-  // Tiered (slab) revenue is a per-month total the daily view prices at ₹0, so
+  // Tiered (slab) revenue is a per-month total the daily view prices at $0, so
   // the chart bars exclude it and won't sum to the KPI. A vendor's monthly
   // minimum is the same shape on the cost side, and worse: it belongs to no day
   // at all, so no allocation would put it on a bar honestly. Surface both gaps
@@ -67,10 +67,10 @@ export default async function DashboardPage({
   const minimumTopUp = kpis.minimum_top_up ?? 0;
   const excluded = [
     tieredRevenue >= 1
-      ? `${formatINR(tieredRevenue, { compact: true })} tiered revenue (billed per calendar month, not per day)`
+      ? `${formatMoney(tieredRevenue, { compact: true })} tiered revenue (billed per calendar month, not per day)`
       : null,
     minimumTopUp >= 1
-      ? `${formatINR(minimumTopUp, { compact: true })} of vendor monthly minimums (owed per month, not per day)`
+      ? `${formatMoney(minimumTopUp, { compact: true })} of vendor monthly minimums (owed per month, not per day)`
       : null,
   ].filter(Boolean);
   const chartCaption =
@@ -115,7 +115,7 @@ export default async function DashboardPage({
         ? isLowConfidence(confidence)
           ? `; margin not measured — vendor cost is confirmed on ${formatShare(
               confirmedShare(confidence!)
-            )} of hits`
+            )} of units`
           : `; margin holding at ${formatPercent(kpis.margin_pct, 0)}`
         : ""}
       .{" "}
@@ -123,7 +123,7 @@ export default async function DashboardPage({
         <>
           <span className="text-bad-ink" style={{ fontWeight: 500 }}>
             {risk.estimated ? "~" : ""}
-            {formatINR(risk.total, { compact: true })}
+            {formatMoney(risk.total, { compact: true })}
           </span>{" "}
           is at risk this month.
         </>
@@ -141,7 +141,7 @@ export default async function DashboardPage({
       name: c.display_name,
       sub: c.group_name ?? undefined,
       value: c.revenue,
-      display: formatINR(c.revenue, { compact: true }),
+      display: formatMoney(c.revenue, { compact: true }),
       href: `/accounts/${generateSlug(c.display_name)}`,
     }));
 
@@ -187,8 +187,8 @@ export default async function DashboardPage({
       name: a.name,
       sub: a.product_code,
       value: a.revenue,
-      display: formatINR(a.revenue, { compact: true }),
-      href: `/apis/${a.product_code}`,
+      display: formatMoney(a.revenue, { compact: true }),
+      href: `/skus/${a.product_code}`,
     }));
 
   // Per-account revenue + MoM growth for the portfolio visuals (treemap +
@@ -304,7 +304,7 @@ export default async function DashboardPage({
           >
             <TopList title="Top accounts by revenue" rows={accountRows} />
             <div className="hairline pt-5">
-              <TopList title="Top APIs by revenue" rows={apiRows} />
+              <TopList title="Top SKUs by revenue" rows={apiRows} />
             </div>
             <Link
               href="/accounts"

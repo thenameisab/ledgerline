@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Combobox } from "@/components/ui/Combobox";
 import { RollingText } from "@/components/ui/RollingText";
-import { formatINR, formatNumber, formatDate } from "@/lib/format";
+import { formatMoney, formatNumber, formatDate } from "@/lib/format";
 
 type MergeTarget = { id: number; display_name: string };
 
@@ -115,7 +115,7 @@ export function BlockingStatementsPanel({
             )}
             <span className="font-mono">{s.number}</span>
             <span className="text-ink-faint">{s.period_label}</span>
-            <span className="ml-auto tabular-nums">{formatINR(s.total_revenue)}</span>
+            <span className="ml-auto tabular-nums">{formatMoney(s.total_revenue)}</span>
             <span className="rounded bg-bg px-1.5 py-0.5 text-[11px] uppercase tracking-wide text-ink-muted">{s.status}</span>
           </li>
         ))}
@@ -188,7 +188,7 @@ export function CollisionsPanel({
                     onChange={() => setResolutions({ ...resolutions, [k]: "target" })}
                   />
                   <span className="truncate">
-                    {targetName}: <span className="tabular-nums">{formatINR(c.target_price_successful)}</span>
+                    {targetName}: <span className="tabular-nums">{formatMoney(c.target_price_successful)}</span>
                   </span>
                 </label>
                 <label
@@ -203,7 +203,7 @@ export function CollisionsPanel({
                     onChange={() => setResolutions({ ...resolutions, [k]: "source" })}
                   />
                   <span className="truncate">
-                    {sourceName}: <span className="tabular-nums">{formatINR(c.source_price_successful)}</span>
+                    {sourceName}: <span className="tabular-nums">{formatMoney(c.source_price_successful)}</span>
                   </span>
                 </label>
               </div>
@@ -212,7 +212,7 @@ export function CollisionsPanel({
         })}
       </ul>
       <p className="mt-2 text-[11px] leading-snug text-ink-faint">
-        Both accounts price these APIs from the same date. Pick which price survives — nothing is dropped silently.
+        Both accounts price these SKUs from the same date. Pick which price survives — nothing is dropped silently.
       </p>
     </div>
   );
@@ -379,7 +379,7 @@ function MergeDialog({
           {preview && (
             <div className="mt-4 rounded-lg border border-border bg-bg p-3">
               <p className="text-xs text-ink leading-relaxed">
-                Moves <span className="font-medium tabular-nums">{formatINR(preview.revenueMoved)}</span> of revenue into{" "}
+                Moves <span className="font-medium tabular-nums">{formatMoney(preview.revenueMoved)}</span> of revenue into{" "}
                 <span className="font-medium">{preview.target.display_name}</span>.
               </p>
               <div className="mt-1.5">
@@ -534,7 +534,7 @@ function DeleteDialog({ accountId, accountName, isAdmin }: { accountId: number; 
           {preview && (
             <div className="rounded-lg border border-border bg-bg p-3">
               <p className="text-xs text-ink leading-relaxed">
-                All-time revenue: <span className="font-medium tabular-nums">{formatINR(preview.revenue)}</span>
+                All-time revenue: <span className="font-medium tabular-nums">{formatMoney(preview.revenue)}</span>
               </p>
               <div className="mt-1.5">
                 <RowCountsSummary counts={preview.rowCounts} />

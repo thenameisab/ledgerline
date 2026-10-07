@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Customized,
 } from "recharts";
-import { formatINR, formatPercent } from "@/lib/format";
+import { formatMoney, formatPercent } from "@/lib/format";
 
 export type QuadrantPoint = {
   client_id: number;
@@ -126,7 +126,7 @@ function LogoDot({
       onMouseEnter={() => onHover({ p: payload, x: cx, y: cy })}
       onMouseLeave={() => onHover(null)}
       style={{ cursor: "pointer" }}
-      aria-label={`${payload.name}, ${formatINR(payload.revenue, { compact: true })}, ${formatPercent(payload.delta_pct, 0)}`}
+      aria-label={`${payload.name}, ${formatMoney(payload.revenue, { compact: true })}, ${formatPercent(payload.delta_pct, 0)}`}
     >
       {moved && (
         <>
@@ -170,7 +170,7 @@ function PointTooltip({ p }: { p: QuadrantPoint }) {
       }}
     >
       <div className="text-ink font-medium">{p.name}</div>
-      <div className="text-ink-muted tnum">{formatINR(p.revenue)}</div>
+      <div className="text-ink-muted tnum">{formatMoney(p.revenue)}</div>
       <div className={p.delta_pct >= 0 ? "text-success-ink tnum" : "text-bad-ink tnum"}>
         {p.delta_pct > 0 ? "+" : ""}
         {formatPercent(p.delta_pct, 0)} vs last month
@@ -229,7 +229,7 @@ export function GrowthQuadrant({ points }: { points: QuadrantPoint[] }) {
               fontSize={11}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v) => formatINR(v, { compact: true })}
+              tickFormatter={(v) => formatMoney(v, { compact: true })}
             />
             <YAxis
               type="number"
@@ -277,7 +277,7 @@ export function GrowthQuadrant({ points }: { points: QuadrantPoint[] }) {
             {points.map((p) => (
               <tr key={p.client_id}>
                 <td>{p.name}</td>
-                <td>{formatINR(p.revenue)}</td>
+                <td>{formatMoney(p.revenue)}</td>
                 <td>{formatPercent(p.delta_pct, 0)}</td>
               </tr>
             ))}

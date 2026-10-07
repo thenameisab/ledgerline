@@ -1,7 +1,7 @@
 "use client";
 
 // Landing snippet: an inline copy of the ⌘K command palette with a small
-// hard-coded index and the same query grammar as the app (@account, #API,
+// hard-coded index and the same query grammar as the app (@account, #SKU,
 // field:value, > for actions, metric words for answers).
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
@@ -18,7 +18,7 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import { Kbd, Label, Num, Snippet, inr, useInView } from "@/components/landing/ui";
+import { Kbd, Label, Num, Snippet, usd, useInView } from "@/components/landing/ui";
 
 /* ---------- Data (fictional) ---------- */
 
@@ -27,41 +27,41 @@ type Status = "active" | "pending" | "leaking";
 const STATUS: Record<Status, { text: string; dot: string }> = {
   active: { text: "Active", dot: "bg-ok" },
   pending: { text: "Pending approval", dot: "bg-warn" },
-  leaking: { text: "Unpriced hits", dot: "bg-bad" },
+  leaking: { text: "Unpriced usage", dot: "bg-bad" },
 };
 
 type Account = { name: string; slug: string; sep: number; status: Status };
 
 const ACCOUNTS: Account[] = [
-  { name: "Acme Lending Co", slug: "acme-lending-co", sep: 618420, status: "active" },
-  { name: "Acme Microfinance", slug: "acme-microfinance", sep: 142860, status: "pending" },
-  { name: "Orbit Cards", slug: "orbit-cards", sep: 542180, status: "active" },
-  { name: "Orbit Neobank", slug: "orbit-neobank", sep: 296510, status: "leaking" },
-  { name: "Orbit SME", slug: "orbit-sme", sep: 88240, status: "active" },
-  { name: "Vertex Pay", slug: "vertex-pay", sep: 384700, status: "active" },
-  { name: "Helios Capital", slug: "helios-capital", sep: 211350, status: "pending" },
-  { name: "Northwind Home Loans", slug: "northwind-home-loans", sep: 167930, status: "leaking" },
-  { name: "Zenith Payments", slug: "zenith-payments", sep: 452090, status: "active" },
-  { name: "Pinnacle NBFC", slug: "pinnacle-nbfc", sep: 73480, status: "active" },
+  { name: "Copperleaf CRM", slug: "copperleaf-crm", sep: 180102, status: "active" },
+  { name: "Copperleaf Support", slug: "copperleaf-support", sep: 64280, status: "pending" },
+  { name: "Quillmark Studio", slug: "quillmark-studio", sep: 209743, status: "active" },
+  { name: "Quillmark News", slug: "quillmark-news", sep: 58610, status: "leaking" },
+  { name: "Quillmark Podcasts", slug: "quillmark-podcasts", sep: 21480, status: "active" },
+  { name: "Harbor Freight", slug: "harbor-freight", sep: 96370, status: "active" },
+  { name: "Brightline Clinics", slug: "brightline-clinics", sep: 71920, status: "pending" },
+  { name: "Kestrel Store", slug: "kestrel-store", sep: 88450, status: "leaking" },
+  { name: "Kestrel Ads", slug: "kestrel-ads", sep: 30260, status: "active" },
+  { name: "Pinnacle Markets", slug: "pinnacle-markets", sep: 18740, status: "active" },
 ];
 
-type Api = { code: string; name: string; hits: number };
+type Api = { code: string; name: string; units: number; unit: string };
 
 const APIS: Api[] = [
-  { code: "KY1001", name: "PAN Verification", hits: 124310 },
-  { code: "KY1002", name: "Aadhaar OTP Verification", hits: 86240 },
-  { code: "KY1007", name: "Face Match", hits: 41870 },
-  { code: "KB2001", name: "GSTIN Verification", hits: 18420 },
-  { code: "BV3001", name: "Bank Account Verification (Penny Drop)", hits: 97530 },
-  { code: "IN4004", name: "Bank Statement Analysis", hits: 12960 },
-  { code: "FR5001", name: "Credit Bureau Pull", hits: 55110 },
-  { code: "FR5005", name: "AML / PEP Screening", hits: 23680 },
+  { code: "ATL-PRO-IN", name: "Atlas Pro · input tokens", units: 41_820, unit: "M tokens" },
+  { code: "ATL-PRO-OUT", name: "Atlas Pro · output tokens", units: 8_460, unit: "M tokens" },
+  { code: "ATL-FLASH-IN", name: "Atlas Flash · input tokens", units: 512_300, unit: "M tokens" },
+  { code: "ATL-EMBED", name: "Atlas Embed v3", units: 884_100, unit: "M tokens" },
+  { code: "PRM-VID-1080", name: "Prism Video · 1080p", units: 51_200, unit: "seconds" },
+  { code: "VOX-AGENT", name: "Realtime voice agent", units: 318_400, unit: "minutes" },
+  { code: "MSG-SMS-US", name: "SMS · United States", units: 1_862_000, unit: "messages" },
+  { code: "GPU-H100", name: "H100 GPU · on-demand", units: 9_310, unit: "GPU-hours" },
 ];
 
 const VIEWS = [
   { name: "Accounts leaking revenue", path: "/accounts?status=leaking" },
   { name: "Manual entries pending approval", path: "/review/manual-entries?status=pending" },
-  { name: "APIs with no traffic", path: "/apis?traffic=none" },
+  { name: "SKUs with no traffic", path: "/skus?traffic=none" },
   { name: "Invoices in draft", path: "/invoices?status=draft" },
 ];
 
@@ -90,18 +90,19 @@ const MONTH_ALIAS: Record<string, MonthKey> = {
   october: "oct",
 };
 
-const METRICS = ["revenue", "hits", "unpriced"] as const;
+const METRICS = ["revenue", "margin", "unpriced"] as const;
 type Metric = (typeof METRICS)[number];
 const STOP = ["in", "for", "of", "the", "on", "during", "what", "is", "was"];
 
 // Words the trailing, still-being-typed token is ignored for, so a half-typed
 // keyword ("rev", "se", "status:") does not empty the list for a moment.
-const KEYWORDS = [...METRICS, ...STOP, ...Object.keys(MONTH_ALIAS), "account:", "api:", "status:", "month:"];
+const KEYWORDS = [...METRICS, ...STOP, ...Object.keys(MONTH_ALIAS), "account:", "sku:", "api:", "status:", "month:"];
 
 const revenue = (a: Account, m: MonthKey) => Math.round(a.sep * MONTHS[m].factor);
-const hitsOf = (a: Account, m: MonthKey) => Math.round(revenue(a, m) / 6.4);
+const marginOf = (a: Account, m: MonthKey) => Math.round(revenue(a, m) * 0.54);
+/** Revenue the unpriced usage would add at list price. */
 const unpricedOf = (a: Account, m: MonthKey) =>
-  a.status === "leaking" ? Math.round(hitsOf(a, m) * 0.031) : 0;
+  a.status === "leaking" ? Math.round(revenue(a, m) * 0.031) : 0;
 
 /** 30 daily points, deterministic per account+month, scaled to sum to `total`. */
 function series(seedText: string, total: number): number[] {
@@ -130,8 +131,11 @@ type Op = { field: Field; value: string };
 function toOp(tok: string): Op | null {
   if (tok.length > 1 && tok[0] === "@") return { field: "account", value: tok.slice(1).toLowerCase() };
   if (tok.length > 1 && tok[0] === "#") return { field: "api", value: tok.slice(1).toLowerCase() };
-  const m = /^(account|api|status|month):(.+)$/i.exec(tok);
-  if (m) return { field: m[1].toLowerCase() as Field, value: m[2].toLowerCase() };
+  const m = /^(account|sku|api|status|month):(.+)$/i.exec(tok);
+  if (m) {
+    const f = m[1].toLowerCase();
+    return { field: (f === "sku" ? "api" : f) as Field, value: m[2].toLowerCase() };
+  }
   return null;
 }
 
@@ -250,7 +254,7 @@ function search(text: string, chips: Op[]): Group[] {
 
   if (metric && accounts.length === 1 && (accOps.length > 0 || core.length > 0)) {
     const a = accounts[0];
-    const tab = metric === "revenue" ? "revenue" : "usage";
+    const tab = metric === "unpriced" ? "usage" : "revenue";
     return [
       {
         label: "Answer",
@@ -282,8 +286,8 @@ function search(text: string, chips: Op[]): Group[] {
   const groups: Group[] = [
     { label: "Accounts", rows: accountRows },
     {
-      label: "APIs",
-      rows: apis.map((x) => ({ kind: "api", id: `api-${x.code}`, api: x, path: `/apis/${x.code}` })),
+      label: "SKUs",
+      rows: apis.map((x) => ({ kind: "api", id: `api-${x.code}`, api: x, path: `/skus/${x.code}` })),
     },
     {
       label: "Views",
@@ -299,7 +303,7 @@ function search(text: string, chips: Op[]): Group[] {
 
 /* ---------- Autoplay script ---------- */
 
-const SCRIPT = ["orbit", "@orbit-cards revenue in sep", "status:pending", ">refresh"];
+const SCRIPT = ["quillmark", "@quillmark-studio margin in sep", "#atl", ">refresh"];
 
 /* ---------- Component ---------- */
 
@@ -472,7 +476,7 @@ export function PaletteSnippet() {
                 aria-controls={listId}
                 aria-autocomplete="list"
                 aria-activedescendant={activeRow ? `${listId}-${activeRow.id}` : undefined}
-                placeholder={chips.length ? "" : "Search accounts, APIs, invoices… or ask"}
+                placeholder={chips.length ? "" : "Search accounts, SKUs, invoices… or ask"}
                 spellCheck={false}
                 autoComplete="off"
                 className="h-[30px] w-full rounded-sm bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-faint focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1"
@@ -504,7 +508,7 @@ export function PaletteSnippet() {
           {groups.length === 0 && (
             <div className="px-3 py-5 text-[13px] text-ink-muted">
               No matches. Try <span className="font-mono text-[12px]">@account</span>,{" "}
-              <span className="font-mono text-[12px]">#API</span>,{" "}
+              <span className="font-mono text-[12px]">#SKU</span>,{" "}
               <span className="font-mono text-[12px]">status:pending</span> or{" "}
               <span className="font-mono text-[12px]">&gt;</span> for actions.
             </div>
@@ -611,7 +615,7 @@ function RowBody({ row }: { row: Exclude<Row, { kind: "answer" }> }) {
         </span>
         <span aria-hidden className={`h-1.5 w-1.5 shrink-0 rounded-full sm:hidden ${s.dot}`} title={s.text} />
         <span className="sr-only">{s.text}</span>
-        <span className="w-[84px] shrink-0 text-right tabular-nums text-ink">{inr(revenue(a, row.month))}</span>
+        <span className="w-[84px] shrink-0 text-right tabular-nums text-ink">{usd(revenue(a, row.month))}</span>
         <span className="w-[28px] shrink-0 font-mono text-[10.5px] text-ink-faint">{MONTHS[row.month].short}</span>
       </>
     );
@@ -619,12 +623,14 @@ function RowBody({ row }: { row: Exclude<Row, { kind: "answer" }> }) {
   if (row.kind === "api") {
     return (
       <>
-        <span className="w-[52px] shrink-0 font-mono text-[11px] text-ink-faint">{row.api.code}</span>
+        <span className="w-[92px] shrink-0 truncate font-mono text-[11px] text-ink-faint" title={row.api.code}>
+          {row.api.code}
+        </span>
         <span className="min-w-0 flex-1 truncate text-ink" title={row.api.name}>
           {row.api.name}
         </span>
         <span className="hidden shrink-0 tabular-nums text-[12px] text-ink-faint sm:inline">
-          {row.api.hits.toLocaleString("en-IN")} hits MTD
+          {row.api.units.toLocaleString("en-US")} {row.api.unit} MTD
         </span>
       </>
     );
@@ -663,11 +669,8 @@ function AnswerCard({
 }) {
   const { account: a, metric, month } = row;
   const value =
-    metric === "revenue" ? revenue(a, month) : metric === "hits" ? hitsOf(a, month) : unpricedOf(a, month);
-  const fmt =
-    metric === "revenue"
-      ? inr
-      : (n: number) => `${Math.round(n).toLocaleString("en-IN")}${metric === "unpriced" ? " hits" : ""}`;
+    metric === "revenue" ? revenue(a, month) : metric === "margin" ? marginOf(a, month) : unpricedOf(a, month);
+  const fmt = usd;
   const points = series(`${a.slug}-${metric}-${month}`, Math.max(value, 1));
   const max = Math.max(...points);
   const min = Math.min(...points);

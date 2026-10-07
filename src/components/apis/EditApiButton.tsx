@@ -15,7 +15,7 @@ export function EditApiButton({ api }: { api: ApiFormInitial & { product_code: s
     <>
       <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
         <Pencil size={12} strokeWidth={1.5} />
-        Edit API
+        Edit SKU
       </Button>
       {open && (
         <ApiFormModal
@@ -25,7 +25,7 @@ export function EditApiButton({ api }: { api: ApiFormInitial & { product_code: s
           onSaved={(saved) => {
             setOpen(false);
             if (saved.product_code !== api.product_code) {
-              router.push(`/apis/${saved.product_code}`);
+              router.push(`/skus/${saved.product_code}`);
             } else {
               router.refresh();
             }

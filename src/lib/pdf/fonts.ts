@@ -11,16 +11,16 @@ import path from "node:path";
 // weight (see DEPLOY.md). They have to be full files, not aggressively-subset
 // woffs, or fontkit's glyph metric reader trips during render.
 //
-// Two substitutions the screen doesn't need, both for the same reason — the
-// Indian Rupee Sign U+20B9:
+// Two substitutions the screen doesn't need:
 //
-//   1. JetBrains Mono has no ₹ in any release, so the PDF's mono is Source Code
-//      Pro, which does.
-//   2. TASA Orbiter has no ₹ either. Display type is therefore used for the
-//      *words* (brand, account name, period, thank-you) while the currency
-//      landmarks — the statement total and grand total — are set in Inter
-//      Semibold at the same size. They still read as landmarks; they just
-//      aren't display type. Do not move a ₹-bearing style onto "Display".
+//   1. The PDF's mono is Source Code Pro, not JetBrains Mono. It covers the
+//      currency glyphs the statement prints.
+//   2. Display type (TASA Orbiter) is used for the *words* (brand, account
+//      name, period, thank-you). The currency landmarks — the statement total
+//      and grand total — are set in Inter Semibold at the same size. They still
+//      read as landmarks. Keep currency figures on Inter or the mono family,
+//      not on "Display", so a currency glyph outside TASA Orbiter's set cannot
+//      render blank.
 //
 // The screen renders JetBrains Mono and display-type figures as normal; only
 // the PDF carries these swaps.
@@ -58,8 +58,8 @@ export function registerPdfFonts() {
     ],
   });
 
-  // Hyphenation defaults to over-eager English on long product codes like
-  // "KY1001_Comprehensive". Disable globally — line breaks go to whitespace
+  // Hyphenation defaults to over-eager English on long SKU codes like
+  // "ATL-REASON-OUT". Disable globally — line breaks go to whitespace
   // only, matching the screen behavior.
   Font.registerHyphenationCallback((word) => [word]);
 }

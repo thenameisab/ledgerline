@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "sandbox-controls",
   title: "Sandbox controls",
   summary:
-    "One app-wide sandbox switch, effective-dated per-(account, API) classification, and capped sandbox billing — the three levers over test traffic.",
+    "One app-wide sandbox switch, effective-dated per-(account, SKU) classification, and capped sandbox billing — the three levers over test traffic.",
   group: "Sandbox",
   role: "admin",
   routes: ["/admin"],
@@ -28,17 +28,17 @@ export default function Body() {
         that could disagree with one another.
       </p>
 
-      <H2 id="classification">Per-(account, API) classification</H2>
+      <H2 id="classification">Per-(account, SKU) classification</H2>
       <p>
-        A classification marks a specific account-and-API pair as sandbox from an effective date. It
+        A classification marks a specific account-and-SKU pair as sandbox from an effective date. It
         overrides the account-level default for that pair only. With no rules present, the effective
         sandbox flag is identical to the plain account flag — rules refine, they never rewrite.
       </p>
 
       <H2 id="capped-billing">Capped billing</H2>
       <p>
-        A sandbox billing rule bills sandbox usage for a pair up to a cap: hits below the cap stay
-        free, hits above it earn revenue at the account&rsquo;s rate. This is how a &ldquo;free test
+        A sandbox billing rule bills sandbox usage for a pair up to a cap: units below the cap stay
+        free, units above it earn revenue at the account&rsquo;s rate. This is how a &ldquo;free test
         allowance, then billed&rdquo; contract is set up without marking the whole pair as live
         usage.
       </p>

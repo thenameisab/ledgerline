@@ -37,7 +37,7 @@ export default function Body() {
       <p>
         Pick <em>&ldquo;Revenue for … in …&rdquo;</em> and it asks you for the account — from the
         real list of accounts, not a free-text guess — then optionally a month. Pick{" "}
-        <em>&ldquo;Accounts using …&rdquo;</em> and it offers the API catalogue. You never have to know the
+        <em>&ldquo;Accounts using …&rdquo;</em> and it offers the SKU catalog. You never have to know the
         wording, and every value on offer is one that actually exists.
       </p>
       <ul>
@@ -63,8 +63,8 @@ export default function Body() {
       <p>
         Because you picked the account from a list, a cue-built question is sent as a{" "}
         <strong>structured request</strong> rather than a sentence. That matters: the prose parser
-        strips common words to find the entity, so an account called <em>Total Finance</em> would
-        lose &ldquo;Total&rdquo; on the way in. Cues skip that step entirely and send the exact name.
+        strips common words to find the entity, so an account called <em>Harbor Last Mile</em> would
+        lose &ldquo;Last&rdquo; on the way in. Cues skip that step entirely and send the exact name.
       </p>
 
       <H2 id="operators">Operators — narrow the search</H2>
@@ -74,8 +74,8 @@ export default function Body() {
       </p>
       <ul>
         <li>
-          <code>field:value</code> scopes to one field — <code>account:acme</code>,{" "}
-          <code>api:KY1001</code>, <code>status:pending</code>,{" "}
+          <code>field:value</code> scopes to one field — <code>account:copperleaf</code>,{" "}
+          <code>sku:ATL-PRO-IN</code>, <code>status:pending</code>,{" "}
           <code>month:june</code>, <code>user:maya</code>, <code>type:invoice</code>.
         </li>
         <li>
@@ -84,12 +84,12 @@ export default function Body() {
           <code>month:</code>.
         </li>
         <li>
-          <code>@acme</code> is short for <code>account:</code>, <code>#KY1001</code> for{" "}
-          <code>api:</code>.
+          <code>@copperleaf</code> is short for <code>account:</code>, <code>#ATL-PRO-IN</code> for{" "}
+          <code>sku:</code>.
         </li>
         <li>
           <code>-sandbox</code> excludes a term. Quote a value with spaces:{" "}
-          <code>account:&quot;northwind finance&quot;</code>.
+          <code>account:&quot;copperleaf labs&quot;</code>.
         </li>
       </ul>
       <p>
@@ -111,7 +111,7 @@ export default function Body() {
         destination in its own right. Type <em>&ldquo;leaking&rdquo;</em>,{" "}
         <em>&ldquo;pending&rdquo;</em>, <em>&ldquo;inactive&rdquo;</em> and a{" "}
         <strong>Views</strong> group offers the filtered page directly — accounts with revenue
-        leak, entries awaiting approval, APIs with no traffic. Operators compose into views too:{" "}
+        leak, entries awaiting approval, SKUs with no traffic. Operators compose into views too:{" "}
         <code>user:</code> becomes that person&rsquo;s audit trail.
       </p>
 
@@ -128,8 +128,8 @@ export default function Body() {
         </li>
         <li>
           <strong>Ask</strong> — start with <Kbd>?</Kbd>, or phrase a question (
-          <em>&ldquo;revenue for Acme in May&rdquo;</em>). A metric word like{" "}
-          <code>revenue</code>, <code>hits</code>, or <code>unpriced</code> is enough to trigger it.
+          <em>&ldquo;revenue for Copperleaf CRM in May&rdquo;</em>). A metric word like{" "}
+          <code>revenue</code>, <code>units</code>, or <code>unpriced</code> is enough to trigger it.
           Plain entity names stay in search so jumping is never hijacked.
         </li>
       </ul>
@@ -150,7 +150,7 @@ export default function Body() {
           <strong>Groups</strong> — account count and rolled-up revenue.
         </li>
         <li>
-          <strong>APIs</strong> — name and product code.
+          <strong>SKUs</strong> — name and SKU code.
         </li>
         <li>
           <strong>Manual entries</strong> — account · date, total, and status (draft / pending /
@@ -193,7 +193,7 @@ export default function Body() {
         </li>
         <li>
           <strong>Create account / group / manual entry</strong>, <strong>Resolve aliases</strong>,{" "}
-          <strong>Review API catalog</strong>, <strong>Set sandbox billing rules</strong> — the
+          <strong>Review SKU catalog</strong>, <strong>Set sandbox billing rules</strong> — the
           customisation work admins and <em>editors</em> both own.
         </li>
         <li>
@@ -216,14 +216,14 @@ export default function Body() {
       <ul>
         <li>
           <strong>Account</strong> — Add manual entry, Edit pricing, Edit profile, View invoices,
-          and &ldquo;APIs used by this account&rdquo;.
+          and &ldquo;SKUs used by this account&rdquo;.
         </li>
         <li>
           <strong>Invoice</strong> — Export PDF, Export CSV (variant follows your role), Add manual
           entry, Edit pricing, Edit profile.
         </li>
         <li>
-          <strong>API</strong> — &ldquo;Accounts using this API&rdquo;.
+          <strong>SKU</strong> — &ldquo;Accounts using this SKU&rdquo;.
         </li>
       </ul>
       <p>
@@ -235,19 +235,19 @@ export default function Body() {
       <H2 id="ask">Ask — a number, inline</H2>
       <p>
         Ask mode answers from the same cached summaries the dashboard uses, so the figure
-        reconciles exactly. It covers <strong>revenue</strong>, <strong>hits</strong>, and{" "}
+        reconciles exactly. It covers <strong>revenue</strong>, <strong>units</strong>, and{" "}
         <strong>unpriced</strong> — for an account, a group, the top N accounts, or the whole org —
         and parses periods like <em>&ldquo;May&rdquo;</em>, <em>&ldquo;May 2026&rdquo;</em>, or{" "}
         <em>&ldquo;last month&rdquo;</em> (default is month-to-date).
       </p>
       <ul>
         <li>
-          <strong>Explain</strong> — <em>&ldquo;why did Acme change vs last month?&rdquo;</em>{" "}
+          <strong>Explain</strong> — <em>&ldquo;why did Kestrel Store change vs last month?&rdquo;</em>{" "}
           attributes the delta across volume, price, slab tiers, bundles, and code remaps.
         </li>
         <li>
-          <strong>Relate</strong> — <em>&ldquo;accounts using KY1001&rdquo;</em> or{" "}
-          <em>&ldquo;APIs used by Acme&rdquo;</em>.
+          <strong>Relate</strong> — <em>&ldquo;accounts using ATL-PRO-IN&rdquo;</em> or{" "}
+          <em>&ldquo;SKUs used by Kestrel Store&rdquo;</em>.
         </li>
       </ul>
       <p>
@@ -259,7 +259,7 @@ export default function Body() {
       <H2 id="expand">The panel grows to fit the answer</H2>
       <p>
         An answer isn&rsquo;t always one number. Ask for an account&rsquo;s revenue and you also get
-        its daily line and its top APIs; ask for the top 5 and you get a ranked table with hits
+        its daily line and its top SKUs; ask for the top 5 and you get a ranked table with units
         alongside revenue. When an answer carries a chart, or a breakdown long enough to deserve a
         real table, the palette <strong>expands in both axes</strong> — from a 560&nbsp;px list to an
         880&nbsp;px panel, and taller — and animates there over 220&nbsp;ms on the design
@@ -290,7 +290,7 @@ export default function Body() {
       <H2 id="shortcuts">Global shortcuts</H2>
       <ul>
         <li>
-          <Kbd>⌘1</Kbd> Dashboard · <Kbd>⌘2</Kbd> Accounts · <Kbd>⌘3</Kbd> APIs ·{" "}
+          <Kbd>⌘1</Kbd> Dashboard · <Kbd>⌘2</Kbd> Accounts · <Kbd>⌘3</Kbd> SKUs ·{" "}
           <Kbd>⌘4</Kbd> Manual entries
         </li>
         <li>
@@ -318,7 +318,7 @@ export default function Body() {
           showing an error.
         </li>
         <li>
-          <strong>No results</strong> — the palette suggests a next step (an account, invoice, API
+          <strong>No results</strong> — the palette suggests a next step (an account, invoice, SKU
           code, or a question) rather than a bare &ldquo;0 results&rdquo;; ask mode always shows a
           loading row, an answer, or a hint — never a blank panel.
         </li>

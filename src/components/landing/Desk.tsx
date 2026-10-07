@@ -27,12 +27,12 @@ function InvoiceSlip() {
       style={{ background: "var(--a-cream)", color: "var(--a-cream-ink)" }}
     >
       <div className={`${mono} text-[9.5px] opacity-70`}>Invoice</div>
-      <div className="mt-0.5 font-mono text-[15px] font-medium">LL-2026-0042</div>
-      <div className="mt-2 text-[11.5px]">Orbit Cards · Sep 2026</div>
+      <div className="mt-0.5 font-mono text-[15px] font-medium">LL-2026-0038</div>
+      <div className="mt-2 text-[11.5px]">Copperleaf CRM · Sep 2026</div>
       <div className="my-2.5 border-t border-dashed" style={{ borderColor: "currentColor", opacity: 0.35 }} />
       <div className="flex items-baseline justify-between text-[11px]">
-        <span className="opacity-70">Total incl. GST</span>
-        <span className="font-mono text-[13px] font-medium">₹2,96,391</span>
+        <span className="opacity-70">12 SKUs · total</span>
+        <span className="font-mono text-[13px] font-medium">$186,420</span>
       </div>
       <div
         className={`${mono} absolute right-3 top-4 rotate-[10deg] rounded-[3px] border-[1.5px] px-1.5 py-0.5 text-[9px] font-semibold`}
@@ -54,21 +54,23 @@ function PriceTag() {
         className="absolute left-[14px] top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full"
         style={{ background: "var(--ll-paper)", boxShadow: "inset 0 1px 2px rgba(0,0,0,.25)" }}
       />
-      <div className="font-display text-[26px] font-medium leading-none tracking-display">₹3.20</div>
-      <div className={`${mono} mt-1.5 text-[9.5px] opacity-75`}>per hit · KY1001</div>
+      <div className="font-display text-[26px] font-medium leading-none tracking-display">$3.00</div>
+      <div className={`${mono} mt-1.5 text-[9.5px] opacity-75`}>per 1M tokens · Atlas Pro</div>
     </div>
   );
 }
 
 function Receipt() {
+  // One account's day: four SKUs, four different units.
   const rows: [string, string, string][] = [
-    ["KY1001", "×412", "1,318"],
-    ["BV3001", "×238", "714"],
-    ["FR5001", "×96", "1,152"],
+    ["ATL-PRO-OUT", "84M tok", "1,260"],
+    ["VOX-AGENT", "3,140 min", "188"],
+    ["MSG-SMS-US", "18.9K msg", "149"],
+    ["GPU-H100", "96 GPU-h", "239"],
   ];
   return (
     <div
-      className="ll-zigzag w-[176px] px-3.5 pb-5 pt-3.5 font-mono"
+      className="ll-zigzag w-[212px] px-3.5 pb-5 pt-3.5 font-mono"
       style={{ background: "var(--a-white)", color: "var(--a-white-ink)" }}
     >
       <div className={`${mono} text-center text-[9.5px] opacity-60`}>Usage · 06 Oct</div>
@@ -77,13 +79,13 @@ function Receipt() {
           <div key={c} className="flex justify-between gap-2">
             <span>{c}</span>
             <span className="opacity-60">{h}</span>
-            <span>₹{a}</span>
+            <span>${a}</span>
           </div>
         ))}
       </div>
       <div className="mt-2 flex justify-between border-t border-dashed pt-1.5 text-[11px] font-medium" style={{ borderColor: "rgba(0,0,0,.25)" }}>
         <span>Total</span>
-        <span>₹3,184</span>
+        <span>$1,836</span>
       </div>
     </div>
   );
@@ -100,8 +102,8 @@ function StickyNote() {
         style={{ background: "rgba(255,255,255,.55)", boxShadow: "0 1px 1px rgba(0,0,0,.06)" }}
       />
       <div className={`${mono} text-[9.5px] opacity-70`}>Alert · needs action</div>
-      <div className="mt-1.5 text-[13px] font-medium leading-snug">Acme Lending Co</div>
-      <div className="mt-1 text-[11.5px] leading-snug">PAN volume down 62% vs the 4-week baseline</div>
+      <div className="mt-1.5 text-[13px] font-medium leading-snug">Brightline Clinics</div>
+      <div className="mt-1 text-[11.5px] leading-snug">Speech-to-text minutes down 70% vs the 4-week baseline</div>
     </div>
   );
 }
@@ -169,8 +171,8 @@ function Coin() {
       style={{ background: "var(--a-slate)", color: "var(--a-slate-ink)" }}
     >
       <span className="absolute top-2 h-2 w-2 rounded-full" style={{ background: "var(--ll-paper)" }} />
-      <div className="mt-1 font-mono text-[14px] font-medium">18%</div>
-      <div className={`${mono} text-[8.5px] opacity-80`}>GST</div>
+      <div className="mt-1 font-mono text-[14px] font-medium">43</div>
+      <div className={`${mono} text-[8.5px] opacity-80`}>SKUs</div>
     </div>
   );
 }
@@ -193,11 +195,23 @@ function IndexCards() {
       >
         <div className={`${mono} text-[9.5px] opacity-75`}>Pricing models</div>
         <div className="mt-1.5 space-y-[3px] font-mono text-[11.5px] leading-[17px]">
-          <div>Flat ········ ₹3.50</div>
-          <div>Tier ···· 4.00/3.20</div>
+          <div>Flat ······ $0.0079</div>
+          <div>Tier ···· 3.00/2.40</div>
           <div>Slab ···· whole vol.</div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function UnitsTape() {
+  return (
+    <div
+      className="flex items-center gap-2 rounded-[3px] px-3 py-2 font-mono text-[10.5px]"
+      style={{ background: "var(--a-terra)", color: "var(--a-terra-ink)" }}
+    >
+      <span className={`${mono} text-[9px] opacity-75`}>Units</span>
+      <span className="whitespace-nowrap">tokens · minutes · messages · images · GPU-hours</span>
     </div>
   );
 }
@@ -236,6 +250,7 @@ const PIECES: Piece[] = [
   { id: "stamp", El: Stamp, at: [34, 85], rot: -14 },
   { id: "receipt", El: Receipt, at: [11, 72], rot: 4 },
   { id: "chip", El: SandboxChip, at: [21, 51], rot: -2 },
+  { id: "units", El: UnitsTape, at: [80, 46], rot: 3 },
 ];
 
 function DraggablePiece({

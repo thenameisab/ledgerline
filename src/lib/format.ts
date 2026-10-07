@@ -1,44 +1,41 @@
-// Formatting helpers — INR-localised numbers and dates.
+// Formatting helpers — USD amounts, numbers and dates.
 //
-// We deliberately avoid `Number.prototype.toLocaleString("en-IN", …)` for
-// number formatting. Node's default ICU build can group differently than the
-// browser (e.g. "1,234,567" server-side vs "12,34,567" browser-side), which
+// We deliberately avoid `Number.prototype.toLocaleString(…)` for number
+// formatting. Node's ICU build can group differently than the browser, which
 // causes React hydration mismatches. Use the deterministic formatter below.
 
-function formatIntegerINR(n: number): string {
+function formatInteger(n: number): string {
   const sign = n < 0 ? "-" : "";
   const s = Math.abs(Math.trunc(n)).toString();
-  if (s.length <= 3) return sign + s;
-  const last3 = s.slice(-3);
-  const rest = s.slice(0, -3);
-  const grouped = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
-  return sign + grouped + "," + last3;
+  return sign + s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-function formatDecimalINR(n: number, precision: number): string {
-  if (precision <= 0) return formatIntegerINR(n);
+function formatDecimal(n: number, precision: number): string {
+  if (precision <= 0) return formatInteger(Math.round(n));
   const sign = n < 0 ? "-" : "";
-  const abs = Math.abs(n);
-  const fixed = abs.toFixed(precision); // e.g. "1234567.89"
+  const fixed = Math.abs(n).toFixed(precision); // e.g. "1234567.89"
   const [intPart, decPart] = fixed.split(".");
-  return sign + formatIntegerINR(Number(intPart)) + "." + decPart;
+  return sign + formatInteger(Number(intPart)) + "." + decPart;
 }
 
-export function formatINR(n: number, opts: { precision?: number; compact?: boolean } = {}): string {
+/** A USD amount: "$12,480", or "$1.24M" with `compact`. Negative amounts read "-$1,200". */
+export function formatMoney(n: number, opts: { precision?: number; compact?: boolean } = {}): string {
   const { precision = 0, compact = false } = opts;
   if (!Number.isFinite(n)) return "—";
-  if (compact && Math.abs(n) >= 1e7) return `₹${(n / 1e7).toFixed(2)}Cr`;
-  if (compact && Math.abs(n) >= 1e5) return `₹${(n / 1e5).toFixed(2)}L`;
-  if (compact && Math.abs(n) >= 1e3) return `₹${(n / 1e3).toFixed(1)}K`;
-  return `₹${formatDecimalINR(n, precision)}`;
+  const sign = n < 0 ? "-" : "";
+  const a = Math.abs(n);
+  if (compact && a >= 1e9) return `${sign}$${(a / 1e9).toFixed(2)}B`;
+  if (compact && a >= 1e6) return `${sign}$${(a / 1e6).toFixed(2)}M`;
+  if (compact && a >= 1e3) return `${sign}$${(a / 1e3).toFixed(1)}K`;
+  return `${sign}$${formatDecimal(a, precision)}`;
 }
 
+/** A unit price. Keeps up to 4 decimals because many SKUs cost fractions of a cent. */
 export function formatPrice(n: number): string {
   if (!Number.isFinite(n)) return "—";
-  if (n === 0) return "₹0";
-  // Show 2 decimals, trim trailing zeros to a max of 4 if more precision exists.
-  const precision = Number.isInteger(n * 100) ? 2 : 4;
-  return `₹${formatDecimalINR(n, precision)}`;
+  if (n === 0) return "$0";
+  const precision = Number.isInteger(Math.round(n * 1e6) / 1e4) ? 2 : 4;
+  return `${n < 0 ? "-" : ""}$${formatDecimal(Math.abs(n), precision)}`;
 }
 
 export function formatPercent(n: number, precision: number = 1): string {
@@ -48,7 +45,7 @@ export function formatPercent(n: number, precision: number = 1): string {
 
 export function formatNumber(n: number): string {
   if (!Number.isFinite(n)) return "—";
-  return formatIntegerINR(n);
+  return formatInteger(n);
 }
 
 export function formatDate(s: string): string {

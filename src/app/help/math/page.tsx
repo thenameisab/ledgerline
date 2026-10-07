@@ -20,7 +20,7 @@ export default function MathPage() {
   return (
     <DocPage
       title="Mathematics"
-      lede="Every formula behind every number Ledgerline shows — money arithmetic, pricing resolution, stitched bundles, graduated slab tiers, margins, invoices, pacing, risk estimation, the activity heatmap, and Indian-system number formatting."
+      lede="Every formula behind every number Ledgerline shows — money arithmetic, pricing resolution, stitched bundles, graduated slab tiers, margins, invoices, pacing, risk estimation, the activity heatmap, and number formatting."
     >
       <p>
         Ledgerline computes money in three layers: Postgres stores and aggregates exact{" "}
@@ -33,7 +33,7 @@ export default function MathPage() {
       {/* ────────────────────────────────────────────────────────── 1. Money */}
       <H2 id="money">Money representation</H2>
       <p>
-        All money is INR (₹). The database column type for every price, cost, revenue, and
+        All money is USD ($). The database column type for every price, cost, revenue, and
         adjustment is <code>NUMERIC(14,4)</code> — up to 10 integer digits and exactly 4
         fractional digits. The <code>postgres</code> driver returns <code>NUMERIC</code> values
         as <em>strings</em> (they can exceed IEEE-754 precision), and{" "}
@@ -51,7 +51,7 @@ export default function MathPage() {
         <strong>banker&rsquo;s rounding</strong>: a value exactly halfway between two
         representable results rounds to the one whose last digit is <em>even</em> (2.5 → 2,
         3.5 → 4). Always rounding halves up would bias every tie in the same direction, and
-        summing thousands of usage rows would accumulate that bias into a real rupee error;
+        summing thousands of usage rows would accumulate that bias into a real error in dollars;
         half-even ties break up and down equally often, so the expected error of a long sum is
         zero.
       </p>
@@ -109,7 +109,7 @@ export function marginPct(margin: Money | unknown, revenue: Money | unknown): nu
 }`}
       />
       <p>
-        Example: margin ₹100 on revenue ₹500 gives{" "}
+        Example: margin $100 on revenue $500 gives{" "}
         <Math tex={R`(100/500)\times 100 = 20\%`} />. The division and multiplication happen in
         Decimal; conversion to <code>number</code> is the very last step.
       </p>
@@ -123,16 +123,16 @@ export function marginPct(margin: Money | unknown, revenue: Money | unknown): nu
       {/* ──────────────────────────────────────────────────────── 2. Pricing */}
       <H2 id="pricing">Pricing</H2>
       <p>
-        Every (account, API) pair carries four unit prices, one per hit status — a row in the{" "}
+        Every (account, SKU) pair carries four unit prices, one per usage outcome — a row in the{" "}
         <code>pricing</code> table:
       </p>
       <ParamTable
         nameHeader="Column"
         rows={[
-          { name: "price_successful", type: "NUMERIC(14,4)", desc: <>₹ per successful hit — the symbol <Math tex={R`p_s`} /> below.</> },
-          { name: "price_successful_no_data", type: "NUMERIC(14,4)", desc: <>₹ per hit that succeeded but returned no data — <Math tex={R`p_{\mathit{snd}}`} />.</> },
-          { name: "price_failed", type: "NUMERIC(14,4)", desc: <>₹ per failed hit (some contracts still bill these) — <Math tex={R`p_f`} />.</> },
-          { name: "price_in_progress", type: "NUMERIC(14,4)", desc: <>₹ per in-progress (async/deferred) hit — <Math tex={R`p_{\mathit{ip}}`} />.</> },
+          { name: "price_successful", type: "NUMERIC(14,4)", desc: <>$ per successful unit — the symbol <Math tex={R`p_s`} /> below.</> },
+          { name: "price_successful_no_data", type: "NUMERIC(14,4)", desc: <>$ per unit that succeeded but returned no data — <Math tex={R`p_{\mathit{snd}}`} />.</> },
+          { name: "price_failed", type: "NUMERIC(14,4)", desc: <>$ per failed unit (some contracts still bill these) — <Math tex={R`p_f`} />.</> },
+          { name: "price_in_progress", type: "NUMERIC(14,4)", desc: <>$ per in-progress (async/deferred) unit — <Math tex={R`p_{\mathit{ip}}`} />.</> },
         ]}
       />
 
@@ -156,13 +156,13 @@ export function marginPct(margin: Money | unknown, revenue: Money | unknown): nu
       </p>
       <Callout variant="warn" title="No pricing row">
         If no pricing row exists with <Math tex={R`e_i \le D`} />, all four prices{" "}
-        <code>COALESCE</code> to 0. The row earns ₹0 and the pair surfaces as a{" "}
+        <code>COALESCE</code> to 0. The row earns $0 and the pair surfaces as a{" "}
         <strong>revenue leak</strong> (see <a href="#risk">Risk estimation</a>) until priced.
       </Callout>
 
       <H3 id="pricing-revenue">Per-row revenue</H3>
       <p>
-        Each <code>usage_daily</code> row carries four hit counts:{" "}
+        Each <code>usage_daily</code> row carries four unit counts:{" "}
         <Math tex="s" /> (successful), <Math tex={R`\mathit{snd}`} /> (successful, no data),{" "}
         <Math tex="f" /> (failed), and <Math tex={R`\mathit{ip}`} /> (in progress). The view{" "}
         <code>usage_daily_with_revenue</code> computes revenue per row, entirely in SQL{" "}
@@ -174,13 +174,13 @@ export function marginPct(margin: Money | unknown, revenue: Money | unknown): nu
       />
       <p>
         The <Math tex={R`p_\bullet`} /> here are the view&rsquo;s <em>effective</em> prices
-        (after bundle resolution, next section), so revenue is exactly hits × price for every
+        (after bundle resolution, next section), so revenue is exactly units × price for every
         row with no special cases downstream.
       </p>
 
       <H3 id="pricing-supersede">Supersede vs. update</H3>
       <p>
-        Editing a price behaves differently depending on whether the (account, API) pair has ever
+        Editing a price behaves differently depending on whether the (account, SKU) pair has ever
         appeared on a finalized invoice (<code>isBilledPair</code>), implemented in{" "}
         <FilePath>src/app/api/pricing/route.ts</FilePath>:
       </p>
@@ -205,18 +205,19 @@ export function marginPct(margin: Money | unknown, revenue: Money | unknown): nu
       </Callout>
 
       {/* ──────────────────────────────────────────────────────── 3. Bundles */}
-      <H2 id="bundles">Bundles (stitched APIs)</H2>
+      <H2 id="bundles">Bundles (stitched SKUs)</H2>
       <p>
-        A stitched product fans one customer-facing call out to several catalog APIs. Usage logs
-        hits for <em>each member</em>, but the account pays one agreed price per stitched call. A
+        A stitched product sells several catalog SKUs as one customer-facing product. For
+        example, a realtime voice agent uses VOX-AGENT and VOX-STT-RT together. Usage records
+        units for <em>each member</em>, but the account pays one agreed price per stitched unit. A
         bundle (<FilePath>migrations/0006_api_bundles.sql</FilePath>) names the member set and
-        designates one <strong>anchor API</strong> — the entry point of the chain, whose hit
-        counts equal the number of stitched calls.
+        designates one <strong>anchor SKU</strong>. The anchor&rsquo;s unit counts equal the
+        number of stitched units.
       </p>
 
       <H3 id="bundles-effective-price">Anchor pricing</H3>
       <p>
-        For a usage row of account <Math tex="c" />, API <Math tex="a" />, date <Math tex="D" />,
+        For a usage row of account <Math tex="c" />, SKU <Math tex="a" />, date <Math tex="D" />,
         the effective price for each tier is:
       </p>
       <Math
@@ -229,7 +230,7 @@ p^{\text{individual}} & \text{otherwise}
 \end{cases}`}
       />
       <p>
-        Non-anchor members bill at exactly ₹0 — the bundle price on the anchor row already
+        Non-anchor members bill at exactly $0 — the bundle price on the anchor row already
         covers the whole stitched call, so zeroing the other members prevents double-billing.
         The view exposes <code>bundle_applied = 1</code> on rows where a bundle price was in
         effect, and <code>bundle_anchor = 1</code> on the anchor&rsquo;s rows. In SQL this is a
@@ -253,7 +254,7 @@ p^{\text{individual}} & \text{otherwise}
         <code>effective_from</code> has no applicable bundle row, so it falls through to
         individual <code>pricing</code> — creating a bundle never rewrites already-derived
         history, and a billing period that straddles the stitch date is split correctly:
-        pre-stitch usage stays on per-API lines, post-stitch usage collapses into the bundle
+        pre-stitch usage stays on per-SKU lines, post-stitch usage collapses into the bundle
         line.
       </p>
       <Callout variant="info" title="Leak detection and membership">
@@ -268,9 +269,9 @@ p^{\text{individual}} & \text{otherwise}
       {/* ──────────────────────────────────── 3b. Slab (volume-tier) pricing */}
       <H2 id="slabs">Slab pricing (graduated volume tiers)</H2>
       <p>
-        A pricing row can switch from a flat per-hit rate to <strong>graduated volume tiers</strong>{" "}
+        A pricing row can switch from a flat per-unit rate to <strong>graduated volume tiers</strong>{" "}
         (<code>pricing.pricing_model = &apos;slab&apos;</code>). Tiers are marginal — like income-tax
-        brackets — over the billing period&rsquo;s <em>total</em> hits across all four outcomes.
+        brackets — over the billing period&rsquo;s <em>total</em> units across all four outcomes.
         Each tier carries its own per-outcome price. The applicable tiers come from{" "}
         <code>pricing_slab</code> rows (<FilePath>migrations/0008_pricing_slabs.sql</FilePath>); the
         math lives in <FilePath>src/lib/pricing/slabs.ts</FilePath>.
@@ -278,9 +279,9 @@ p^{\text{individual}} & \text{otherwise}
 
       <H3 id="slabs-bands">Bands and graduated allocation</H3>
       <p>
-        Let the period&rsquo;s outcome hit counts be{" "}
+        Let the period&rsquo;s outcome unit counts be{" "}
         <Math tex={R`s,\ \mathit{snd},\ f,\ \mathit{ip}`} /> and the total{" "}
-        <Math tex={R`T = s + \mathit{snd} + f + \mathit{ip}`} />. Tier <Math tex="i" /> spans hits{" "}
+        <Math tex={R`T = s + \mathit{snd} + f + \mathit{ip}`} />. Tier <Math tex="i" /> spans units{" "}
         <Math tex={R`(\ell_i,\, h_i]`} /> (the first tier from 0; the top tier open-ended,{" "}
         <Math tex={R`h_i = \infty`} />). The volume that falls in tier <Math tex="i" /> is
       </p>
@@ -304,19 +305,20 @@ p^{\text{individual}} & \text{otherwise}
 
       <H3 id="slabs-example">Worked example</H3>
       <p>
-        EPFO / UAN Lookup with tiers 0&ndash;40,000 @ ₹15, 40,001&ndash;50,000 @ ₹13, and
-        50,001+ @ ₹11 (successful only). A period with 45,000 successful hits:
+        MSG-SMS-US (SMS · United States, billed per message) with tiers 0&ndash;4,000,000 @
+        $0.0079, 4,000,001&ndash;5,000,000 @ $0.0072, and 5,000,001+ @ $0.0065 (successful
+        only). A period with 4,500,000 successful messages:
       </p>
       <Math
         display
-        tex={R`\underbrace{40{,}000 \cdot 15}_{\text{tier 1}} + \underbrace{5{,}000 \cdot 13}_{\text{tier 2}} + \underbrace{0 \cdot 11}_{\text{tier 3}} = ₹665{,}000.`}
+        tex={R`\underbrace{4{,}000{,}000 \cdot 0.0079}_{\text{tier 1}} + \underbrace{500{,}000 \cdot 0.0072}_{\text{tier 2}} + \underbrace{0 \cdot 0.0065}_{\text{tier 3}} = 31{,}600 + 3{,}600 = \$35{,}200.`}
       />
 
       <H3 id="slabs-resolution">Why this is computed per period, not per day</H3>
       <p>
         A tier depends on the <em>whole</em> period&rsquo;s volume, so it cannot be resolved one day
         at a time. Slab rows therefore keep their flat <code>price_*</code> columns at 0 — the
-        per-day <code>usage_daily_with_revenue</code> view yields ₹0 for them — and revenue is
+        per-day <code>usage_daily_with_revenue</code> view yields $0 for them — and revenue is
         recomputed at the period level in <code>deriveStatement</code> (for invoices) and in{" "}
         <FilePath>src/lib/repos/slab-revenue.ts</FilePath> (for dashboard windows). Migration{" "}
         <code>0009_view_pricing_model.sql</code> exposes <code>p_model</code> on the view so
@@ -343,7 +345,7 @@ p^{\text{individual}} & \text{otherwise}
       <H2 id="vendor-cost">Vendor cost &amp; margin</H2>
       <p>
         Vendor costs mirror pricing exactly: a <code>vendor_pricing</code> row keyed on
-        (vendor, API) holds four unit costs <Math tex={R`c_s, c_{\mathit{snd}}, c_f, c_{\mathit{ip}}`} />{" "}
+        (vendor, SKU) holds four unit costs <Math tex={R`c_s, c_{\mathit{snd}}, c_f, c_{\mathit{ip}}`} />{" "}
         with the same <code>effective_from</code> step-function resolution. Per usage row:
       </p>
       <Math
@@ -369,11 +371,11 @@ p^{\text{individual}} & \text{otherwise}
       <H3 id="margin-watch">Margin-watch loss</H3>
       <p>
         The dashboard&rsquo;s margin watch finds priced pairs sold below vendor cost. Over the
-        window, group by (account, API) and keep pairs where
+        window, group by (account, SKU) and keep pairs where
       </p>
       <Math
         display
-        tex={R`\sum \text{revenue} > 0 \;\;\wedge\;\; \sum \text{revenue} < \sum \text{vendor\_cost} \;\;\wedge\;\; \sum \text{hits} > 0`}
+        tex={R`\sum \text{revenue} > 0 \;\;\wedge\;\; \sum \text{revenue} < \sum \text{vendor\_cost} \;\;\wedge\;\; \sum \text{units} > 0`}
       />
       <p>The booked loss across those pairs is the absolute net:</p>
       <Math
@@ -381,7 +383,7 @@ p^{\text{individual}} & \text{otherwise}
         tex={R`\text{margin\_loss} = \left|\, \sum_{\text{pairs}} \big( \text{revenue} - \text{vendor\_cost} \big) \,\right|`}
       />
       <p>
-        This is an <strong>actual</strong> figure — every rupee in it comes from real prices and
+        This is an <strong>actual</strong> figure — every dollar in it comes from real prices and
         real costs, unlike the estimated risk items below. Source:{" "}
         <FilePath>src/lib/repos/usage.ts</FilePath> (<code>getRiskSummary</code>).
       </p>
@@ -398,8 +400,8 @@ p^{\text{individual}} & \text{otherwise}
         <Math tex={R`[\,t_0, t_1\,]`} /> is derived live from the revenue view
         (<FilePath>src/lib/repos/statements.ts</FilePath>). Rows group into lines by{" "}
         <code>line_key</code>: bundle-applied usage groups per bundle (one line per stitch,
-        carrying the anchor&rsquo;s hit counts and <em>all</em> members&rsquo; vendor cost);
-        everything else groups per API.
+        carrying the anchor&rsquo;s unit counts and <em>all</em> members&rsquo; vendor cost);
+        everything else groups per SKU.
       </p>
 
       <H3 id="invoice-lines">Line aggregation</H3>
@@ -410,7 +412,7 @@ p^{\text{individual}} & \text{otherwise}
 \text{margin}_{\ell} = \text{revenue}_{\ell} - \text{cost}_{\ell}`}
       />
       <p>
-        Lines with zero total hits are dropped (<code>HAVING &hellip; &gt; 0</code>). Line
+        Lines with zero total units are dropped (<code>HAVING &hellip; &gt; 0</code>). Line
         revenue and cost arrive from SQL as <code>NUMERIC</code> strings and are kept as
         Decimals throughout aggregation.
       </p>
@@ -461,53 +463,60 @@ p^{\text{individual}} & \text{otherwise}
 \end{cases}`}
       />
       <p>
-        where <Math tex={R`s_{\ell}`} /> counts only <em>successful</em> hits
+        where <Math tex={R`s_{\ell}`} /> counts only <em>successful</em> units
         (<FilePath>src/components/InvoiceReceipt.tsx</FilePath>).
       </p>
       <Callout variant="warn" title="Back-calculated, not configured">
-        Because revenue can include paid <em>failed</em> or <em>no-data</em> hits, and because a
+        Because revenue can include paid <em>failed</em> or <em>no-data</em> units, and because a
         price change mid-period blends two rates, this quotient may differ from any single
-        configured <code>price_successful</code>. It answers &ldquo;what did a successful hit
+        configured <code>price_successful</code>. It answers &ldquo;what did a successful unit
         effectively cost this period?&rdquo;, not &ldquo;what is the contracted rate?&rdquo;.
       </Callout>
 
       <H3 id="invoice-worked">Worked example</H3>
-      <p>Account ACME, May 2026, two APIs:</p>
+      <p>Account Kestrel Store, May 2026, two SKUs:</p>
       <ul>
-        <li>API-1 priced ₹10/successful (other tiers ₹0); vendor cost ₹3/successful.</li>
-        <li>API-2 priced ₹5/successful; vendor cost ₹2/successful.</li>
-        <li>Usage: API-1 — 50 successful on May&nbsp;1 + 25 on May&nbsp;3; API-2 — 100 successful on May&nbsp;2.</li>
+        <li>
+          MSG-SMS-US priced $0.0079 per successful message (other outcomes $0); vendor cost
+          $0.0040 per message.
+        </li>
+        <li>DAT-GEOCODE priced $5.00 per 1K successful requests; vendor cost $2.00 per 1K requests.</li>
+        <li>
+          Usage: MSG-SMS-US — 50,000 successful messages on May&nbsp;1 + 25,000 on May&nbsp;3;
+          DAT-GEOCODE — 100 units (100,000 requests) on May&nbsp;2.
+        </li>
       </ul>
       <table>
         <thead>
-          <tr><th>Line</th><th>Hits</th><th>Revenue</th><th>Cost</th><th>Margin</th><th>Margin %</th></tr>
+          <tr><th>Line</th><th>Units</th><th>Revenue</th><th>Cost</th><th>Margin</th><th>Margin %</th></tr>
         </thead>
         <tbody>
-          <tr><td>API-1</td><td>75</td><td>75 × ₹10 = ₹750</td><td>75 × ₹3 = ₹225</td><td>₹525</td><td>70%</td></tr>
-          <tr><td>API-2</td><td>100</td><td>100 × ₹5 = ₹500</td><td>100 × ₹2 = ₹200</td><td>₹300</td><td>60%</td></tr>
-          <tr><td><strong>Totals</strong></td><td>175</td><td><strong>₹1,250</strong></td><td>₹425</td><td>₹825</td><td>66%</td></tr>
+          <tr><td>MSG-SMS-US</td><td>75,000 messages</td><td>75,000 × $0.0079 = $592.50</td><td>75,000 × $0.0040 = $300.00</td><td>$292.50</td><td>49.4%</td></tr>
+          <tr><td>DAT-GEOCODE</td><td>100 × 1K requests</td><td>100 × $5.00 = $500.00</td><td>100 × $2.00 = $200.00</td><td>$300.00</td><td>60.0%</td></tr>
+          <tr><td><strong>Totals</strong></td><td>—</td><td><strong>$1,092.50</strong></td><td>$500.00</td><td>$592.50</td><td>54.2%</td></tr>
         </tbody>
       </table>
       <p>
-        Total margin % is <Math tex={R`(825 / 1250) \times 100 = 66\%`} />. Add a ₹50 credit
+        The totals row leaves units blank because the two SKUs use different units. Total margin
+        % is <Math tex={R`(592.50 / 1092.50) \times 100 = 54.2\%`} />. Add a $50 credit
         (adjustment <Math tex={R`a_1 = -50`} />) after finalizing:
       </p>
-      <Math display tex={R`\text{grand\_total} = 1250 + (-50) = ₹1{,}200`} />
+      <Math display tex={R`\text{grand\_total} = 1092.50 + (-50) = \$1{,}042.50`} />
 
       {/* ──────────────────────────────────────────── 6. Dashboard aggregations */}
       <H2 id="dashboard">Dashboard aggregations</H2>
       <p>
         All dashboard reads come from <code>usage_daily_with_revenue</code> over a window{" "}
         <Math tex={R`[\,t_0, t_1\,]`} /> (default: month-to-date in IST). Sandbox accounts are
-        excluded unless the sandbox toggle is on. Throughout, a row&rsquo;s hits are all four
-        statuses:
+        excluded unless the sandbox toggle is on. Throughout, a row&rsquo;s units are all four
+        outcomes:
       </p>
       <Math display tex={R`h = s + \mathit{snd} + f + \mathit{ip}`} />
 
       <H3 id="kpis">Org KPIs</H3>
       <p>
         <FilePath>src/lib/repos/usage.ts</FilePath> (<code>getKpis</code>) sums across every
-        date <Math tex="d" />, account <Math tex="c" />, and API <Math tex="a" /> in the window:
+        date <Math tex="d" />, account <Math tex="c" />, and SKU <Math tex="a" /> in the window:
       </p>
       <Math
         display
@@ -522,7 +531,7 @@ p^{\text{individual}} & \text{otherwise}
       <Math
         display
         tex={R`\text{active\_accounts} = \big|\{\, c : \exists\ \text{usage row for } c \text{ in window} \,\}\big|, \qquad
-\text{total\_hits} = \sum_{d,c,a} h(d,c,a)`}
+\text{total\_units} = \sum_{d,c,a} h(d,c,a)`}
       />
 
       <H3 id="daily-series">Daily series</H3>
@@ -553,10 +562,10 @@ h(d) = \sum_{c,a} h(d,c,a)`}
         tex={R`\Delta = \frac{R_{\text{mtd}} - R_{\text{scaled}}}{R_{\text{scaled}}} \times 100`}
       />
       <p>
-        <strong>Worked example.</strong> Prior month: ₹30,000 over <Math tex="N = 30" /> days
-        (₹1,000/day). Current month: ₹18,000 over <Math tex="E = 15" /> data days. Then{" "}
-        <Math tex={R`R_{\text{scaled}} = 30000 \times 15/30 = 15{,}000`} /> and{" "}
-        <Math tex={R`\Delta = (18000 - 15000)/15000 \times 100 = +20\%`} /> — pacing ahead.
+        <strong>Worked example.</strong> Prior month: $720,000 over <Math tex="N = 30" /> days
+        ($24,000/day). Current month: $432,000 over <Math tex="E = 15" /> data days. Then{" "}
+        <Math tex={R`R_{\text{scaled}} = 720000 \times 15/30 = 360{,}000`} /> and{" "}
+        <Math tex={R`\Delta = (432000 - 360000)/360000 \times 100 = +20\%`} /> — pacing ahead.
       </p>
       <Callout variant="info" title="When the delta is null">
         If <Math tex={R`R_{\text{prior}} \le 0`} /> or <Math tex={R`E \le 0`} /> the delta is{" "}
@@ -568,8 +577,8 @@ h(d) = \sum_{c,a} h(d,c,a)`}
 
       <H3 id="account-summaries">Account summaries &amp; unpriced pairs</H3>
       <p>
-        Per account (<FilePath>src/lib/repos/accounts.ts</FilePath>): revenue, hits, and{" "}
-        <code>apis_used</code> (distinct APIs with traffic) sum as above. A pair is{" "}
+        Per account (<FilePath>src/lib/repos/accounts.ts</FilePath>): revenue, units, and{" "}
+        <code>apis_used</code> (distinct SKUs with traffic) sum as above. A pair is{" "}
         <strong>unpriced</strong> when it has traffic, no effective price in any tier, and is
         not in a bundle:
       </p>
@@ -580,25 +589,25 @@ h(d) = \sum_{c,a} h(d,c,a)`}
       <Math
         display
         tex={R`\text{unpriced\_pairs}(c) = \big|\{\, a : \text{unpriced}(c,a) \,\}\big|, \qquad
-\text{unpriced\_hits}(c) = \sum_{a\,:\,\text{unpriced}} h`}
+\text{unpriced\_units}(c) = \sum_{a\,:\,\text{unpriced}} h`}
       />
 
-      <H3 id="api-summaries">API summaries &amp; average unit price</H3>
+      <H3 id="sku-summaries">SKU summaries &amp; average unit price</H3>
       <p>
-        Per API (<FilePath>src/lib/repos/apis.ts</FilePath>), with{" "}
-        <Math tex={R`s_{\text{hits}}`} /> the sum of <em>successful</em> hits only:
+        Per SKU (<FilePath>src/lib/repos/apis.ts</FilePath>), with{" "}
+        <Math tex={R`s_{\text{units}}`} /> the sum of <em>successful</em> units only:
       </p>
       <Math
         display
         tex={R`\text{avg\_unit\_price} =
 \begin{cases}
-\dfrac{\text{revenue}}{s_{\text{hits}}} & s_{\text{hits}} > 0 \\[6pt]
+\dfrac{\text{revenue}}{s_{\text{units}}} & s_{\text{units}} > 0 \\[6pt]
 0 & \text{otherwise}
 \end{cases}`}
       />
       <p>
-        The APIs screen&rsquo;s <em>low-margin</em> filter (<FilePath>src/app/apis/page.tsx</FilePath>)
-        keeps APIs earning real revenue at under a 25% margin ratio:
+        The SKUs screen&rsquo;s <em>low-margin</em> filter (<FilePath>src/app/skus/page.tsx</FilePath>)
+        keeps SKUs earning real revenue at under a 25% margin ratio:
       </p>
       <Math
         display
@@ -606,8 +615,8 @@ h(d) = \sum_{c,a} h(d,c,a)`}
       />
       <p>
         Briefing copy (<FilePath>src/lib/briefing.ts</FilePath>) applies fixed thresholds to
-        these aggregates: API concentration flagged when one API holds ≥ 60% of an account&rsquo;s
-        revenue, account concentration when one account holds ≥ 50% of an API&rsquo;s revenue,
+        these aggregates: SKU concentration flagged when one SKU holds ≥ 60% of an account&rsquo;s
+        revenue, account concentration when one account holds ≥ 50% of a SKU&rsquo;s revenue,
         price spread when <Math tex={R`p_{\max}/p_{\min} \ge 2`} /> over non-zero prices, and
         pace callouts when <Math tex={R`|\Delta| \ge 5\%`} />.
       </p>
@@ -616,8 +625,8 @@ h(d) = \sum_{c,a} h(d,c,a)`}
       <H2 id="risk">Risk estimation</H2>
       <p>
         The &ldquo;money at risk&rdquo; panel (<FilePath>src/lib/repos/usage.ts</FilePath>,{" "}
-        <code>getRiskSummary</code>) quantifies three problems in rupees. Two are{" "}
-        <em>estimates</em> priced at the org&rsquo;s average revenue per billable hit; one is an
+        <code>getRiskSummary</code>) quantifies three problems in dollars. Two are{" "}
+        <em>estimates</em> priced at the org&rsquo;s average revenue per billable unit; one is an
         actual booked figure.
       </p>
 
@@ -633,7 +642,7 @@ h(d) = \sum_{c,a} h(d,c,a)`}
       />
       <Callout variant="info" title="No priced volume">
         If the window has no rows with positive revenue, the rate is 0 and both estimated risk
-        items collapse to ₹0 — Ledgerline will not invent a rate.
+        items collapse to $0 — Ledgerline will not invent a rate.
       </Callout>
 
       <H3 id="risk-leak">Revenue leak (estimated)</H3>
@@ -644,19 +653,19 @@ h(d) = \sum_{c,a} h(d,c,a)`}
       </p>
       <Math
         display
-        tex={R`\text{leak\_hits} = \sum_{(c,a)\,:\,\text{unpriced}} h, \qquad
-\text{leak\_amount} = \text{leak\_hits} \times \text{rate}`}
+        tex={R`\text{leak\_units} = \sum_{(c,a)\,:\,\text{unpriced}} h, \qquad
+\text{leak\_amount} = \text{leak\_units} \times \text{rate}`}
       />
 
       <H3 id="risk-silent">Silent loss (estimated)</H3>
       <p>
-        Usage rows whose raw account or API name failed to resolve (<code>client_id IS NULL</code>{" "}
+        Usage rows whose raw account name or SKU code failed to resolve (<code>client_id IS NULL</code>{" "}
         or <code>api_code IS NULL</code>) are invisible to revenue entirely:
       </p>
       <Math
         display
-        tex={R`\text{loss\_hits} = \sum_{\text{rows unmapped}} h, \qquad
-\text{loss\_amount} = \text{loss\_hits} \times \text{rate}`}
+        tex={R`\text{loss\_units} = \sum_{\text{rows unmapped}} h, \qquad
+\text{loss\_amount} = \text{loss\_units} \times \text{rate}`}
       />
 
       <H3 id="risk-total">Margin watch &amp; totals</H3>
@@ -670,17 +679,17 @@ h(d) = \sum_{c,a} h(d,c,a)`}
       />
       <p>
         The total is marked estimated (shown with a <code>~</code> prefix) whenever any
-        estimated component is positive — mixing one modeled rupee in makes the whole figure a
-        model.
+        estimated component is positive. One modeled dollar in the sum makes the whole figure an
+        estimate.
       </p>
 
       {/* ──────────────────────────────────────────────────── 8. Activity heatmap */}
       <H2 id="heatmap">Activity heatmap</H2>
       <p>
         The 90-day heatmap (<FilePath>src/components/ActivityHeatmap.tsx</FilePath>) tints each
-        day by hit volume using quintile-style bucketing over the window&rsquo;s{" "}
+        day by unit volume using quintile-style bucketing over the window&rsquo;s{" "}
         <em>positive</em> days. Let <Math tex={R`P = (P_0 \le P_1 \le \dots \le P_{n-1})`} /> be
-        the sorted hit counts of in-window days with <Math tex={R`h > 0`} />. The quantile at
+        the sorted unit counts of in-window days with <Math tex={R`h > 0`} />. The quantile at
         fraction <Math tex="p" /> is the element at the floored index, clamped to the last
         element:
       </p>
@@ -694,7 +703,7 @@ P_{\min(n-1,\; \lfloor n \cdot p \rfloor)} & \text{otherwise}
       />
       <p>
         With cut points <Math tex={R`q_1 = q(0.25)`} />, <Math tex={R`q_2 = q(0.5)`} />,{" "}
-        <Math tex={R`q_3 = q(0.75)`} />, a day with <Math tex="h" /> hits lands in bucket:
+        <Math tex={R`q_3 = q(0.75)`} />, a day with <Math tex="h" /> units lands in bucket:
       </p>
       <Math
         display
@@ -734,74 +743,81 @@ const bucket = (hits: number): 0 | 1 | 2 | 3 | 4 => {
         <Math tex={R`P = (5, 10, 15, 20, 100)`} />, so <Math tex="n = 5" />. Then{" "}
         <Math tex={R`q_1 = P_{\lfloor 1.25 \rfloor} = P_1 = 10`} />,{" "}
         <Math tex={R`q_2 = P_{\lfloor 2.5 \rfloor} = P_2 = 15`} />,{" "}
-        <Math tex={R`q_3 = P_{\lfloor 3.75 \rfloor} = P_3 = 20`} />. A day with 8 hits falls in
-        bucket 1 (<Math tex={R`0 < 8 \le 10`} />); a day with 25 hits falls in bucket 4
-        (<Math tex={R`25 > 20`} />). The single 100-hit outlier doesn&rsquo;t wash out the
+        <Math tex={R`q_3 = P_{\lfloor 3.75 \rfloor} = P_3 = 20`} />. A day with 8 units falls in
+        bucket 1 (<Math tex={R`0 < 8 \le 10`} />); a day with 25 units falls in bucket 4
+        (<Math tex={R`25 > 20`} />). The single 100-unit outlier does not compress the
         scale, because cut points come from ranks, not from the maximum.
       </p>
       <Callout variant="info" title="Empty window">
         With no positive days, all quantiles are 0 and every cell takes bucket 0. The header
         stats are <Math tex={R`\text{totalHits} = \sum_{h_d > 0} h_d`} /> and{" "}
         <Math tex={R`\text{activeDays} = |\{ d : h_d > 0 \}|`} />, shown as
-        &ldquo;X hits · Y/90 active days&rdquo;.
+        &ldquo;X units · Y/90 active days&rdquo;.
       </Callout>
 
       {/* ──────────────────────────────────────────────────── 9. Number formatting */}
       <H2 id="formatting">Number formatting</H2>
       <p>
         <FilePath>src/lib/format.ts</FilePath> deliberately avoids{" "}
-        <code>toLocaleString(&quot;en-IN&quot;)</code> — Node&rsquo;s ICU build can group
-        differently from the browser, causing React hydration mismatches. All formatting is
+        <code>toLocaleString(&hellip;)</code> for numbers. Node&rsquo;s ICU build can group
+        differently from the browser, which causes React hydration mismatches. All formatting is
         deterministic.
       </p>
 
-      <H3 id="formatting-grouping">Indian digit grouping</H3>
+      <H3 id="formatting-grouping">Digit grouping</H3>
       <p>
-        The Indian system groups the last three digits, then every <em>two</em> digits
-        thereafter (thousand, lakh, crore):
+        Integers group in threes with commas (thousand, million, billion):
       </p>
       <CodeBlock
         title="src/lib/format.ts"
         lang="ts"
-        code={`function formatIntegerINR(n: number): string {
+        code={`function formatInteger(n: number): string {
   const sign = n < 0 ? "-" : "";
   const s = Math.abs(Math.trunc(n)).toString();
-  if (s.length <= 3) return sign + s;
-  const last3 = s.slice(-3);
-  const rest = s.slice(0, -3);
-  const grouped = rest.replace(/\\B(?=(\\d{2})+(?!\\d))/g, ",");
-  return sign + grouped + "," + last3;
+  return sign + s.replace(/\\B(?=(\\d{3})+(?!\\d))/g, ",");
+}
+
+function formatDecimal(n: number, precision: number): string {
+  if (precision <= 0) return formatInteger(Math.round(n));
+  const sign = n < 0 ? "-" : "";
+  const fixed = Math.abs(n).toFixed(precision); // e.g. "1234567.89"
+  const [intPart, decPart] = fixed.split(".");
+  return sign + formatInteger(Number(intPart)) + "." + decPart;
 }`}
       />
       <p>
-        <strong>Worked example.</strong> 1234567 → last3 = <code>567</code>, rest ={" "}
-        <code>1234</code> → grouped as <code>12,34</code> → result{" "}
-        <strong>12,34,567</strong> (12 lakh, 34 thousand, 567). Decimals format the integer part
-        the same way and re-attach the fixed-precision fraction.
+        <strong>Worked example.</strong> 1234567 → <strong>1,234,567</strong>. With 2 decimals,
+        1234567.891 → <code>toFixed(2)</code> = <code>1234567.89</code> → the integer part is
+        grouped and the fraction re-attached → <strong>1,234,567.89</strong>.
       </p>
 
-      <H3 id="formatting-compact">Compact lakh/crore notation</H3>
-      <p>With <code>compact: true</code>, <code>formatINR</code> is the piecewise function:</p>
+      <H3 id="formatting-compact">Compact K/M/B notation</H3>
+      <p>
+        <code>formatMoney</code> shows whole dollars by default ($12,480). With{" "}
+        <code>compact: true</code> it is the piecewise function:
+      </p>
       <Math
         display
-        tex={R`\operatorname{formatINR}(n) =
+        tex={R`\operatorname{formatMoney}(n) =
 \begin{cases}
-\text{₹}\,\big(n / 10^7\big)\ \text{Cr} & |n| \ge 10^7 \quad \text{(2 decimals)} \\[2pt]
-\text{₹}\,\big(n / 10^5\big)\ \text{L} & 10^5 \le |n| < 10^7 \quad \text{(2 decimals)} \\[2pt]
-\text{₹}\,\big(n / 10^3\big)\ \text{K} & 10^3 \le |n| < 10^5 \quad \text{(1 decimal)} \\[2pt]
-\text{₹}\,n & |n| < 10^3
+\$\,\big(n / 10^9\big)\ \text{B} & |n| \ge 10^9 \quad \text{(2 decimals)} \\[2pt]
+\$\,\big(n / 10^6\big)\ \text{M} & 10^6 \le |n| < 10^9 \quad \text{(2 decimals)} \\[2pt]
+\$\,\big(n / 10^3\big)\ \text{K} & 10^3 \le |n| < 10^6 \quad \text{(1 decimal)} \\[2pt]
+\$\,n & |n| < 10^3
 \end{cases}`}
       />
       <p>
-        Examples: 5,00,00,000 → <strong>₹5.00Cr</strong>; 12,00,000 →{" "}
-        <strong>₹12.00L</strong>; 50,000 → <strong>₹50.0K</strong>. Non-finite input renders as
-        an em dash (—) in every formatter.
+        Examples: 1,240,000 → <strong>$1.24M</strong>; 740,000 → <strong>$740.0K</strong>;
+        950 → <strong>$950</strong>. A negative amount puts the sign before the dollar sign:
+        −1,200 → <strong>-$1,200</strong>. Non-finite input renders as an em dash (—) in every
+        formatter.
       </p>
 
       <H3 id="formatting-price">Price precision</H3>
       <p>
-        Unit prices show 2 decimals when the value is exact at 2, otherwise the full 4 stored
-        decimals (zero shows as plain ₹0):
+        <code>formatPrice</code> shows unit prices with 2 decimals when the value is exact at 2,
+        otherwise with 4 decimals, because many SKUs cost fractions of a cent. Zero shows as
+        plain $0:
       </p>
       <Math
         display
@@ -812,15 +828,16 @@ const bucket = (hits: number): 0 | 1 | 2 | 3 | 4 => {
 \end{cases}`}
       />
       <p>
-        So ₹10.50 stays <strong>₹10.50</strong>, while ₹10.5001 keeps all four decimals —
-        sub-paisa contract rates are never silently rounded on screen.
+        So ATL-PRO-IN at $3 per 1M tokens shows as <strong>$3.00</strong>, while MSG-SMS-US at
+        $0.0079 per message keeps all four decimals (<strong>$0.0079</strong>). Sub-cent
+        contract rates are never rounded on screen.
       </p>
 
       <H3 id="formatting-percent">Percentages</H3>
       <Math display tex={R`\operatorname{formatPercent}(n, k{=}1) = \texttt{toFixed}(n, k) + \text{"\%"}`} />
       <p>
         One decimal by default; KPI headlines pass <Math tex="k=0" />. Integer counts use the
-        same Indian grouping via <code>formatNumber</code> (truncating any fraction first).
+        same comma grouping via <code>formatNumber</code> (truncating any fraction first).
       </p>
 
       {/* ─────────────────────────────────────────────────── 10. Dates & timezones */}
@@ -836,7 +853,7 @@ const bucket = (hits: number): 0 | 1 | 2 | 3 | 4 => {
         <li>
           <code>todayIST()</code> formats &ldquo;now&rdquo; through{" "}
           <code>Intl.DateTimeFormat(&quot;en-CA&quot;, {"{ timeZone: \"Asia/Kolkata\" }"})</code>,
-          yielding the ISO date India is currently on.
+          yielding the current ISO date in IST.
         </li>
         <li>
           <code>mtdRange()</code> — from the 1st of the current IST month to today. The default

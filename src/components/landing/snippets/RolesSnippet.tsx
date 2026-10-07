@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, Clock, Lock, Pencil, X } from "lucide-react";
-import { Label, Segmented, Snippet, inrCompact, useInView } from "@/components/landing/ui";
+import { Label, Segmented, Snippet, usdCompact, useInView } from "@/components/landing/ui";
 
 type Role = "admin" | "editor" | "member";
 
@@ -20,10 +20,10 @@ const PEOPLE: Record<Role, { name: string; initials: string; role: string }> = {
 };
 
 const ROWS = [
-  { name: "Acme Lending Co", revenue: 482310, cost: 301420 },
-  { name: "Orbit Cards", revenue: 412870, cost: 236150 },
-  { name: "Vertex Pay", revenue: 268940, cost: 189610 },
-  { name: "Helios Capital", revenue: 154200, cost: 71830 },
+  { name: "Quillmark Studio", revenue: 209743, cost: 131070 },
+  { name: "Copperleaf CRM", revenue: 180102, cost: 103010 },
+  { name: "Harbor Freight", revenue: 96370, cost: 67940 },
+  { name: "Brightline Clinics", revenue: 71920, cost: 33500 },
 ];
 
 const CAN_DO: { label: Record<Role, string>; allowed: Record<Role, boolean> }[] = [
@@ -33,9 +33,9 @@ const CAN_DO: { label: Record<Role, string>; allowed: Record<Role, boolean> }[] 
   },
   {
     label: {
-      admin: "Approve manual entries above ₹50,000",
-      editor: "Approve manual entries above ₹50,000",
-      member: "Approve manual entries above ₹50,000",
+      admin: "Approve manual entries above $500",
+      editor: "Approve manual entries above $500",
+      member: "Approve manual entries above $500",
     },
     allowed: { admin: true, editor: false, member: false },
   },
@@ -228,7 +228,7 @@ export function RolesSnippet() {
                         role="cell"
                         className={`${W.rev} shrink-0 text-right tabular-nums text-ink`}
                       >
-                        {inrCompact(r.revenue)}
+                        {usdCompact(r.revenue)}
                       </motion.span>
                       <AnimatePresence mode="popLayout" initial={false}>
                         {showCost && (
@@ -240,7 +240,7 @@ export function RolesSnippet() {
                             role="cell"
                             className={`${W.cost} hidden shrink-0 text-right tabular-nums text-ink-muted sm:block`}
                           >
-                            {inrCompact(r.cost)}
+                            {usdCompact(r.cost)}
                           </motion.span>
                         )}
                         {showCost && (

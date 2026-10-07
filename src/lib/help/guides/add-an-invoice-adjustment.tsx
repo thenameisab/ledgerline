@@ -42,7 +42,7 @@ export default function Body() {
         </Step>
         <Step title="Fill label, amount, and notes">
           <strong>Label</strong> is required and appears on the customer document (e.g. “April
-          overbilling correction”). <strong>Amount (₹)</strong> is entered as a positive number —
+          overbilling correction”). <strong>Amount ($)</strong> is entered as a positive number —
           the sign comes from the toggle. <strong>Notes</strong> are optional internal context and
           appear only on the internal variant.
         </Step>

@@ -15,7 +15,7 @@ import {
 } from "@/lib/repos/vendor-recon";
 import { vendorByName } from "@/lib/repos/vendor-cost";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatNumber, formatPercent, formatDateRange, formatDay } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent, formatDateRange, formatDay } from "@/lib/format";
 import { ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -107,7 +107,7 @@ export default async function VendorReconTabPage({
                 Unexplained spend
               </h2>
               <div className="font-serif text-3xl text-ink tnum mt-1.5" style={{ fontWeight: 600 }}>
-                {summary.open_delta_cost > 0 ? formatINR(summary.open_delta_cost) : "₹0"}
+                {summary.open_delta_cost > 0 ? formatMoney(summary.open_delta_cost) : "$0"}
               </div>
               <p className="text-xs text-ink-faint mt-1">
                 volume {vendor} served that Ledgerline never costed
@@ -126,21 +126,21 @@ export default async function VendorReconTabPage({
           <p className="text-sm text-ink-muted mt-5 max-w-3xl leading-normal">
             A pair is flagged when the two sides differ by more than{" "}
             {DELTA_THRESHOLD_PCT}% and the larger side carries at least{" "}
-            {formatNumber(MIN_HITS_FOR_FLAG)} hits. Sandbox traffic counts on both sides —{" "}
+            {formatNumber(MIN_HITS_FOR_FLAG)} units. Sandbox traffic counts on both sides —{" "}
             {vendor} invoices a call whether or not Ledgerline bills a customer for it. In-progress
-            hits are excluded on both sides, because the vendor report has no column for them.
+            units are excluded on both sides, because the vendor report has no column for them.
           </p>
         </section>
 
         {unmatched.length > 0 && (
           <section className="elev-1 bg-bg-raised rounded-lg p-6">
             <h2 className="text-xs uppercase tracking-widest text-ink-muted">
-              {unmatched.length} name{unmatched.length === 1 ? "" : "s"} match no API in the catalog
+              {unmatched.length} name{unmatched.length === 1 ? "" : "s"} match no SKU in the catalog
             </h2>
             <p className="text-sm text-ink-muted mt-2 max-w-3xl leading-normal">
               {vendor} reports{" "}
-              {formatNumber(unmatched.reduce((s, r) => s + r.vendor_hits, 0))} hits under names the
-              catalog does not carry. Until each is aliased to a product code, its volume cannot be
+              {formatNumber(unmatched.reduce((s, r) => s + r.vendor_hits, 0))} units under names the
+              catalog does not carry. Until each is aliased to a SKU code, its volume cannot be
               matched to ours or costed.
             </p>
             <div className="flex flex-wrap gap-2 mt-4">
@@ -155,10 +155,10 @@ export default async function VendorReconTabPage({
               ))}
             </div>
             <Link
-              href="/admin/api-review"
+              href="/admin/sku-review"
               className="inline-flex items-center gap-1 text-xs text-accent-ink hover:underline underline-offset-2 mt-4"
             >
-              API review <ArrowRight size={11} strokeWidth={1.75} />
+              SKU review <ArrowRight size={11} strokeWidth={1.75} />
             </Link>
           </section>
         )}

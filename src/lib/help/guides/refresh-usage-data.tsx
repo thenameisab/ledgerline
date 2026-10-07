@@ -18,7 +18,7 @@ export default function Body() {
         a day. It also re-checks the last few days for changes and fills missed dates. When you need
         current numbers, for example before a review, start a pull by hand. In the demo, the pull
         does not call an external source. It generates usage locally from the recent history of
-        each account and API pair.
+        each account and SKU pair.
       </p>
 
       <Figure
@@ -35,13 +35,13 @@ export default function Body() {
         </Step>
         <Step title="Click “Refresh now”">
           Ledgerline re-pulls today and the two previous days. The button shows a progress label
-          while it runs. Then a toast shows the result, for example “Refreshed — +1,240 hits since
+          while it runs. Then a toast shows the result, for example “Refreshed — +1,240 units since
           the last pull” or “no changes since the last pull”. In the demo, a refresh also runs the
           vendor-side usage pull and the alert check.
         </Step>
         <Step title="Check the run history">
           The new run appears at the top of the table with its trigger, status, rows inserted, and
-          hit count.
+          unit count.
         </Step>
       </Steps>
       <Callout variant="tip">
@@ -57,7 +57,7 @@ export default function Body() {
           usually a platform timeout).
         </li>
         <li>
-          <strong>Unmapped</strong> — if a run pulled rows whose account or API names did not match
+          <strong>Unmapped</strong> — if a run pulled rows whose account or SKU names did not match
           the catalog, the count links straight to the Alias mapper. Revenue for those rows starts
           counting the moment they are mapped.
         </li>

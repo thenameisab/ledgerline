@@ -31,34 +31,34 @@ export default function EndpointsPage() {
       {/* ─── Catalog ───────────────────────────────────────────────────── */}
       <H2 id="catalog">Catalog</H2>
 
-      <H3 id="create-api">Create an API</H3>
+      <H3 id="create-api">Create a SKU</H3>
       <Endpoint method="POST" path="/api/apis">
         <RoleChip role="editor" />
       </Endpoint>
       <p>
-        Adds an API to the catalog. The product code is normalized to uppercase, and the code +
+        Adds a SKU to the catalog. The SKU code is normalized to uppercase, and the code +
         name are stored as implicit log aliases so importer matching works immediately.
       </p>
       <ParamTable
         rows={[
-          { name: "product_code", type: "string", required: true, desc: "1–32 chars, letters/digits/underscore only. Stored uppercase." },
-          { name: "name", type: "string", required: true, desc: "1–200 chars. Must not collide with another API's name or alias." },
+          { name: "product_code", type: "string", required: true, desc: "1–32 chars: letters, digits, hyphen, and underscore only. Stored uppercase." },
+          { name: "name", type: "string", required: true, desc: "1–200 chars. Must not collide with another SKU's name or alias." },
           { name: "category", type: "string | null", desc: "Max 200 chars. Defaults to null." },
-          { name: "entity_type", type: "enum | null", desc: <><code>Business</code>, <code>Individual</code>, or <code>Both</code>.</> },
+          { name: "unit", type: "string", required: true, desc: "What one billed unit is, for example 1M tokens, minute or message. Max 50 chars." },
           { name: "vendor_type", type: "enum | null", desc: <><code>InHouse</code>, <code>Vendor</code>, <code>Stitched</code>, or <code>Journey</code>.</> },
           { name: "default_vendor", type: "string | null", desc: "Max 100 chars." },
-          { name: "log_aliases", type: "string[]", desc: "Extra raw log names that resolve to this API. Default []." },
-          { name: "resolve_raw_name", type: "string", desc: "When set, quarantined usage rows with this raw API name are re-mapped to the new API in the same call (the aliases-screen “create as new API” path)." },
+          { name: "log_aliases", type: "string[]", desc: "Extra raw log names that resolve to this SKU. Default []." },
+          { name: "resolve_raw_name", type: "string", desc: "When set, quarantined usage rows with this raw SKU name are re-mapped to the new SKU in the same call (the aliases-screen “create as new SKU” path)." },
         ]}
       />
       <CodeBlock
         lang="json"
         title="Responses"
         code={`// 200
-{ "ok": true, "product_code": "PAN_ADV", "name": "PAN Advanced" }
+{ "ok": true, "product_code": "ATL-FLASH-OUT", "name": "Atlas Flash · output tokens" }
 
-// 409 — code taken, or name/alias already identifies another API
-{ "ok": false, "error": "Alias \\"PAN Adv\\" already belongs to PAN_BASIC – PAN Basic." }
+// 409 — code taken, or name/alias already identifies another SKU
+{ "ok": false, "error": "Alias \\"Atlas Flash input\\" already belongs to ATL-FLASH-IN – Atlas Flash · input tokens." }
 
 // 400 invalid body · 401 unauthenticated · 403 forbidden
 { "ok": false, "error": "..." }`}
@@ -69,17 +69,17 @@ export default function EndpointsPage() {
         audit action <code>api.create</code>.
       </p>
 
-      <H3 id="update-api">Update or rename an API</H3>
+      <H3 id="update-api">Update or rename a SKU</H3>
       <Endpoint method="PATCH" path="/api/apis/[code]">
         <RoleChip role="editor" />
       </Endpoint>
       <p>
-        Updates metadata for the API whose current product code is <code>[code]</code>. Accepts the
+        Updates metadata for the SKU whose current SKU code is <code>[code]</code>. Accepts the
         same fields as create (no <code>resolve_raw_name</code>), plus:
       </p>
       <ParamTable
         rows={[
-          { name: "product_code", type: "string", required: true, desc: "New code. If it differs from [code], the API is renamed." },
+          { name: "product_code", type: "string", required: true, desc: "New code. If it differs from [code], the SKU is renamed." },
           { name: "is_active", type: "0 | 1", desc: "Soft-deactivate flag. Default 1." },
         ]}
       />
@@ -94,9 +94,9 @@ export default function EndpointsPage() {
         lang="json"
         title="Responses"
         code={`// 200
-{ "ok": true, "product_code": "PAN_ADV", "name": "PAN Advanced" }
+{ "ok": true, "product_code": "ATL-PRO-IN", "name": "Atlas Pro · input tokens" }
 
-// 404 API not found · 409 new code taken or name/alias conflict
+// 404 SKU not found · 409 new code taken or name/alias conflict
 { "ok": false, "error": "..." }`}
       />
       <p>
@@ -119,7 +119,7 @@ export default function EndpointsPage() {
         lang="json"
         title="Responses"
         code={`// 200
-{ "ok": true, "id": 42, "slug": "acme-finance" }
+{ "ok": true, "id": 42, "slug": "copperleaf-crm" }
 
 // 409 duplicate name · 422 validation
 { "ok": false, "fieldErrors": { "display_name": "An account with this name already exists." } }`}
@@ -143,7 +143,7 @@ export default function EndpointsPage() {
           { name: "kind", type: '"account" | "api"', required: true, desc: "Which catalog the raw name belongs to." },
           { name: "raw_name", type: "string", required: true, desc: "The raw log name to map (min 1 char)." },
           { name: "target_id", type: "number", desc: <>Required when <code>kind=&quot;account&quot;</code>: the account id.</> },
-          { name: "target_code", type: "string", desc: <>Required when <code>kind=&quot;api&quot;</code>: the API product code.</> },
+          { name: "target_code", type: "string", desc: <>Required when <code>kind=&quot;api&quot;</code>: the SKU code.</> },
         ]}
       />
       <CodeBlock
@@ -163,21 +163,21 @@ export default function EndpointsPage() {
         <code>alias.resolve</code>.
       </p>
 
-      <H3 id="api-review">Resolve the API review queue</H3>
+      <H3 id="api-review">Resolve the SKU review queue</H3>
       <Endpoint method="POST" path="/api/api-review">
         <RoleChip role="editor" />
       </Endpoint>
       <p>
-        Clears entries from <a href="/help/api/database#api-code-overrides">/admin/api-review</a> —
-        the queue of usage rows whose Product Code didn&apos;t match an active catalog code, plus
+        Clears entries from <a href="/help/api/database#api-code-overrides">/admin/sku-review</a> —
+        the queue of usage rows whose SKU code didn&apos;t match an active catalog code, plus
         name-drift flags. The body is a discriminated union on <code>action</code>:
       </p>
       <ParamTable
         rows={[
           { name: "action", type: '"accept-code" | "override" | "acknowledge-drift"', required: true, desc: "Which resolution to apply." },
-          { name: "code", type: "string", desc: <>Required for <code>accept-code</code> and <code>acknowledge-drift</code>: the API product code.</> },
-          { name: "name", type: "string", desc: <>Required for <code>accept-code</code>: the display name for the newly created (or reactivated) API.</> },
-          { name: "raw_api_name", type: "string", desc: <>Required for <code>override</code> and <code>acknowledge-drift</code>: the raw API name from the quarantined / drifting rows.</> },
+          { name: "code", type: "string", desc: <>Required for <code>accept-code</code> and <code>acknowledge-drift</code>: the SKU code.</> },
+          { name: "name", type: "string", desc: <>Required for <code>accept-code</code>: the display name for the newly created (or reactivated) SKU.</> },
+          { name: "raw_api_name", type: "string", desc: <>Required for <code>override</code> and <code>acknowledge-drift</code>: the raw SKU name from the quarantined / drifting rows.</> },
         ]}
       />
       <CodeBlock
@@ -187,7 +187,7 @@ export default function EndpointsPage() {
 { "ok": true, "backfilled": 312 }
 
 // 404 — code not found (acknowledge-drift)
-{ "ok": false, "error": "API not found" }
+{ "ok": false, "error": "api not found" }
 
 // 400 invalid body / unknown action · 401 unauthenticated · 403 forbidden
 { "ok": false, "error": "..." }`}
@@ -224,17 +224,17 @@ export default function EndpointsPage() {
         <RoleChip role="editor" />
       </Endpoint>
       <p>
-        Sets or updates the four-tier price for a (account, API) pair. Omitted tiers keep their
+        Sets or updates the four-tier price for an (account, SKU) pair. Omitted tiers keep their
         existing values (or 0 for a new pair).
       </p>
       <ParamTable
         rows={[
           { name: "client_id", type: "number", required: true, desc: "Positive integer." },
-          { name: "api_code", type: "string", required: true, desc: "API product code." },
-          { name: "price_successful", type: "number", desc: "Non-negative. Per successful hit." },
-          { name: "price_successful_no_data", type: "number", desc: "Non-negative. Per successful-no-data hit." },
-          { name: "price_failed", type: "number", desc: "Non-negative. Per failed hit." },
-          { name: "price_in_progress", type: "number", desc: "Non-negative. Per in-progress hit." },
+          { name: "api_code", type: "string", required: true, desc: "SKU code." },
+          { name: "price_successful", type: "number", desc: "Non-negative. Per successful unit." },
+          { name: "price_successful_no_data", type: "number", desc: "Non-negative. Per successful-no-data unit." },
+          { name: "price_failed", type: "number", desc: "Non-negative. Per failed unit." },
+          { name: "price_in_progress", type: "number", desc: "Non-negative. Per in-progress unit." },
         ]}
       />
       <p>
@@ -256,8 +256,8 @@ export default function EndpointsPage() {
         title="Response (200)"
         code={`{
   "ok": true,
-  "price_successful": 4.5,
-  "price_successful_no_data": 2,
+  "price_successful": 2.7,
+  "price_successful_no_data": 0,
   "price_failed": 0,
   "price_in_progress": 0,
   "billed": true,
@@ -278,7 +278,7 @@ export default function EndpointsPage() {
         nameHeader="Query param"
         rows={[
           { name: "client_id", type: "number", required: true, desc: "Coerced positive integer." },
-          { name: "api_code", type: "string", required: true, desc: "API product code." },
+          { name: "api_code", type: "string", required: true, desc: "SKU code." },
         ]}
       />
       <CodeBlock
@@ -300,13 +300,13 @@ export default function EndpointsPage() {
         <RoleChip role="admin" />
       </Endpoint>
       <p>
-        Sets the four-tier <em>cost</em> rate for a (vendor, API) pair — the cost side of margin
+        Sets the four-tier <em>cost</em> rate for a (vendor, SKU) pair — the cost side of margin
         math. Omitted tiers keep existing values.
       </p>
       <ParamTable
         rows={[
           { name: "vendor_name", type: "string", required: true, desc: "Vendor display name (free text, matched against usage rows)." },
-          { name: "api_code", type: "string", required: true, desc: "API product code." },
+          { name: "api_code", type: "string", required: true, desc: "SKU code." },
           { name: "cost_successful", type: "number | null", desc: "Non-negative, or null to mark the rate unknown." },
           { name: "cost_successful_no_data", type: "number | null", desc: "Non-negative, or null to mark the rate unknown." },
           { name: "cost_failed", type: "number | null", desc: "Non-negative, or null to mark the rate unknown." },
@@ -319,9 +319,9 @@ export default function EndpointsPage() {
       <CodeBlock
         lang="json"
         title="Response (200)"
-        code={`{ "ok": true, "cost_successful": 1.2, "cost_successful_no_data": 0.6,
+        code={`{ "ok": true, "cost_successful": 1.1, "cost_successful_no_data": 0,
   "cost_failed": 0, "cost_in_progress": null,
-  "status": "quoted", "source": "Quantal MSA 2026-04" }`}
+  "status": "quoted", "source": "Tessel Labs MSA 2026-04" }`}
       />
       <p>
         <strong>Side effects:</strong> writes the rate effective on <code>effective_from</code>{" "}
@@ -363,7 +363,7 @@ export default function EndpointsPage() {
       <p>Each line:</p>
       <ParamTable
         rows={[
-          { name: "api_code", type: "string", required: true, desc: "API product code." },
+          { name: "api_code", type: "string", required: true, desc: "SKU code." },
           { name: "hits_via", type: "enum", desc: <><code>Bulk</code> (default), <code>Integration</code>, or <code>Console</code>.</> },
           { name: "vendor", type: "string | null", desc: "Vendor attribution for cost math." },
           { name: "successful", type: "number", desc: "Non-negative integer, default 0." },
@@ -376,7 +376,7 @@ export default function EndpointsPage() {
         lang="json"
         title="Response (200)"
         code={`{ "ok": true, "lines": [/* per-line revenue + has_pricing */],
-  "total": 61250, "requires_approval": true, "threshold": 50000 }`}
+  "total": 612.50, "requires_approval": true, "threshold": 500 }`}
       />
 
       <H3 id="me-create">action: "create"</H3>
@@ -394,7 +394,7 @@ export default function EndpointsPage() {
       <CodeBlock
         lang="json"
         title="Response (200)"
-        code={`{ "ok": true, "id": 17, "total": 61250, "requires_approval": true }`}
+        code={`{ "ok": true, "id": 17, "total": 612.50, "requires_approval": true }`}
       />
 
       <H3 id="me-transitions">action: "submit" | "approve" | "void"</H3>
@@ -426,7 +426,7 @@ export default function EndpointsPage() {
       </p>
       <Callout variant="info" title="Approval threshold">
         Entries whose previewed revenue exceeds <code>MANUAL_ENTRY_APPROVAL_THRESHOLD</code>{" "}
-        (default 50,000) always require an explicit approval by an admin or editor, even when
+        (default 500) always require an explicit approval by an admin or editor, even when
         created by an admin with <code>submit: true</code>.
       </Callout>
 
@@ -464,7 +464,7 @@ export default function EndpointsPage() {
       <p>
         <strong>Side effects:</strong> per date, deletes that date&apos;s <code>source=&apos;log&apos;</code> rows
         and inserts the fresh pull (idempotent); writes a <code>sync_runs</code> row per date;
-        records audit action <code>sync.backfill</code> with day count, failures, and total hits.
+        records audit action <code>sync.backfill</code> with day count, failures, and total units.
       </p>
 
       <H3 id="sync-refresh">Refresh now</H3>
@@ -490,17 +490,17 @@ export default function EndpointsPage() {
         "rows_before": 0, "rows_after": 230 }
     ],
     "movers": [
-      { "account": "Acme Finance", "hits_before": 1200, "hits_after": 4100, "delta": 2900 }
+      { "account": "Kestrel Store", "hits_before": 1200, "hits_after": 4100, "delta": 2900 }
     ],
     "hits_before": 178000, "hits_after": 219200,
-    "unmapped_clients": [], "unmapped_apis": ["KYC Lite v2"]
+    "unmapped_clients": [], "unmapped_apis": ["Prism Video 4K"]
   }
 }`}
       />
       <p>
         <strong>Side effects:</strong> same delete-and-reinsert per date as the cron; writes{" "}
         <code>sync_runs</code> rows; in the demo, also writes <code>vendor_usage_daily</code> and{" "}
-        <code>alerts</code>; records audit action <code>sync.refresh</code> with the hit deltas.
+        <code>alerts</code>; records audit action <code>sync.refresh</code> with the unit deltas.
       </p>
 
       {/* ─── Invoices ──────────────────────────────────────────────────── */}
@@ -554,22 +554,22 @@ export default function EndpointsPage() {
       <CodeBlock
         lang="json"
         title="Response (200)"
-        code={`[ { "id": 42, "slug": "acme-finance", "name": "Acme Finance", "status": "active" } ]`}
+        code={`[ { "id": 42, "slug": "copperleaf-crm", "name": "Copperleaf CRM", "status": "active" } ]`}
       />
 
-      <H3 id="search-apis">Search APIs</H3>
+      <H3 id="search-apis">Search SKUs</H3>
       <Endpoint method="GET" path="/api/search/apis?q=…">
         <RoleChip role="all" />
       </Endpoint>
       <p>
-        Same contract over active APIs, matching name or product code. Max 6 results; only{" "}
+        Same contract over active SKUs, matching name or SKU code. Max 6 results; only{" "}
         <code>is_active = 1</code> rows. Shares the 60-requests-per-10-seconds budget with account
         search (one <code>search:&#123;userId&#125;</code> bucket).
       </p>
       <CodeBlock
         lang="json"
         title="Response (200)"
-        code={`[ { "id": "PAN_ADV", "name": "PAN Advanced", "code": "PAN_ADV", "category": "KYC" } ]`}
+        code={`[ { "id": "ATL-PRO-IN", "name": "Atlas Pro · input tokens", "code": "ATL-PRO-IN", "category": "Models" } ]`}
       />
 
       {/* ─── Profile ───────────────────────────────────────────────────── */}
@@ -649,12 +649,12 @@ export default function EndpointsPage() {
       <ParamTable
         nameHeader="Route"
         rows={[
-          { name: "GET /api/search?q=…", type: "session", desc: "Grouped palette search across accounts, invoices, groups, APIs, manual entries, vendors, and audit entries. Uses the search rate-limit bucket." },
-          { name: "GET /api/ask?q=…", type: "session", desc: <>Answers revenue, hits, unpriced, variance, and relation questions from deterministic templates. Also accepts a structured form (<code>metric</code>, <code>entityType</code>, <code>topN</code>). 30 requests per 10 s.</> },
-          { name: "GET /api/cmd/options?slot=…", type: "session", desc: "Picker options (accounts, groups, APIs) for the palette's ask cues. Names and codes only. 400 for an unknown slot." },
+          { name: "GET /api/search?q=…", type: "session", desc: "Grouped palette search across accounts, invoices, groups, SKUs, manual entries, vendors, and audit entries. Uses the search rate-limit bucket." },
+          { name: "GET /api/ask?q=…", type: "session", desc: <>Answers revenue, units, unpriced, variance, and relation questions from deterministic templates. Also accepts a structured form (<code>metric</code>, <code>entityType</code>, <code>topN</code>). 30 requests per 10 s.</> },
+          { name: "GET /api/cmd/options?slot=…", type: "session", desc: "Picker options (accounts, groups, SKUs) for the palette's ask cues. Names and codes only. 400 for an unknown slot." },
           { name: "GET /api/context?path=…&period=…", type: "session", desc: "Resolves the entity behind the current page so the palette can offer actions for that page." },
           { name: "GET /api/hover/account/[slug]", type: "session", desc: "Data for the account hover card." },
-          { name: "GET /api/hover/api/[code]", type: "session", desc: "Data for the API hover card. Margin is included only for admins and editors." },
+          { name: "GET /api/hover/api/[code]", type: "session", desc: "Data for the SKU hover card. Margin is included only for admins and editors." },
           { name: "GET /api/notifications", type: "session", desc: <>Returns <code>{`{ ok, items, unread }`}</code> for the current user.</> },
           { name: "PATCH /api/notifications", type: "session", desc: <>Body <code>{`{ action: "mark_read", ids }`}</code> or <code>{`{ action: "mark_all_read" }`}</code>.</> },
         ]}
@@ -719,7 +719,7 @@ export default function EndpointsPage() {
           { name: "GET /api/cron/vendor-recon-sync", type: "cron", desc: "Pulls the vendor side for the last 10 days into vendor_usage_daily." },
           { name: "GET /api/cron/alerts", type: "cron", desc: <>Evaluates alert rules for synced dates, then sends alert emails. <code>?dry=1&amp;from=…&amp;to=…</code> returns what each date would open. <code>?dry=daily</code> and <code>?dry=critical</code> return email HTML.</> },
           { name: "GET /api/cron/roundup-daily | roundup-weekly | roundup-monthly", type: "cron", desc: <>Revenue roundup emails. <code>?dry=1</code> returns the HTML and sends nothing.</> },
-          { name: "GET /api/cron/product-update-weekly", type: "cron", desc: <>Weekly API usage email. <code>?dry=1</code> returns the HTML. Skipped when the recipient list is empty.</> },
+          { name: "GET /api/cron/product-update-weekly", type: "cron", desc: <>Weekly SKU usage email. <code>?dry=1</code> returns the HTML. Skipped when the recipient list is empty.</> },
           { name: "GET /api/cron/purge-account-ops", type: "cron", desc: "Makes executed merges and deletes permanent once their undo window has passed." },
           { name: "POST /api/cache/revalidate", type: "cron", desc: <>Calls <code>revalidateRevenue()</code> to clear every cached revenue read. The nightly reset job calls it after it reseeds the database.</> },
         ]}

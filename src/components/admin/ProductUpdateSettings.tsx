@@ -15,7 +15,7 @@ const ROWS: { product: UpdateProduct; label: string; hint: string }[] = [
   {
     product: "usage",
     label: "Weekly usage update",
-    hint: "Mondays ~12:00 IST. Hits, success rate, channels, top APIs and accounts, newly active and quiet accounts, data quality.",
+    hint: "Mondays ~12:00 IST. Units, success rate, channels, top SKUs and accounts, newly active and quiet accounts, data quality.",
   },
 ];
 

@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "vendor-costs",
   title: "Vendor costs",
   summary:
-    "What each upstream vendor charges per API call — the cost side of every margin number, with an explicit difference between a rate we know, a rate of zero, and a rate nobody has told us.",
+    "What each upstream vendor charges per unit of usage — the cost side of every margin number, with an explicit difference between a rate we know, a rate of zero, and a rate nobody has told us.",
   group: "Admin",
   role: "admin",
   routes: ["/vendors"],
@@ -15,18 +15,18 @@ export default function Body() {
   return (
     <>
       <p>
-        Revenue is only half the ledger. Every API call also costs something from the upstream
-        vendor that executes it, and margin — on the dashboard, on account profiles, on internal
+        Revenue is only half the ledger. Every unit of usage also costs something from the upstream
+        vendor that serves it, and margin — on the dashboard, on account profiles, on internal
         invoices — is revenue minus exactly these numbers. The rate card is where those rates
         live. Its main job is to be honest about which of them are real.
       </p>
 
       <Callout variant="warn" title="Most rates are not known yet">
-        The table used to hold a placeholder for every vendor crossed with every API — 1,248 rows,
-        none of them confirmed, most for pairs that never carried a single hit. Margin was
+        The table used to hold a placeholder for every vendor crossed with every SKU — over a thousand rows,
+        none of them confirmed, most for pairs that never carried a single unit. Margin was
         arithmetic on invented numbers. Those rows are gone. What remains is one row per
-        (vendor, API) pair that traffic has actually been seen on, and almost all of them are
-        still empty. A cost of ₹0 on an unrated API is not a saving; it is a gap.
+        (vendor, SKU) pair that traffic has actually been seen on, and almost all of them are
+        still empty. A cost of $0 on an unrated SKU is not a saving; it is a gap.
       </Callout>
 
       <Figure
@@ -56,20 +56,20 @@ export default function Body() {
         usage, and removing it would take that with it.
       </p>
 
-      <H2 id="sandbox">Sandbox calls</H2>
+      <H2 id="sandbox">Sandbox usage</H2>
       <p>
-        Ledgerline does not bill a customer for a call made in sandbox. Whether the <em>vendor</em>
-        bills <em>us</em> for it is a separate question, and one only the contract answers. Until
+        Ledgerline does not bill a customer for sandbox usage. Whether the <em>vendor</em>
+        bills <em>us</em> for that usage is a separate question, and one only the contract answers. Until
         it is answered the product charges sandbox traffic at the vendor&rsquo;s full rate, because
-        overstating cost is the safer error — sandbox was 5.1% of August&rsquo;s hits, and
+        overstating cost is the safer error — sandbox was 5.1% of August&rsquo;s units, and
         assuming it is free would flatter every margin figure by that much.
       </p>
       <p>
         Each vendor page carries the answer. Set <strong>does not charge</strong> only from the
-        agreement. When you do, that vendor&rsquo;s sandbox hits stop carrying cost everywhere at
+        agreement. When you do, that vendor&rsquo;s sandbox units stop carrying cost everywhere at
         once — the dashboard, account margin, the rate card, the monthly minimum — and they stop
         counting toward a volume bracket, because they are not on the invoice the brackets
-        describe. They also stop appearing as unrated work: a hit a vendor has told us it does
+        describe. They also stop appearing as unrated work: a unit a vendor has told us it does
         not charge for is a decided zero, not a missing rate.
       </p>
       <p>
@@ -84,7 +84,7 @@ export default function Body() {
       </p>
       <ul>
         <li>
-          <strong>&mdash;</strong> the rate is <em>unknown</em>. Nobody has told us. Hits on this
+          <strong>&mdash;</strong> the rate is <em>unknown</em>. Nobody has told us. Units on this
           outcome contribute nothing to cost, which makes margin look better than it is.
         </li>
         <li>
@@ -92,7 +92,7 @@ export default function Body() {
           this outcome — most do not bill failures. This is a fact, not a gap.
         </li>
         <li>
-          <strong>₹ a number</strong> the rate itself.
+          <strong>$ a number</strong> the rate itself.
         </li>
       </ul>
 
@@ -120,7 +120,7 @@ export default function Body() {
 
       <Figure
         src="/help/shots/admin-vendor-detail.png"
-        alt="Vendor rate card with per-API outcome costs, effective dates and statuses"
+        alt="Vendor rate card with per-SKU outcome costs, effective dates and statuses"
         caption="The rate card: unpriced traffic first, because that is the work to do."
       />
 
@@ -157,9 +157,9 @@ export default function Body() {
 
       <H2 id="confidence">Coverage is shown, not implied</H2>
       <p>
-        Each vendor card carries a confidence bar: the share of its hits priced by a contracted
+        Each vendor card carries a confidence bar: the share of its units priced by a contracted
         rate, a quoted rate, an estimate, or no rate at all. A single chip could not say this —
-        the old one appeared only when <em>every</em> API was estimated, so a vendor with one
+        the old one appeared only when <em>every</em> SKU was estimated, so a vendor with one
         confirmed rate and thirty placeholders read as confirmed. Internal invoice exports carry
         the same signal per line (the CSV&rsquo;s <code>is_estimated</code> column is true for any
         line whose rate is not contracted).
@@ -168,13 +168,13 @@ export default function Body() {
       <H2 id="edges">Behaviour at the edges</H2>
       <ul>
         <li>
-          <strong>API with no rate</strong> — cost is treated as zero, which <em>overstates</em>{" "}
-          margin. These rows are banded to the top of the rate card with their hit counts, so the
+          <strong>SKU with no rate</strong> — cost is treated as zero, which <em>overstates</em>{" "}
+          margin. These rows are banded to the top of the rate card with their unit counts, so the
           size of the gap is visible.
         </li>
         <li>
           <strong>Vendor with no traffic this period</strong> — still opens, and its rates can
-          still be set. A rate should be enterable before the first hit arrives, not after.
+          still be set. A rate should be enterable before the first unit of usage arrives, not after.
         </li>
         <li>
           <strong>Selling below cost</strong> — when a known cost exceeds the charged price, the
@@ -182,13 +182,13 @@ export default function Body() {
         </li>
         <li>
           <strong>Sandbox traffic</strong> — carries vendor cost today, because whether a vendor
-          bills sandbox calls is a contract fact we do not yet record per vendor. Sandbox hits
+          bills sandbox usage is a contract fact we do not yet record per vendor. Sandbox units
           therefore depress margin slightly.
         </li>
         <li>
           <strong>Who can see this</strong> — the rate card is admin-only. Editors see the margin
-          it produces, on the dashboard, the APIs list, an account and a draft invoice, but never a
-          vendor&apos;s per-hit rate. Members see revenue and no margin at all.
+          it produces, on the dashboard, the SKUs list, an account and a draft invoice, but never a
+          vendor&apos;s per-unit rate. Members see revenue and no margin at all.
         </li>
       </ul>
 

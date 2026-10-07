@@ -22,7 +22,7 @@ import { getIncludeSandbox } from "@/lib/repos/settings";
 import { prevMonthOf } from "@/lib/repos/periods";
 import { resolvePeriod } from "@/lib/period";
 import { briefingComposer } from "@/lib/briefing";
-import { formatINR, formatNumber, formatPrice } from "@/lib/format";
+import { formatMoney, formatNumber, formatPrice } from "@/lib/format";
 import { Users } from "lucide-react";
 
 export default async function ApiProfilePage({
@@ -88,7 +88,7 @@ export default async function ApiProfilePage({
     <main>
       <StatusBar
         title={api.name}
-        subtitle={[`Code ${api.product_code}`, api.entity_type, api.vendor_type]
+        subtitle={[`Code ${api.product_code}`, `Billed per ${api.unit}`, api.vendor_type]
           .filter(Boolean)
           .join(" · ")}
         actions={
@@ -98,7 +98,7 @@ export default async function ApiProfilePage({
                 product_code: api.product_code,
                 name: api.name,
                 category: api.category,
-                entity_type: api.entity_type,
+                unit: api.unit,
                 vendor_type: api.vendor_type,
                 default_vendor: api.default_vendor,
                 log_aliases: parseAliases(api.log_aliases),
@@ -123,6 +123,7 @@ export default async function ApiProfilePage({
           hits={summary?.total_hits ?? 0}
           accounts={summary?.unique_accounts ?? 0}
           avgPrice={summary?.avg_unit_price ?? 0}
+          unit={api.unit}
           spread={variance && variance.min > 0 ? { min: variance.min, max: variance.max } : null}
           confidence={confidence}
           costFixHref={
@@ -160,7 +161,7 @@ export default async function ApiProfilePage({
               <thead className="bg-bg-sunken text-ink-faint text-[11px] uppercase tracking-wide sticky top-0 z-10">
                 <tr className="text-left">
                   <th className="px-4 py-3 font-medium">Account</th>
-                  <th className="px-3 py-3 font-medium text-right">Hits</th>
+                  <th className="px-3 py-3 font-medium text-right">Units</th>
                   <th className="px-3 py-3 font-medium text-right">Negotiated</th>
                   <th className="px-3 py-3 font-medium">Price ladder</th>
                   <th className="px-3 py-3 font-medium text-right">Revenue</th>
@@ -241,7 +242,7 @@ export default async function ApiProfilePage({
                           </div>
                         </td>
                         <td className="px-3 py-3 text-right font-mono tabular-nums text-ink">
-                          {formatINR(c.revenue ?? 0, { precision: 0 })}
+                          {formatMoney(c.revenue ?? 0, { precision: 0 })}
                         </td>
                       </tr>
                     );
@@ -251,7 +252,7 @@ export default async function ApiProfilePage({
             </table>
             {topAccounts.length === 0 && (
               <div className="px-6 py-10 text-center text-ink-muted">
-                No account traffic for this API in this window.
+                No account usage for this SKU in this window.
               </div>
             )}
           </div>

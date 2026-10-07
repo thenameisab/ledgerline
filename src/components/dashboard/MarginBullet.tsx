@@ -55,7 +55,7 @@ export function MarginBullet({
         aria-valuemax={100}
         aria-label={
           muted
-            ? `Margin ${formatPercent(pct, 1)}, target ${target}%. Cost is confirmed on less than half of this period's hits.`
+            ? `Margin ${formatPercent(pct, 1)}, target ${target}%. Cost is confirmed on less than half of this period's units.`
             : `Margin ${formatPercent(pct, 1)}, target ${target}%`
         }
       >

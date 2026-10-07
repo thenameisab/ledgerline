@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "manual-entries",
   title: "Manual entries",
   summary:
-    "Book off-stream bulk usage — work done over email or tickets — into revenue, with a live-priced preview and an approval gate above ₹50,000.",
+    "Book off-stream bulk usage — work done over email or tickets — into revenue, with a live-priced preview and an approval gate above $500.",
   group: "Billing",
   role: "admin",
   routes: ["/admin/manual-entries"],
@@ -15,7 +15,7 @@ export default function Body() {
   return (
     <>
       <p>
-        Not all billable work flows through the API logs: bulk verifications run from a ticket, a
+        Not all billable work flows through the usage logs: a bulk batch job run from a ticket, a
         one-off batch delivered over email. Manual entries put that work on the books so the month
         ends complete. Each entry records what happened, why, and for whom — and is priced through
         the same temporal price book as logged traffic, so it lands on invoices exactly like
@@ -25,7 +25,7 @@ export default function Body() {
       <Figure
         src="/help/shots/manual-entry-wizard.png"
         alt="Manual entry wizard with entry details, usage lines, and a live revenue preview"
-        caption="The wizard: details, per-API usage lines, and a debounced live preview."
+        caption="The wizard: details, per-SKU usage lines, and a debounced live preview."
       />
 
       <H2 id="what-you-see">What you see</H2>
@@ -34,7 +34,7 @@ export default function Body() {
           <strong>The wizard</strong> — reachable from an account profile (account pre-locked, shown
           as a "SCOPED" chip) or from the admin index (account picker). Three sections: entry
           details (effective date, a required reason, an optional reference for the source ticket
-          or email), repeating usage lines (API, hits-via context, optional vendor, and hit counts
+          or email), repeating usage lines (SKU, optional vendor, and unit counts
           per outcome), and a live preview.
         </li>
         <li>
@@ -59,8 +59,8 @@ export default function Body() {
       <H2 id="what-you-can-do">What you can do</H2>
       <ul>
         <li>
-          <strong>Create an entry</strong> — fill the form; the preview prices it as you go. An
-          API missing from the catalog can be created inline from the picker without leaving the
+          <strong>Create an entry</strong> — fill the form; the preview prices it as you go. A
+          SKU missing from the catalog can be created inline from the picker without leaving the
           wizard.
         </li>
         <li>
@@ -75,8 +75,8 @@ export default function Body() {
         </li>
       </ul>
 
-      <Callout variant="warn" title="The ₹50,000 gate">
-        Entries whose previewed revenue exceeds the approval threshold (default ₹50,000, set by
+      <Callout variant="warn" title="The $500 gate">
+        Entries whose previewed revenue exceeds the approval threshold (default $500, set by
         the <code>MANUAL_ENTRY_APPROVAL_THRESHOLD</code> environment variable) require a second
         admin. Pending entries do not count in KPIs or invoices.
       </Callout>
@@ -85,7 +85,7 @@ export default function Body() {
       <ul>
         <li>
           <strong>Validation</strong> — a reason is required, at least one usage line, each line
-          needs an API and at least one non-zero hit count.
+          needs a SKU and at least one non-zero unit count.
         </li>
         <li>
           <strong>Unpriced lines are allowed</strong> — they save with a warning and surface as
@@ -93,7 +93,7 @@ export default function Body() {
         </li>
         <li>
           <strong>Every transition is audited</strong> — create, submit, approve, void, and any
-          inline API creation all write audit events.
+          inline SKU creation all write audit events.
         </li>
         <li>
           <strong>Navigating away mid-form</strong> — unsaved wizard state is lost; there is no

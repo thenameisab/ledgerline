@@ -12,7 +12,7 @@ type NameDrift = { api_code: string; raw_name: string; hits: number; last_seen: 
 type Retired = { product_code: string; name: string; rows: number; hits: number };
 type ApiTarget = { product_code: string; name: string };
 
-const fmt = (n: number) => n.toLocaleString("en-IN");
+const fmt = (n: number) => n.toLocaleString("en-US");
 
 async function post(body: unknown) {
   const res = await fetch("/api/api-review", {
@@ -194,15 +194,15 @@ export function ApiReview({
   return (
     <div className="space-y-5">
       <Section
-        title="Unknown product codes"
-        hint="Usage arrived with a Product Code that isn't an active catalog code. Accept it into the catalog (then price it) or reactivate a retired code. Until then these hits earn nothing."
+        title="Unknown SKU codes"
+        hint="Usage arrived with a SKU code that isn't an active catalog code. Accept it into the catalog (then price it) or reactivate a retired code. Until then this usage earns nothing."
         count={unknownCodes.length}
       >
         <table className="w-full text-sm">
           <thead className="bg-bg-sunken text-ink-muted text-xs uppercase tracking-wide">
             <tr>
               <th className={TH}>Code</th><th className={TH}>Name {`(catalog)`}</th>
-              <th className={THr}>Hits</th><th className={TH}>Last seen</th><th className={THr}>Action</th>
+              <th className={THr}>Units</th><th className={TH}>Last seen</th><th className={THr}>Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -212,14 +212,14 @@ export function ApiReview({
       </Section>
 
       <Section
-        title="Missing product codes"
-        hint="Usage arrived with a blank Product Code. The real fix is upstream in the usage log source; meanwhile add a durable name → code override so these hits bill correctly going forward."
+        title="Missing SKU codes"
+        hint="Usage arrived with a blank SKU code. Fix this in the usage log source. Until then, add a name → code override so this usage bills correctly from now on."
         count={noCodeRows.length}
       >
         <table className="w-full text-sm">
           <thead className="bg-bg-sunken text-ink-muted text-xs uppercase tracking-wide">
             <tr>
-              <th className={TH}>Raw API name</th><th className={THr}>Hits</th>
+              <th className={TH}>Raw SKU name</th><th className={THr}>Units</th>
               <th className={TH}>Last seen</th><th className={TH}>Map to</th><th className={THr}>Action</th>
             </tr>
           </thead>
@@ -231,14 +231,14 @@ export function ApiReview({
 
       <Section
         title="Name drift"
-        hint="These hits matched by code, but the name the source used isn't a known catalog name or alias. Advisory only — billing is unaffected. Acknowledge to record the variant and clear it."
+        hint="These usage rows matched by code, but the name the source used isn't a known catalog name or alias. Advisory only — billing is unaffected. Acknowledge to record the variant and clear it."
         count={drift.length}
       >
         <table className="w-full text-sm">
           <thead className="bg-bg-sunken text-ink-muted text-xs uppercase tracking-wide">
             <tr>
               <th className={TH}>Code</th><th className={TH}>Name in source</th>
-              <th className={THr}>Hits</th><th className={TH}>Last seen</th><th className={THr}>Action</th>
+              <th className={THr}>Units</th><th className={TH}>Last seen</th><th className={THr}>Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -255,7 +255,7 @@ export function ApiReview({
         <table className="w-full text-sm">
           <thead className="bg-bg-sunken text-ink-muted text-xs uppercase tracking-wide">
             <tr>
-              <th className={TH}>Code</th><th className={TH}>Name</th><th className={THr}>Hits</th><th className={THr}>Action</th>
+              <th className={TH}>Code</th><th className={TH}>Name</th><th className={THr}>Units</th><th className={THr}>Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">

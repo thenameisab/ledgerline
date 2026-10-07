@@ -18,7 +18,7 @@ export default function Body() {
         Every number in Ledgerline comes from usage data. The usage sync pulls daily usage from the
         usage log source and writes it to the database. In a live deployment, a scheduled job runs
         the sync once a day for the previous day. In the demo, no external source is called. The
-        sync generates usage locally from the recent history of each account and API pair. The sync
+        sync generates usage locally from the recent history of each account and SKU pair. The sync
         page shows the run history, a manual refresh, and a backfill form for re-pulling a date
         range.
       </p>
@@ -74,7 +74,7 @@ export default function Body() {
         </li>
         <li>
           <strong>Run history</strong> — one row per run and date: start time, the business date it
-          pulled, the trigger (cron, manual, or backfill), status, rows inserted, total hits, and
+          pulled, the trigger (cron, manual, or backfill), status, rows inserted, total units, and
           unmapped name counts that link to Aliases. Failed runs are tinted red and show the error.
           A run with no update for more than 30 minutes shows as <em>stalled</em>. A run that
           succeeded but inserted zero rows is marked <em>no data</em>, which means the source had
@@ -93,7 +93,7 @@ export default function Body() {
       <ul>
         <li>
           <strong>Recent days are re-synced</strong> — each scheduled run re-syncs the last three
-          closed days, because the source can change a recent day as in-progress hits settle.
+          closed days, because the source can change a recent day as in-progress usage settles.
         </li>
         <li>
           <strong>Idempotent per date</strong> — a sync deletes the rows it synced earlier for a
@@ -108,11 +108,11 @@ export default function Body() {
           until the source has data for it.
         </li>
         <li>
-          <strong>API matching by code only</strong> — a row maps to an API by its{" "}
-          <em>Product Code</em>, and only when that code is an active catalog entry. A blank or
+          <strong>SKU matching by code only</strong> — a row maps to a SKU by its{" "}
+          <em>SKU code</em>, and only when that code is an active catalog entry. A blank or
           unknown code uses an admin override if one exists. Otherwise the row is held for{" "}
-          <a href="/help/features/api-review">API review</a>. Account names map by name in
-          Aliases. The sync never matches an API by name and never creates catalog records.
+          <a href="/help/features/sku-review">SKU review</a>. Account names map by name in
+          Aliases. The sync never matches a SKU by name and never creates catalog records.
         </li>
       </ul>
 
@@ -134,8 +134,8 @@ export default function Body() {
         </li>
         <li>
           <strong>Resolve unmapped names</strong> — click the unmapped count on a run to open
-          Aliases for account names. Unknown API codes are resolved in{" "}
-          <a href="/help/features/api-review">API review</a>.
+          Aliases for account names. Unknown SKU codes are resolved in{" "}
+          <a href="/help/features/sku-review">SKU review</a>.
         </li>
       </ul>
 

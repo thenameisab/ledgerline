@@ -21,7 +21,7 @@ export type CostConfidence = {
   /**
    * Hits on a pair decided to have no vendor bill at all — in-house, or a
    * stitched/journey product costed on its components.
-   * Not a rate and not a guess: a structural ₹0.
+   * Not a rate and not a guess: a structural $0.
    */
   not_billed: number;
   /** Hits with no rate at all — no row, or a row with no successful-hit cost. */
@@ -41,7 +41,7 @@ export type CostConfidence = {
  * reader we know less than we do.
  *
  * `not_billed` joins them for a stronger version of the same reason. A pair
- * marked in-house has no vendor invoice to be wrong about — its ₹0 is more
+ * marked in-house has no vendor invoice to be wrong about — its $0 is more
  * certain than any contracted rate, not less. Counting a structural zero as
  * unconfirmed would tell a reader we know less than we do, which is the exact
  * failure the ladder exists to prevent.

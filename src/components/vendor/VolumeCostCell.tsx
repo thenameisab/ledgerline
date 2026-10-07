@@ -65,7 +65,7 @@ export function VolumeCostCell({
       <>
         <button
           onClick={() => setOpen(true)}
-          title="Price this pair by volume — brackets on the month's total hits"
+          title="Price this pair by volume — brackets on the month's total units"
           className="inline-flex items-center gap-0.5 text-[10px] text-ink-faint hover:text-accent-ink px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-border transition-colors"
         >
           <Layers size={9} strokeWidth={1.75} />

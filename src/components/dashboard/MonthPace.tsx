@@ -1,4 +1,4 @@
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { CircleCheck, TrendingUp } from "lucide-react";
 
 // Answers "is the month on track?". When the period still has days left, it
@@ -33,7 +33,7 @@ export function MonthPace({
           {complete ? "Month complete" : "Projected month-end"}
         </span>
         <span className="text-sm font-mono tnum text-accent-ink">
-          {formatINR(projected, { compact: true })}
+          {formatMoney(projected, { compact: true })}
         </span>
       </div>
       <div className="relative h-2 rounded-full bg-bg-sunken overflow-hidden">
@@ -59,7 +59,7 @@ export function MonthPace({
         {hasBenchmark ? (
           <span className="inline-flex items-center gap-1">
             {complete && ahead && <CircleCheck size={11} strokeWidth={1.5} className="text-ok-ink" />}
-            benchmark {formatINR(benchmark, { compact: true })}
+            benchmark {formatMoney(benchmark, { compact: true })}
           </span>
         ) : (
           <span className="text-ink-faint">no prior-month data</span>

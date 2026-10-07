@@ -72,7 +72,7 @@ export type ReconSummary = {
   /** Items over the threshold and above the hit floor, excluding dismissed ones. */
   open_items: number;
   dismissed_items: number;
-  /** Rupee value of open gaps where a rate is known. */
+  /** Dollar value of open gaps where a rate is known. */
   open_delta_cost: number;
   /** Vendor-side rows whose API name matched nothing in the catalog. */
   unmatched_hits: number;

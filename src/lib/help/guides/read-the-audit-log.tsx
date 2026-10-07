@@ -50,7 +50,7 @@ export default function Body() {
           pricing row or invite exactly as it was.
         </Step>
         <Step title="Follow the entity">
-          Where the entity still exists (an API, an account), its identifier links to the live
+          Where the entity still exists (a SKU, an account), its identifier links to the live
           record.
         </Step>
       </Steps>

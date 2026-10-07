@@ -312,7 +312,7 @@ export function DateRangePicker({ from, to }: { from: string; to: string }) {
                       <ChevronLeft size={14} strokeWidth={1.5} />
                     </button>
                     <span className="text-xs text-ink font-medium">
-                      {new Date(Date.UTC(calYear, calMonth, 1)).toLocaleDateString("en-IN", { month: "long", year: "numeric", timeZone: "UTC" })}
+                      {new Date(Date.UTC(calYear, calMonth, 1)).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" })}
                     </span>
                     <button type="button" onClick={nextMonth} className="p-1 rounded hover:bg-bg-sunken transition-colors duration-fast ease-expo">
                       <ChevronRight size={14} strokeWidth={1.5} />
@@ -332,7 +332,7 @@ export function DateRangePicker({ from, to }: { from: string; to: string }) {
                   <div className="flex items-center justify-between mb-2">
                     <div className="w-6" />
                     <span className="text-xs text-ink font-medium">
-                      {new Date(Date.UTC(nextYear2, nextMonth2, 1)).toLocaleDateString("en-IN", { month: "long", year: "numeric", timeZone: "UTC" })}
+                      {new Date(Date.UTC(nextYear2, nextMonth2, 1)).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" })}
                     </span>
                     <div className="w-6" />
                   </div>

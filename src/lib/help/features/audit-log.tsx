@@ -37,7 +37,7 @@ export default function Body() {
         <li>
           <strong>Event rows</strong> — timestamp, the acting user, an action badge, the entity it
           touched (linked where a page exists), and a compact change summary like{" "}
-          <code>price_successful: 4.00 → 5.50</code>.
+          <code>price_successful: 3.00 → 2.75</code>.
         </li>
         <li>
           <strong>Expandable detail</strong> — each row discloses the full before and after

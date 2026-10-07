@@ -28,14 +28,14 @@ export type WeekWindow = {
 };
 
 const DAY_SHORT = (iso: string) =>
-  new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", {
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     timeZone: "UTC",
   });
 
 const WEEKDAY_SHORT = (iso: string) =>
-  new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", { weekday: "short", timeZone: "UTC" });
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { weekday: "short", timeZone: "UTC" });
 
 /** The finished Mon–Sun week before `today`, and the week before that. */
 export function lastFullWeek(today: string): WeekWindow {

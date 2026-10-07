@@ -26,7 +26,7 @@ export default async function ApiReviewPage() {
   return (
     <main>
       <StatusBar
-        title="API review"
+        title="SKU review"
         subtitle={
           open === 0
             ? "Every usage row maps to an active catalog code."

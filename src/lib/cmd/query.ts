@@ -9,15 +9,16 @@
 // and Linear, nothing invented:
 //
 //   plain text            fuzzy/token match, as before
-//   field:value           scope to a field    → account:acme  status:pending
+//   field:value           scope to a field    → account:copperleaf  status:pending
 //   is:value              alias for status:   → is:pending
-//   @name                 alias for account:  → @acme
-//   #CODE                 alias for api:      → #KY1001
-//   -word                 exclude a term      → acme -sandbox
+//   @name                 alias for account:  → @copperleaf
+//   #CODE                 alias for api:      → #ATL-PRO-IN
+//   sku:CODE              alias for api:      → sku:ATL-PRO-IN
+//   -word                 exclude a term      → copperleaf -sandbox
 //   >verb                 action mode         (unchanged)
 //   ?question             ask mode            (unchanged)
 //
-// A quoted value keeps its spaces: account:"northwind finance". Everything else is
+// A quoted value keeps its spaces: account:"copperleaf labs". Everything else is
 // whitespace-delimited.
 
 export type CmdMode = "search" | "action" | "ask";
@@ -43,6 +44,7 @@ const FIELD_ALIASES: Record<string, FilterField> = {
   acct: "account",
   client: "account",
   api: "api",
+  sku: "api",
   code: "api",
   group: "group",
   parent: "group",
@@ -72,7 +74,7 @@ export type ParsedQuery = {
 };
 
 // Splits on whitespace but keeps "quoted phrases" together, including when the
-// quote follows a field prefix (account:"northwind finance" — the common case, since
+// quote follows a field prefix (account:"copperleaf labs" — the common case, since
 // that's the whole reason to quote). Returns tokens with quotes removed, so the
 // field:value split downstream works the same either way.
 function tokenize(s: string): string[] {
@@ -87,7 +89,7 @@ function tokenize(s: string): string[] {
 }
 
 // A query is a question when it's explicitly marked ("?"), opens with a
-// question word, or carries a metric/intent signal ("revenue", "hits",
+// question word, or carries a metric/intent signal ("revenue", "units",
 // "unpriced", "using"…). Action mode (">") always wins. Plain entity names
 // (no signal) stay as search so jumping isn't hijacked.
 //
@@ -98,7 +100,7 @@ export function isAskText(s: string): boolean {
   if (!t) return false;
   if (t.startsWith("?") || t.endsWith("?")) return true;
   if (/^(how |what'?s? |which |why |who |top \d)/.test(t)) return true;
-  if (/\b(revenue|bill|billed|billing|margin|hits|usage|unpriced|using|uses|consume|apis? used|accounts? using)\b/.test(t)) return true;
+  if (/\b(revenue|bill|billed|billing|margin|hits|units|usage|unpriced|using|uses|consume|apis? used|skus? used|accounts? using)\b/.test(t)) return true;
   return false;
 }
 
@@ -168,7 +170,8 @@ export function parseQuery(raw: string): ParsedQuery {
 
 /** Human label for a filter chip. */
 export function filterLabel(field: FilterField, value: string): string {
-  return `${field}:${value}`;
+  // The api field reads as "sku" in the UI; `api:` still parses.
+  return `${field === "api" ? "sku" : field}:${value}`;
 }
 
 /**

@@ -12,10 +12,11 @@ const ApiCreateSchema = z.object({
     .string()
     .min(1)
     .max(32)
-    .regex(/^[A-Z0-9_]+$/i, "letters, digits, underscore only"),
+    .regex(/^[A-Z0-9_-]+$/i, "letters, digits, hyphen, underscore only"),
   name: z.string().min(1).max(200),
   category: z.string().max(200).nullable().optional().transform((v) => v ?? null),
-  entity_type: z.enum(["Business", "Individual", "Both"]).nullable().optional().transform((v) => v ?? null),
+  // What one billed unit is ("1M tokens", "minute").
+  unit: z.string().trim().min(1).max(50),
   vendor_type: z.enum(["InHouse", "Vendor", "Stitched", "Journey"]).nullable().optional().transform((v) => v ?? null),
   default_vendor: z.string().max(100).nullable().optional().transform((v) => v ?? null),
   log_aliases: z.array(z.string().min(1)).optional().default([]),
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
   const [existing] = await sql`SELECT product_code FROM apis WHERE product_code = ${code}`;
   if (existing) {
     return NextResponse.json(
-      { ok: false, error: `API ${code} already exists` },
+      { ok: false, error: `SKU ${code} already exists` },
       { status: 409 }
     );
   }
@@ -73,8 +74,8 @@ export async function POST(req: Request) {
   }
 
   await sql`
-    INSERT INTO apis (product_code, name, log_aliases, category, entity_type, vendor_type, default_vendor, is_active)
-    VALUES (${code}, ${body.name}, ${JSON.stringify(aliases)}, ${body.category}, ${body.entity_type}, ${body.vendor_type}, ${body.default_vendor}, 1)
+    INSERT INTO apis (product_code, name, log_aliases, category, unit, vendor_type, default_vendor, is_active)
+    VALUES (${code}, ${body.name}, ${JSON.stringify(aliases)}, ${body.category}, ${body.unit}, ${body.vendor_type}, ${body.default_vendor}, 1)
   `;
 
   if (body.resolve_raw_name) {

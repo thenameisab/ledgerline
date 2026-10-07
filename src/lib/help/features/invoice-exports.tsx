@@ -30,7 +30,7 @@ export default function Body() {
       <H2 id="what-you-see">What you see</H2>
       <ul>
         <li>
-          <strong>Customer PDF</strong> — revenue columns only: per-API hits, outcome counts,
+          <strong>Customer PDF</strong> — revenue columns only: per-SKU units, outcome counts,
           prices, and revenue. Closes with a "Thank you for choosing Ledgerline" block. No vendor
           cost, no margin, anywhere.
         </li>

@@ -102,13 +102,13 @@ function composeBriefing(o: {
   is_sandbox: number;
 }): string {
   if (o.is_sandbox) {
-    return `Sandbox traffic — ${formatNumber(o.hits)} hits across ${o.apis_used} APIs. Excluded from headline by default.`;
+    return `Sandbox traffic — ${formatNumber(o.hits)} units across ${o.apis_used} SKUs. Excluded from headline by default.`;
   }
   const parts: string[] = [];
-  parts.push(`${formatNumber(o.hits)} hits across ${o.apis_used} APIs`);
+  parts.push(`${formatNumber(o.hits)} units across ${o.apis_used} SKUs`);
   if (o.unpriced_pairs > 0) {
     parts.push(
-      `${o.unpriced_pairs} (account, api) pair${o.unpriced_pairs === 1 ? "" : "s"} unpriced — ${formatNumber(o.unpriced_hits)} hits at risk`
+      `${o.unpriced_pairs} (account, SKU) pair${o.unpriced_pairs === 1 ? "" : "s"} unpriced — ${formatNumber(o.unpriced_hits)} units at risk`
     );
   }
   return parts.join(" · ");
@@ -438,7 +438,7 @@ export async function getGroupDetail(
   const [members, summaries] = await Promise.all([
     sql`SELECT id, display_name, slug, (logo_data_url IS NOT NULL) AS has_logo, status, is_sandbox FROM clients WHERE account_id = ${id} AND deleted_at IS NULL ORDER BY display_name`,
     // Honor the same sandbox toggle as the groups list (default off) so the
-    // two pages agree; sandbox members still appear in the list below, at ₹0
+    // two pages agree; sandbox members still appear in the list below, at $0
     // when excluded.
     getAccountSummaries({ from: opts.from, to: opts.to, includeSandbox: opts.includeSandbox }),
   ]);
@@ -815,13 +815,13 @@ export async function getAccountApiBreakdown(
              OR price_failed > 0 OR price_in_progress > 0)
     `,
     sql`SELECT api_code FROM leak_dismissals WHERE client_id = ${accountId}`,
-    // Volume-priced APIs (tier/slab) price to ₹0 in the per-day view (their
+    // Volume-priced APIs (tier/slab) price to $0 in the per-day view (their
     // period-total math can't live there). Recompute their revenue PER CALENDAR
     // MONTH (brackets reset monthly — the billing truth) and add it back, with a
     // per-bracket breakdown. includeSandbox matches this read's sandbox filter.
     slabBreakdownByApi({ accountId, from: opts.from, to: opts.to, includeSandbox: !!opts.includeSandbox }),
     // And the mirror of it on the cost side: a vendor rate that changes with
-    // volume also costs ₹0 per day, so this account's share of the month's
+    // volume also costs $0 per day, so this account's share of the month's
     // real cost is added back per API.
     vendorVolumeCostByApi({ clientId: accountId, from: opts.from, to: opts.to, includeSandbox: !!opts.includeSandbox }),
   ]);
@@ -947,7 +947,7 @@ async function getAccountDailySeriesImpl(
     GROUP BY date
     ORDER BY date
   `;
-  // Volume-priced vendor rates cost ₹0 per day in the view; the month's blended
+  // Volume-priced vendor rates cost $0 per day in the view; the month's blended
   // rate lands on the days that earned it, so the series still sums to the month.
   const volumeByDate = await vendorVolumeCostByDate({
     clientId: accountId,

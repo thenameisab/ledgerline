@@ -31,8 +31,8 @@ export function PriceCell({
       <span
         className={`inline-flex items-center justify-end gap-0.5 px-1.5 py-1 text-sm font-mono tnum text-ink ${widthCls}`}
       >
-        <span className="text-ink-faint text-xs">₹</span>
-        <span>{value === 0 ? <span className="text-ink-faint">—</span> : value.toFixed(2)}</span>
+        <span className="text-ink-faint text-xs">$</span>
+        <span>{value === 0 ? <span className="text-ink-faint">—</span> : value.toFixed(Number.isInteger(Math.round(value * 1e6) / 1e4) ? 2 : 4)}</span>
       </span>
     );
   }
@@ -70,7 +70,7 @@ export function PriceCell({
         flash === "saved" ? "border-success bg-ok-bg" : "border-border focus-within:border-accent focus-within:bg-bg-raised"
       }`}
     >
-      <span className="text-ink-faint text-xs">₹</span>
+      <span className="text-ink-faint text-xs">$</span>
       <input
         value={v}
         placeholder="0"

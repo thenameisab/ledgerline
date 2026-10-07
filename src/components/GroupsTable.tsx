@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { AccountLogo } from "@/components/accounts/AccountLogo";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import type { GroupSummary } from "@/lib/repos/accounts";
 import { generateSlug } from "@/lib/slug";
 
@@ -81,7 +81,7 @@ export function GroupsTable({ rows }: { rows: GroupSummary[] }) {
                 <td className="px-3 py-3 align-middle text-right font-mono tnum text-sm">
                   {a.revenue > 0 ? (
                     <span className="text-ink" style={{ fontWeight: 500 }}>
-                      {formatINR(a.revenue, { compact: true })}
+                      {formatMoney(a.revenue, { compact: true })}
                     </span>
                   ) : (
                     <span className="text-ink-faint">—</span>

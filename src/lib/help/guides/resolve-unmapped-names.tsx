@@ -4,7 +4,7 @@ import { H2, Steps, Step, Callout, Figure, Related } from "@/components/help/doc
 export const meta: GuideMeta = {
   slug: "resolve-unmapped-names",
   title: "Resolve unmapped names (aliases)",
-  summary: "Map raw account names to canonical accounts, and resolve unmatched API codes, so their hits start counting as revenue.",
+  summary: "Map raw account names to canonical accounts, and resolve unmatched SKU codes, so their usage starts counting as revenue.",
   group: "Data pipeline",
   role: "admin",
   minutes: 4,
@@ -16,7 +16,7 @@ export default function Body() {
       <p>
         When the sync pulls usage it cannot attribute, the rows are kept with their raw labels and
         earn nothing — that is the “silent loss” bucket on the dashboard. There are two separate
-        paths, because accounts and APIs match differently:
+        paths, because accounts and SKUs match differently:
       </p>
       <ul>
         <li>
@@ -24,23 +24,23 @@ export default function Body() {
           <strong>Admin → Aliases</strong>.
         </li>
         <li>
-          <strong>API codes</strong> match by Product Code only (no name or alias fallback) —
-          resolve them in the new <strong>Admin → API review</strong> queue.
+          <strong>SKU codes</strong> match by SKU code only (no name or alias fallback) —
+          resolve them in the new <strong>Admin → SKU review</strong> queue.
         </li>
       </ul>
       <p>Revenue starts counting the moment a row resolves on either path.</p>
 
       <Figure
         src="/help/shots/admin-aliases.png"
-        alt="The Alias mapper with unmapped names, hit counts, and resolution dropdowns"
-        caption="The Alias mapper: unattributed hits KPI on top, one resolver row per raw name."
+        alt="The Alias mapper with unmapped names, unit counts, and resolution dropdowns"
+        caption="The Alias mapper: unattributed units KPI on top, one resolver row per raw name."
       />
 
       <H2 id="accounts">Resolve unmapped account names</H2>
       <Steps>
         <Step title="Open Admin → Aliases">
-          The <strong>Accounts</strong> tab is the default. The KPI shows unattributed hits this
-          month; each row lists a raw name, its hits, and when it was last seen.
+          The <strong>Accounts</strong> tab is the default. The KPI shows unattributed units this
+          month; each row lists a raw name, its units, and when it was last seen.
         </Step>
         <Step title="Pick the target in the “Map to” dropdown">
           Choose the canonical account the raw name belongs to. If the account genuinely does not
@@ -53,16 +53,16 @@ export default function Body() {
         </Step>
       </Steps>
 
-      <H2 id="apis">Resolve unmatched API codes</H2>
+      <H2 id="apis">Resolve unmatched SKU codes</H2>
       <p>
-        APIs no longer match by name. A usage row maps to an API only when its Product Code is an{" "}
-        <em>active</em> catalog code. Anything else lands in <strong>Admin → API review</strong>,
+        SKUs do not match by name. A usage row maps to a SKU only when its SKU code is an{" "}
+        <em>active</em> catalog code. Anything else lands in <strong>Admin → SKU review</strong>,
         sorted into queues. Pick the queue, then take the matching action:
       </p>
       <Steps>
         <Step title="Unknown codes → accept into the catalog">
-          A code that has usage but no catalog row. If it is a genuine product, accept it to create
-          the catalog entry; its hits resolve from then on. Codes are never auto-created — they wait
+          A code that has usage but no catalog row. If it is a genuine SKU, accept it to create
+          the catalog entry; its usage resolves from then on. Codes are never auto-created — they wait
           here for review.
         </Step>
         <Step title="Missing codes → add a name→code override">
@@ -77,19 +77,19 @@ export default function Body() {
         </Step>
         <Step title="Retired codes with usage → reactivate">
           A deactivated (retired) code is still taking traffic. If it should bill again, reactivate
-          it in the catalog; otherwise leave it retired and the hits stay quarantined.
+          it in the catalog; otherwise leave it retired and the usage stays quarantined.
         </Step>
       </Steps>
 
       <Callout variant="tip">
         Sync runs link here directly: the Unmapped column in the run history on Admin → Usage sync
-        jumps to the right queue whenever a pull contained unrecognised account names or API codes.
+        jumps to the right queue whenever a pull contained unrecognised account names or SKU codes.
       </Callout>
 
       <Related
         links={[
-          { href: "/help/features/api-review", label: "API review" },
-          { href: "/help/guides/create-or-edit-an-api", label: "Create or edit an API" },
+          { href: "/help/features/sku-review", label: "SKU review" },
+          { href: "/help/guides/create-or-edit-a-sku", label: "Create or edit a SKU" },
           { href: "/help/guides/refresh-usage-data", label: "Refresh usage data now" },
           { href: "/help/guides/read-the-dashboard", label: "Read the dashboard" },
         ]}

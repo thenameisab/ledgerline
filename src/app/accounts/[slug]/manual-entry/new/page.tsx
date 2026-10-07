@@ -40,7 +40,7 @@ export default async function AccountManualEntryNewPage({
     <main>
       <StatusBar
         title={`Manual entry · ${account.display_name}`}
-        subtitle="Log off-stream bulk usage. After saving, the lines appear in the API breakdown below."
+        subtitle="Log off-stream bulk usage. After saving, the lines appear in the SKU breakdown below."
       />
       <div className="mx-auto w-full max-w-[1200px] px-7 py-6">
         <ManualEntryWizard

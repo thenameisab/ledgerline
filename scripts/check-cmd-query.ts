@@ -31,61 +31,63 @@ function check(name: string, actual: unknown, expected: unknown) {
 }
 
 console.log("\nmode detection");
-check("plain name is search", parseQuery("acme").mode, "search");
+check("plain name is search", parseQuery("copperleaf").mode, "search");
 check("leading > is action", parseQuery("> refresh").mode, "action");
 check("action strips the sigil", parseQuery("> refresh").text, "refresh");
-check("trailing ? is ask", parseQuery("revenue for acme?").mode, "ask");
-check("leading ? is ask", parseQuery("?acme").mode, "ask");
-check("metric word is ask", parseQuery("revenue for acme").mode, "ask");
+check("trailing ? is ask", parseQuery("revenue for copperleaf?").mode, "ask");
+check("leading ? is ask", parseQuery("?copperleaf").mode, "ask");
+check("metric word is ask", parseQuery("revenue for copperleaf").mode, "ask");
 check("question word is ask", parseQuery("which accounts leak").mode, "ask");
-check("bare entity stays search", parseQuery("northwind").mode, "search");
+check("bare entity stays search", parseQuery("harbor").mode, "search");
 // The important one: operators mean "narrow a list", so they must not be
 // hijacked into ask mode by a metric word that happens to be present.
 check("operators beat metric words", parseQuery("status:pending revenue").mode, "search");
 check("operators survive that", parseQuery("status:pending revenue").filters, { status: "pending" });
 
 console.log("\nfield operators");
-check("field:value", parseQuery("account:acme").filters, { account: "acme" });
-check("alias client:", parseQuery("client:acme").filters, { account: "acme" });
+check("field:value", parseQuery("account:copperleaf").filters, { account: "copperleaf" });
+check("alias client:", parseQuery("client:copperleaf").filters, { account: "copperleaf" });
+check("alias sku:", parseQuery("sku:ATL-PRO-IN").filters, { api: "ATL-PRO-IN" });
 check("alias is:", parseQuery("is:pending").filters, { status: "pending" });
 check("alias in:", parseQuery("in:june").filters, { month: "june" });
-check("two operators", parseQuery("account:acme api:KY1001").filters, {
-  account: "acme",
-  api: "KY1001",
+check("two operators", parseQuery("account:copperleaf api:ATL-PRO-IN").filters, {
+  account: "copperleaf",
+  api: "ATL-PRO-IN",
 });
-check("quoted value keeps spaces", parseQuery('account:"northwind finance"').filters, {
-  account: "northwind finance",
+check("quoted value keeps spaces", parseQuery('account:"copperleaf labs"').filters, {
+  account: "copperleaf labs",
 });
 check("first writer wins", parseQuery("account:a account:b").filters, { account: "a" });
-check("free text survives operators", parseQuery("account:acme masking").text, "masking");
+check("free text survives operators", parseQuery("account:copperleaf embed").text, "embed");
 check("unknown field is plain text", parseQuery("foo:bar").filters, {});
 check("unknown field kept as text", parseQuery("foo:bar").text, "foo:bar");
 check("bare colon is text", parseQuery(":").text, ":");
 
 console.log("\nsigils");
-check("@ is account", parseQuery("@acme").filters, { account: "acme" });
-check("# is api", parseQuery("#KY1001").filters, { api: "KY1001" });
+check("@ is account", parseQuery("@copperleaf").filters, { account: "copperleaf" });
+check("# is api", parseQuery("#ATL-PRO-IN").filters, { api: "ATL-PRO-IN" });
 check("lone @ is text", parseQuery("@").text, "@");
 check("email is not a sigil", parseQuery("maya@ledgerline.local").text, "maya@ledgerline.local");
 
 console.log("\nexclusions");
-check("-word excludes", parseQuery("acme -sandbox").excludes, ["sandbox"]);
-check("-word leaves text", parseQuery("acme -sandbox").text, "acme");
+check("-word excludes", parseQuery("copperleaf -sandbox").excludes, ["sandbox"]);
+check("-word leaves text", parseQuery("copperleaf -sandbox").text, "copperleaf");
 check("negative number is not an exclusion", parseQuery("-42").excludes, []);
 check("lone hyphen is text", parseQuery("-").text, "-");
-check("passesExcludes filters", passesExcludes("Acme Sandbox", ["sandbox"]), false);
-check("passesExcludes keeps", passesExcludes("Acme Ltd", ["sandbox"]), true);
+check("passesExcludes filters", passesExcludes("Copperleaf Sandbox", ["sandbox"]), false);
+check("passesExcludes keeps", passesExcludes("Copperleaf CRM", ["sandbox"]), true);
 check("passesExcludes empty is pass-through", passesExcludes("anything", []), true);
 
 console.log("\nhasOperators");
-check("plain text has none", parseQuery("acme").hasOperators, false);
+check("plain text has none", parseQuery("copperleaf").hasOperators, false);
 check("filter counts", parseQuery("status:pending").hasOperators, true);
-check("exclusion counts", parseQuery("acme -sandbox").hasOperators, true);
+check("exclusion counts", parseQuery("copperleaf -sandbox").hasOperators, true);
 
 console.log("\nremoveFilter (chip dismiss)");
-check("removes the named field", removeFilter("account:acme api:KY1001", "account"), "api:KY1001");
-check("removes the sigil form", removeFilter("@acme masking", "account"), "masking");
-check("leaves other fields alone", removeFilter("account:acme masking", "api"), "account:acme masking");
+check("removes the named field", removeFilter("account:copperleaf api:ATL-PRO-IN", "account"), "api:ATL-PRO-IN");
+check("removes the sku: alias", removeFilter("sku:ATL-PRO-IN embed", "api"), "embed");
+check("removes the sigil form", removeFilter("@copperleaf embed", "account"), "embed");
+check("leaves other fields alone", removeFilter("account:copperleaf embed", "api"), "account:copperleaf embed");
 
 console.log("\nmonth resolution");
 const year = new Date().getFullYear();
@@ -120,28 +122,28 @@ check(
 check(
   "preview substitutes filled values",
   cuePreview(cuesFor("admin").find((c) => c.id === "cue-revenue-account")!, [
-    { value: "Acme", label: "Acme" },
+    { value: "Copperleaf CRM", label: "Copperleaf CRM" },
     null,
   ]),
-  "Revenue for Acme in a month…"
+  "Revenue for Copperleaf CRM in a month…"
 );
 check(
   "revenue cue builds a spec",
   cuesFor("admin")
     .find((c) => c.id === "cue-revenue-account")!
-    .build([{ value: "Acme Lending", label: "Acme Lending" }, { value: "2026-06", label: "June 2026" }]),
+    .build([{ value: "Copperleaf CRM", label: "Copperleaf CRM" }, { value: "2026-06", label: "June 2026" }]),
   {
     kind: "ask-spec",
-    spec: { metric: "revenue", entityType: "account", entityName: "Acme Lending", period: "2026-06" },
-    echo: "Revenue for Acme Lending in June 2026",
+    spec: { metric: "revenue", entityType: "account", entityName: "Copperleaf CRM", period: "2026-06" },
+    echo: "Revenue for Copperleaf CRM in June 2026",
   }
 );
 check(
-  "relation cue sends the API code, not its name",
+  "relation cue sends the SKU code, not its name",
   cuesFor("admin")
     .find((c) => c.id === "cue-accounts-using")!
-    .build([{ value: "KY1001", label: "Aadhaar Masking", sub: "KY1001" }]),
-  { kind: "ask-text", text: "accounts using KY1001" }
+    .build([{ value: "ATL-PRO-IN", label: "Atlas Pro · input tokens", sub: "ATL-PRO-IN" }]),
+  { kind: "ask-text", text: "accounts using ATL-PRO-IN" }
 );
 
 console.log("\nslot options");

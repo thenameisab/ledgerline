@@ -33,7 +33,7 @@ export function ConfidenceBar({
   const caption =
     hits === 0
       ? "No traffic this period"
-      : `Cost confirmed on ${formatShare(confirmedShare(confidence))} of hits`;
+      : `Cost confirmed on ${formatShare(confirmedShare(confidence))} of units`;
 
   return (
     <div>
@@ -51,7 +51,7 @@ export function ConfidenceBar({
           hits === 0
             ? "No traffic this period"
             : segments
-                .map((s) => `${s.label}: ${formatNumber(s.n)} hits (${formatShare(pct(s.n))})`)
+                .map((s) => `${s.label}: ${formatNumber(s.n)} units (${formatShare(pct(s.n))})`)
                 .join("\n")
         }
       >

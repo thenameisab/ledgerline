@@ -249,7 +249,7 @@ export async function deriveStatement(
   // bundle collapses into ONE line keyed on the bundle: the line carries the
   // stitch name, the anchor's hit counts (those are the stitched calls the
   // price applies to) and the vendor cost of ALL members (the true delivery
-  // cost). Member APIs never appear as their own ₹0 lines. Usage from before
+  // cost). Member APIs never appear as their own $0 lines. Usage from before
   // the stitch's effective date (bundle_applied = 0) still groups per API —
   // it really was billed individually.
   // Production lines only. Sandbox hits are billed separately below, capped
@@ -321,7 +321,7 @@ export async function deriveStatement(
     };
   });
 
-  // Volume-priced (slab/tier) vendor rates cost ₹0 in the per-day view: a
+  // Volume-priced (slab/tier) vendor rates cost $0 in the per-day view: a
   // month's bracket cannot be resolved one day at a time, so those pairs keep
   // their flat cost columns at 0. Add the real cost back — the month's whole
   // volume across every account picks the bracket (that is what the vendor
@@ -725,7 +725,7 @@ export async function listAccountStatements(accountId: number): Promise<Statemen
   const slabByPeriod = await slabRevenueByPeriod(accountId, periods);
 
   // The mirror of slabByPeriod on the cost side: a volume-priced vendor rate is
-  // ₹0 in the per-day view. Read per day over the whole span in one call and
+  // $0 in the per-day view. Read per day over the whole span in one call and
   // bucket into periods, rather than one call per period.
   const spanFrom = periods.reduce((m, p) => (p.start_date < m ? p.start_date : m), periods[0].start_date);
   const spanTo = periods.reduce((m, p) => (p.end_date > m ? p.end_date : m), periods[0].end_date);
@@ -788,7 +788,7 @@ export async function listAccountStatements(accountId: number): Promise<Statemen
   );
 
   // Billed sandbox per period, capped per (account, api) — mirrors deriveStatement
-  // so the list total matches the opened draft. Slab sandbox reads ₹0 here (the
+  // so the list total matches the opened draft. Slab sandbox reads $0 here (the
   // view prices it at 0); deriveStatement is authoritative for that rare case.
   const sbRows = await sql`
     SELECT bp.id AS period_id, v.api_code,

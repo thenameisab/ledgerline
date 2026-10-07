@@ -43,6 +43,7 @@ export function SlabModal({
   onOpenChange,
   apiName,
   apiCode,
+  unit,
   initialModel,
   initialSlabs,
   onSave,
@@ -51,6 +52,8 @@ export function SlabModal({
   onOpenChange: (o: boolean) => void;
   apiName: string;
   apiCode: string;
+  /** The SKU's billing unit. Bracket prices are per one unit. */
+  unit: string;
   initialModel: VolumeModel;
   initialSlabs: SlabTier[];
   onSave: (model: VolumeModel, slabs: SlabTier[]) => void;
@@ -167,7 +170,8 @@ export function SlabModal({
 
           <Dialog.Description id="slab-modal-desc" className="text-xs text-ink-muted mb-3">
             <span className="text-ink">{apiName}</span>{" "}
-            <span className="font-mono text-ink-faint">{apiCode}</span>
+            <span className="font-mono text-ink-faint">{apiCode}</span>{" "}
+            <span className="text-ink-faint">· prices per {unit}</span>
           </Dialog.Description>
 
           {/* Model selector — Slab (whole-volume) is the default. */}
@@ -197,15 +201,15 @@ export function SlabModal({
             {model === "slab" ? (
               <>
                 <span className="text-ink-muted">Slab (whole-volume):</span> the whole
-                period bills at the single bracket its total hits land in. A month of
-                45,000 hits with brackets 0–40k @ ₹15 and 40k+ @ ₹13 bills all 45,000 ×
-                ₹13. Crossing a threshold re-prices the entire volume.
+                period bills at the single bracket its total units land in. A month of
+                45,000 units with brackets 0–40k @ $15 and 40k+ @ $13 bills all 45,000 ×
+                $13. Crossing a threshold re-prices the entire volume.
               </>
             ) : (
               <>
                 <span className="text-ink-muted">Tiered (graduated):</span> rates are
-                graduated on the period’s total hits — like tax brackets. The same 45,000
-                hits bill 40,000 × ₹15 + 5,000 × ₹13.
+                graduated on the period’s total units, like tax brackets. The same 45,000
+                units bill 40,000 × $15 + 5,000 × $13.
               </>
             )}{" "}
             Each bracket can price the four outcomes (S / ND / F / IP) separately; leave a
@@ -237,10 +241,10 @@ export function SlabModal({
               </colgroup>
               <thead className="bg-bg-sunken text-ink-faint text-[11px] uppercase tracking-wide">
                 <tr className="text-left">
-                  <th className="px-3 py-2 font-medium">Hits range</th>
+                  <th className="px-3 py-2 font-medium">Units range</th>
                   {PRICE_FIELDS.map((f) => (
                     <th key={f.key} className="px-2 py-2 font-medium text-right">
-                      {f.label} ₹
+                      {f.label} $
                     </th>
                   ))}
                   <th />
@@ -255,11 +259,11 @@ export function SlabModal({
                       <td className="px-3 py-2 align-middle">
                         {isLast ? (
                           <span className="text-xs font-mono text-ink-muted">
-                            {min.toLocaleString("en-IN")}+ &nbsp;and above
+                            {min.toLocaleString("en-US")}+ &nbsp;and above
                           </span>
                         ) : (
                           <span className="flex items-center gap-1 text-xs font-mono text-ink-muted">
-                            <span className="shrink-0">{min.toLocaleString("en-IN")}</span>
+                            <span className="shrink-0">{min.toLocaleString("en-US")}</span>
                             <span className="text-ink-faint shrink-0">–</span>
                             <input
                               value={t.capStr}
@@ -276,7 +280,7 @@ export function SlabModal({
                       {PRICE_FIELDS.map((f) => (
                         <td key={f.key} className="px-2 py-2">
                           <span className="inline-flex items-center gap-0.5 px-1.5 py-1 rounded border border-border bg-bg w-full text-sm focus-within:border-accent">
-                            <span className="text-ink-faint text-xs shrink-0">₹</span>
+                            <span className="text-ink-faint text-xs shrink-0">$</span>
                             <input
                               value={t[f.key]}
                               placeholder="0"
