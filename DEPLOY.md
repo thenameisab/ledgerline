@@ -32,15 +32,19 @@ and turns off prepared statements, which the pooler does not support.
 
 ## 3. Create the schema and the demo data (once, from your machine)
 
-Use the direct string. Run the two scripts with `npx tsx`, not with
-`npm run db:setup` or `npm run seed`: those go through `scripts/local.ts`, which
-starts the embedded Postgres and replaces `DATABASE_URL` with a local address.
+Run this from the repository root:
 
 ```bash
-set -a; source .env.deploy.local; set +a
-DATABASE_URL="$DATABASE_URL_DIRECT" npx tsx scripts/db-setup.ts
-DATABASE_URL="$DATABASE_URL_DIRECT" npx tsx scripts/seed-mock.ts
+npm run deploy:seed
 ```
+
+`scripts/deploy-seed.ts` reads `.env.deploy.local` with Node's env-file parser,
+which handles the `&` in Neon strings. It runs `scripts/db-setup.ts` and then
+`scripts/seed-mock.ts` with `DATABASE_URL` set to `DATABASE_URL_DIRECT`. Do not
+use `npm run db:setup` or `npm run seed` for this: those go through
+`scripts/local.ts`, which starts the embedded Postgres and replaces
+`DATABASE_URL` with a local address. The seed inserts rows one at a time, so
+against a distant region it can take 15 minutes or more.
 
 Both scripts are safe to run again. The seed replaces all demo data.
 
@@ -99,12 +103,10 @@ bypass rule for the host, because the app returns per-user pages.
 ## Reseeding and the revenue cache
 
 Next.js keeps revenue reads in its Data Cache with no expiry, and on Vercel the
-cache stays across deployments. After you reseed Neon from your machine, clear
-it:
+cache stays across deployments. To reseed and then clear the cache:
 
 ```bash
-set -a; source .env.deploy.local; set +a
-curl -X POST -H "Authorization: Bearer $CRON_SECRET" https://YOUR-DOMAIN/api/cache/revalidate
+npm run deploy:seed -- --revalidate=https://YOUR-DOMAIN
 ```
 
 The nightly reset job (reseed, then clear the cache) is a later step.

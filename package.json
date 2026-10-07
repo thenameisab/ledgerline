@@ -11,6 +11,7 @@
     "reseed": "tsx scripts/local.ts seed",
     "db:setup": "tsx scripts/local.ts db:setup",
     "migrate": "tsx scripts/local.ts migrate",
+    "deploy:seed": "tsx scripts/deploy-seed.ts",
     "check:cmd": "tsx scripts/check-cmd-query.ts",
     "check:names": "tsx scripts/check-names.ts",
     "vendor-sync": "tsx --env-file=.env.local scripts/vendor-recon-sync.ts",
