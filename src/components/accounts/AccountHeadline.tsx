@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Activity, Zap, CircleDollarSign, Percent, ChevronRight } from "lucide-react";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { DeltaPill, Stat } from "@/components/dashboard/Headline";
 
 // Per-account hero in the flagship language: serif landmark + accent rail,
@@ -56,7 +56,7 @@ export function AccountHeadline({
                 className="block font-serif text-5xl text-ink leading-none tnum landmark-wipe"
                 style={{ fontWeight: 600 }}
               >
-                {formatINR(revenue, { precision: 0 })}
+                {formatMoney(revenue, { precision: 0 })}
               </span>
               <span className="block h-px bg-accent mt-2 landmark-rail" aria-hidden="true" />
             </span>
@@ -81,7 +81,7 @@ export function AccountHeadline({
               />
             </div>
             <div className="mt-[6px] text-[11px] text-ink-faint font-mono">
-              of {formatINR(orgRevenue, { compact: true })} org MTD
+              of {formatMoney(orgRevenue, { compact: true })} org MTD
             </div>
           </div>
 
@@ -145,7 +145,7 @@ export function AccountHeadline({
                 {leak.amount > 0 ? (
                   <>
                     <span className="text-[10px] text-ink-faint mr-[2px]">est</span>
-                    {formatINR(leak.amount, { compact: true })}
+                    {formatMoney(leak.amount, { compact: true })}
                   </>
                 ) : isHistorical ? (
                   "historical"

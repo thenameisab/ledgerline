@@ -6,7 +6,7 @@ import { buttonClass } from "@/components/ui/Button";
 import { FilterPill } from "@/components/ui/FilterPill";
 import { listManualEntries } from "@/lib/repos/manual-entries";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatNumber, formatDate, formatDateTime } from "@/lib/format";
+import { formatMoney, formatNumber, formatDate, formatDateTime } from "@/lib/format";
 import { FileEdit, Plus, AlertTriangle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +50,7 @@ export default async function ManualEntriesPage({
     <main>
       <StatusBar
         title="Manual entries"
-        subtitle={`${all.length} ${all.length === 1 ? "entry" : "entries"} logged · ${formatINR(approvedRevenue, { compact: true })} approved revenue`}
+        subtitle={`${all.length} ${all.length === 1 ? "entry" : "entries"} logged · ${formatMoney(approvedRevenue, { compact: true })} approved revenue`}
         actions={
           <Link href="/admin/manual-entries/new" className={buttonClass({ variant: "primary", size: "md" })}>
             <Plus size={14} strokeWidth={1.5} />
@@ -80,7 +80,7 @@ export default async function ManualEntriesPage({
                     className="block font-serif text-5xl text-ink leading-none tnum landmark-wipe"
                     style={{ fontWeight: 600 }}
                   >
-                    {formatINR(approvedRevenue, { precision: 0 })}
+                    {formatMoney(approvedRevenue, { precision: 0 })}
                   </span>
                   <span className="block h-px bg-accent mt-2 landmark-rail" aria-hidden="true" />
                 </span>
@@ -97,7 +97,7 @@ export default async function ManualEntriesPage({
                   <span style={{ fontWeight: 500 }}>Awaiting approval</span>
                 </div>
                 <div className="font-serif text-2xl text-ink tnum mt-1" style={{ fontWeight: 600 }}>
-                  {formatINR(pendingRevenue, { precision: 0 })}
+                  {formatMoney(pendingRevenue, { precision: 0 })}
                 </div>
                 <div className="text-xs text-ink-muted mt-0.5">
                   {pending.length} {pending.length === 1 ? "entry" : "entries"} blocked until an admin signs off
@@ -197,7 +197,7 @@ export default async function ManualEntriesPage({
                       {e.api_count} · {formatNumber(e.total_hits)}
                     </td>
                     <td className="px-4 py-2.5 text-right text-ink tnum font-mono">
-                      {formatINR(e.total_revenue, { precision: 2 })}
+                      {formatMoney(e.total_revenue, { precision: 2 })}
                     </td>
                     <td className="px-4 py-2.5">
                       <div className={`h-[8px] rounded overflow-hidden ${
@@ -235,7 +235,7 @@ export default async function ManualEntriesPage({
         )}
 
         <div className="text-xs text-ink-faint">
-          Total revenue across visible entries: {formatINR(totalRevenue, { precision: 2 })}.
+          Total revenue across visible entries: {formatMoney(totalRevenue, { precision: 2 })}.
           Draft and pending entries are excluded from dashboard KPIs and invoices until approved.
         </div>
       </div>

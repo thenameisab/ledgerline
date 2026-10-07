@@ -15,7 +15,7 @@ import {
 } from "@/lib/repos/vendor-recon";
 import { vendorByName } from "@/lib/repos/vendor-cost";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatNumber, formatPercent, formatDateRange, formatDay } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent, formatDateRange, formatDay } from "@/lib/format";
 import { ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -107,7 +107,7 @@ export default async function VendorReconTabPage({
                 Unexplained spend
               </h2>
               <div className="font-serif text-3xl text-ink tnum mt-1.5" style={{ fontWeight: 600 }}>
-                {summary.open_delta_cost > 0 ? formatINR(summary.open_delta_cost) : "₹0"}
+                {summary.open_delta_cost > 0 ? formatMoney(summary.open_delta_cost) : "₹0"}
               </div>
               <p className="text-xs text-ink-faint mt-1">
                 volume {vendor} served that Ledgerline never costed
@@ -155,7 +155,7 @@ export default async function VendorReconTabPage({
               ))}
             </div>
             <Link
-              href="/admin/api-review"
+              href="/admin/sku-review"
               className="inline-flex items-center gap-1 text-xs text-accent-ink hover:underline underline-offset-2 mt-4"
             >
               API review <ArrowRight size={11} strokeWidth={1.75} />

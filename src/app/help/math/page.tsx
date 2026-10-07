@@ -781,10 +781,10 @@ const bucket = (hits: number): 0 | 1 | 2 | 3 | 4 => {
       </p>
 
       <H3 id="formatting-compact">Compact lakh/crore notation</H3>
-      <p>With <code>compact: true</code>, <code>formatINR</code> is the piecewise function:</p>
+      <p>With <code>compact: true</code>, <code>formatMoney</code> is the piecewise function:</p>
       <Math
         display
-        tex={R`\operatorname{formatINR}(n) =
+        tex={R`\operatorname{formatMoney}(n) =
 \begin{cases}
 \text{₹}\,\big(n / 10^7\big)\ \text{Cr} & |n| \ge 10^7 \quad \text{(2 decimals)} \\[2pt]
 \text{₹}\,\big(n / 10^5\big)\ \text{L} & 10^5 \le |n| < 10^7 \quad \text{(2 decimals)} \\[2pt]

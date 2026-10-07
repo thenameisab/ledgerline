@@ -113,7 +113,7 @@ export function AlertItem({
           {formatDatesInText(shortTitle(a.title, a.account_name))}
           {a.api_code && (
             <Link
-              href={`/apis/${encodeURIComponent(a.api_code)}`}
+              href={`/skus/${encodeURIComponent(a.api_code)}`}
               className="ms-2 align-baseline font-mono text-xs font-normal text-accent-ink hover:underline"
             >
               {a.api_code}

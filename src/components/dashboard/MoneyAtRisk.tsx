@@ -7,7 +7,7 @@ import {
   CircleCheck,
   ArrowRight,
 } from "lucide-react";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { RollingText } from "@/components/ui/RollingText";
 import type { RiskSummary, RiskItem } from "@/lib/repos/types";
 
@@ -65,7 +65,7 @@ export function MoneyAtRisk({ summary }: { summary: RiskSummary }) {
           <span className="text-sm font-mono tnum text-bad-ink risk-pulse">
             {summary.estimated ? "~" : ""}
             <RollingText
-              text={formatINR(summary.total, { compact: true })}
+              text={formatMoney(summary.total, { compact: true })}
               options={{ direction: "up" }}
               colorOnChange="rise-bad"
               signValue={summary.total}
@@ -86,7 +86,7 @@ export function MoneyAtRisk({ summary }: { summary: RiskSummary }) {
           const Icon = m.icon;
           const tintBg = m.tone === "bad" ? "bg-bad-bg hover:bg-bad-bg-hover" : "bg-warn-bg hover:bg-warn-bg-hover";
           const ink = m.tone === "bad" ? "text-bad-ink" : "text-warn-ink";
-          const signed = it.kind === "margin_watch" ? `−${formatINR(it.amount, { compact: true })}` : formatINR(it.amount, { compact: true });
+          const signed = it.kind === "margin_watch" ? `−${formatMoney(it.amount, { compact: true })}` : formatMoney(it.amount, { compact: true });
           return (
             <li key={it.kind} className="risk-enter" style={{ "--i": idx } as React.CSSProperties}>
               <Link
@@ -122,7 +122,7 @@ export function MoneyAtRisk({ summary }: { summary: RiskSummary }) {
       {summary.estimated && (
         <p className="text-[11px] text-ink-faint mt-3 leading-relaxed">
           Leak and silent-loss figures are estimated at the org average of{" "}
-          {formatINR(summary.rate, { precision: 2 })}/hit — unpriced and unmapped traffic has no
+          {formatMoney(summary.rate, { precision: 2 })}/hit — unpriced and unmapped traffic has no
           booked price. Margin-watch is an actual booked loss.
         </p>
       )}

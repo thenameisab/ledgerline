@@ -70,7 +70,7 @@ const LIST_VIEWS: CmdView[] = [
     id: "view-apis-high-volume",
     label: "High-volume APIs",
     keywords: "busiest most used top traffic hits volume",
-    href: "/apis?filter=high-volume",
+    href: "/skus?filter=high-volume",
     icon: TrendingUp,
   },
   {
@@ -78,7 +78,7 @@ const LIST_VIEWS: CmdView[] = [
     id: "view-apis-low-margin",
     label: "Low-margin APIs",
     keywords: "thin margin unprofitable cost expensive",
-    href: "/apis?filter=low-margin",
+    href: "/skus?filter=low-margin",
     icon: TrendingDown,
     roles: COST,
   },
@@ -86,7 +86,7 @@ const LIST_VIEWS: CmdView[] = [
     id: "view-apis-inactive",
     label: "Inactive APIs",
     keywords: "unused dormant zero traffic no hits dead",
-    href: "/apis?filter=inactive",
+    href: "/skus?filter=inactive",
     icon: MoonStar,
   },
 ];

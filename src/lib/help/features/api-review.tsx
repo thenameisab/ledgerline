@@ -8,7 +8,7 @@ export const meta: FeatureMeta = {
     "The code-first triage desk: usage maps to an API by Product Code only, and anything that doesn't — unknown codes, blank codes, name drift, retired codes still in use — surfaces here to accept, override, acknowledge, or reactivate.",
   group: "Admin",
   role: "admin",
-  routes: ["/admin/api-review"],
+  routes: ["/admin/sku-review"],
 };
 
 export default function Body() {

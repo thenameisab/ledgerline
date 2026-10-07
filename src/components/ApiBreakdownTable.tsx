@@ -3,7 +3,7 @@ import { PriceCell } from "@/components/PriceCell";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { LeakDismissButton } from "@/components/accounts/LeakDismissButton";
 import { SlabBandsDisclosure } from "@/components/accounts/SlabBandsDisclosure";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import type { AccountApiBreakdown } from "@/lib/repos/accounts";
 
 // v0.1: vendor cost + margin columns deliberately omitted at the per-(account, api)
@@ -191,7 +191,7 @@ export function ApiBreakdownTable({
 
                   <td className="px-3 py-3 align-top text-right font-mono tnum text-ink text-base leading-tight">
                     {b.revenue > 0 ? (
-                      formatINR(b.revenue, { precision: 0 })
+                      formatMoney(b.revenue, { precision: 0 })
                     ) : (
                       <span className="text-ink-faint">—</span>
                     )}

@@ -13,7 +13,7 @@ import { readFile } from "fs/promises";
 import path from "path";
 import type { RoundupData } from "../roundup";
 import { squarify, scatterLayout, type TreemapCell } from "../roundup-charts";
-import { formatINR } from "../format";
+import { formatMoney } from "../format";
 import type { ChartType } from "../roundup-image";
 
 // Ledgerline palette → hex (Satori has no CSS custom properties).
@@ -187,7 +187,7 @@ function ConcentrationImage({ data }: { data: RoundupData }) {
               )}
               {showRev && (
                 <div style={{ display: "flex", marginTop: 2 * S, fontSize: 10 * S, color: ink, opacity: 0.85 }}>
-                  {formatINR(r.revenue, { compact: true })}
+                  {formatMoney(r.revenue, { compact: true })}
                   {r.deltaPct != null && !r.isOthers ? `  ${r.deltaPct > 0 ? "+" : ""}${Math.round(r.deltaPct)}%` : ""}
                 </div>
               )}
@@ -249,7 +249,7 @@ function QuadrantImage({ data }: { data: RoundupData }) {
         {/* x tick labels */}
         {layout.xTicks.map((t, i) => (
           <div key={`xl${i}`} style={{ display: "flex", position: "absolute", left: t.x - 20 * S, top: plot.top + plot.h + 4 * S, width: 40 * S, justifyContent: "center", fontSize: 9 * S, color: P.faint }}>
-            {formatINR(t.label, { compact: true })}
+            {formatMoney(t.label, { compact: true })}
           </div>
         ))}
         {/* points */}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, Check, Loader2, Pencil, TrendingDown } from "lucide-react";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import type { VendorMinimumMonth } from "@/lib/repos/vendor-minimum";
 import type { RateStatus } from "@/lib/repos/vendor-cost";
 import { useSettleAfterSave } from "./useSettleAfterSave";
@@ -119,7 +119,7 @@ export function MinimumCard({
             {current == null ? (
               <span className="text-ink-faint text-lg">None on file</span>
             ) : (
-              formatINR(current, { precision: 0 })
+              formatMoney(current, { precision: 0 })
             )}
           </div>
           {current != null && (
@@ -149,7 +149,7 @@ export function MinimumCard({
         ) : topUp > 0 ? (
           <>
             The floor bound in {bound.length} month{bound.length === 1 ? "" : "s"} of this window,
-            adding <span className="text-ink">{formatINR(topUp, { precision: 0 })}</span> over what
+            adding <span className="text-ink">{formatMoney(topUp, { precision: 0 })}</span> over what
             the traffic metered. That top-up belongs to no account or API — it is in this
             vendor&rsquo;s total and the company&rsquo;s, and nowhere further down.
           </>
@@ -179,10 +179,10 @@ export function MinimumCard({
                 <tr key={`${m.vendor}:${m.month}`}>
                   <td className="px-3 py-2 text-ink">{monthLabel(m.month)}</td>
                   <td className="px-3 py-2 text-right font-mono tnum text-ink-muted">
-                    {formatINR(m.computed, { precision: 0 })}
+                    {formatMoney(m.computed, { precision: 0 })}
                   </td>
                   <td className="px-3 py-2 text-right font-mono tnum text-ink-muted">
-                    {formatINR(m.minimum, { precision: 0 })}
+                    {formatMoney(m.minimum, { precision: 0 })}
                   </td>
                   <td className="px-3 py-2 text-right">
                     {!m.applied ? (
@@ -199,7 +199,7 @@ export function MinimumCard({
                     ) : m.top_up > 0 ? (
                       <span className="inline-flex items-center gap-1 font-mono tnum text-warn-ink">
                         <TrendingDown size={11} strokeWidth={1.75} />
-                        {formatINR(m.top_up, { precision: 0 })}
+                        {formatMoney(m.top_up, { precision: 0 })}
                       </span>
                     ) : (
                       <span className="text-[11px] text-ink-faint">cleared</span>

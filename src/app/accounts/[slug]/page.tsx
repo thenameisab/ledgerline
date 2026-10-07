@@ -30,7 +30,7 @@ import { prevMonthOf } from "@/lib/repos/periods";
 import { resolvePeriod } from "@/lib/period";
 import { getSessionUser, canEdit, canViewCost, can } from "@/lib/access";
 import { briefingComposer } from "@/lib/briefing";
-import { formatINR, formatNumber, formatDay, formatDateRange } from "@/lib/format";
+import { formatMoney, formatNumber, formatDay, formatDateRange } from "@/lib/format";
 import { ApiStatusChart } from "@/components/charts/ApiStatusChart";
 import { FileText, ArrowRight, Plus, ChevronRight, FlaskConical } from "lucide-react";
 import { buttonClass } from "@/components/ui/Button";
@@ -123,7 +123,7 @@ export default async function AccountProfilePage({
   const tieredRevenue = (summary?.revenue ?? 0) - series.reduce((s, d) => s + d.revenue, 0);
   const chartCaption =
     tieredRevenue >= 1
-      ? `Excludes ${formatINR(tieredRevenue, { compact: true })} tiered revenue (billed per calendar month, not per day) — daily bars won't sum to the total.`
+      ? `Excludes ${formatMoney(tieredRevenue, { compact: true })} tiered revenue (billed per calendar month, not per day) — daily bars won't sum to the total.`
       : undefined;
 
   // Leak state (per-day truth, dismissal-aware) comes from the summary. Active
@@ -325,7 +325,7 @@ export default async function AccountProfilePage({
             </h2>
             {sandboxUsage.length > 0 && (
               <span className="text-sm text-ink-muted">
-                {formatINR(
+                {formatMoney(
                   sandboxUsage.reduce((s, r) => s + r.suppressed_revenue, 0),
                   { compact: true }
                 )}{" "}
@@ -366,7 +366,7 @@ export default async function AccountProfilePage({
                           {formatNumber(r.hits)}
                         </td>
                         <td className="px-3 py-3 text-right text-ink font-mono tnum">
-                          {formatINR(r.suppressed_revenue)}
+                          {formatMoney(r.suppressed_revenue)}
                         </td>
                       </tr>
                     ))}

@@ -61,7 +61,7 @@ const APIS: Api[] = [
 const VIEWS = [
   { name: "Accounts leaking revenue", path: "/accounts?status=leaking" },
   { name: "Manual entries pending approval", path: "/review/manual-entries?status=pending" },
-  { name: "APIs with no traffic", path: "/apis?traffic=none" },
+  { name: "APIs with no traffic", path: "/skus?traffic=none" },
   { name: "Invoices in draft", path: "/invoices?status=draft" },
 ];
 
@@ -283,7 +283,7 @@ function search(text: string, chips: Op[]): Group[] {
     { label: "Accounts", rows: accountRows },
     {
       label: "APIs",
-      rows: apis.map((x) => ({ kind: "api", id: `api-${x.code}`, api: x, path: `/apis/${x.code}` })),
+      rows: apis.map((x) => ({ kind: "api", id: `api-${x.code}`, api: x, path: `/skus/${x.code}` })),
     },
     {
       label: "Views",

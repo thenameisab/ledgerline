@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import type { SlabBandAgg } from "@/lib/repos/slab-revenue";
 
 // Expand toggle under a tiered API row: which slab band earned what. Bands are
@@ -38,7 +38,7 @@ export function SlabBandsDisclosure({ bands }: { bands: SlabBandAgg[] }) {
               <span className="text-ink-faint whitespace-nowrap">@ ₹{b.price}</span>
               <span className="text-ink-faint whitespace-nowrap">· {formatNumber(b.hits)} hits</span>
               <span className="ml-auto font-mono tnum text-ink whitespace-nowrap">
-                {formatINR(b.revenue, { precision: 0 })}
+                {formatMoney(b.revenue, { precision: 0 })}
               </span>
             </li>
           ))}

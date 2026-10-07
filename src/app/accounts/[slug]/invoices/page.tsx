@@ -8,7 +8,7 @@ import { FilterPill } from "@/components/ui/FilterPill";
 import { getAccount, getAccountBySlug, resolveAccountSlug } from "@/lib/repos/accounts";
 import { listAccountStatements, deriveStatement } from "@/lib/repos/statements";
 import { getSessionUser, canViewCost } from "@/lib/access";
-import { formatINR, formatNumber, formatDateTime } from "@/lib/format";
+import { formatMoney, formatNumber, formatDateTime } from "@/lib/format";
 import {
   ExternalLink,
   FileText,
@@ -206,7 +206,7 @@ export default async function AccountInvoicesPage({
                           }`}
                           style={{ fontWeight: 500 }}
                         >
-                          {s.totals.revenue > 0 ? formatINR(s.totals.revenue, { compact: true }) : "—"}
+                          {s.totals.revenue > 0 ? formatMoney(s.totals.revenue, { compact: true }) : "—"}
                         </td>
                       </tr>
                     );

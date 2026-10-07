@@ -22,7 +22,7 @@ import { vendorMinimumMonths, vendorCommitments } from "@/lib/repos/vendor-minim
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { resolvePeriod } from "@/lib/period";
 import { requireRole, can } from "@/lib/access";
-import { formatINR, formatNumber, formatPercent, formatDateRange } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent, formatDateRange } from "@/lib/format";
 import { Activity, Layers, BadgeCheck, Ban } from "lucide-react";
 
 /** No outcome on this row has a cost yet. */
@@ -113,7 +113,7 @@ export default async function VendorRateCardPage({
     <main>
       <StatusBar
         title={vendor}
-        subtitle={`${rows.length} API${rows.length === 1 ? "" : "s"} on the rate card · ${formatINR(totalCost, { compact: true })} cost · ${formatDateRange(period.from, period.to)}`}
+        subtitle={`${rows.length} API${rows.length === 1 ? "" : "s"} on the rate card · ${formatMoney(totalCost, { compact: true })} cost · ${formatDateRange(period.from, period.to)}`}
       />
 
       <div className="mx-auto w-full max-w-[1600px] px-7 pt-5 space-y-4">
@@ -133,7 +133,7 @@ export default async function VendorRateCardPage({
                 className="block font-serif text-5xl text-ink leading-none tnum landmark-wipe"
                 style={{ fontWeight: 600 }}
               >
-                {formatINR(totalCost, { precision: 0 })}
+                {formatMoney(totalCost, { precision: 0 })}
               </span>
               <span className="block h-px bg-accent mt-2 landmark-rail" aria-hidden="true" />
             </span>
@@ -159,9 +159,9 @@ export default async function VendorRateCardPage({
           </p>
           {minimumTopUp > 0 && (
             <p className="text-sm text-ink-muted mt-2 max-w-2xl leading-normal">
-              {formatINR(minimumTopUp, { precision: 0 })} of that is the monthly minimum topping
+              {formatMoney(minimumTopUp, { precision: 0 })} of that is the monthly minimum topping
               light months up to the contracted floor, not metered traffic. The rate card rows
-              below sum to {formatINR(meteredCost, { precision: 0 })}.
+              below sum to {formatMoney(meteredCost, { precision: 0 })}.
             </p>
           )}
           <div className="max-w-sm mt-4">
@@ -336,7 +336,7 @@ function Row({
     >
       <td className="px-4 py-3">
         <div className="font-mono text-xs text-ink-faint">{r.api_code}</div>
-        <Link href={`/apis/${r.api_code}`} className="block text-sm text-ink hover:text-accent-ink">
+        <Link href={`/skus/${r.api_code}`} className="block text-sm text-ink hover:text-accent-ink">
           <TruncateTooltip as="div" text={r.api_name} />
         </Link>
         {/* A pair on flat rates gets a quiet way into volume pricing. A pair
@@ -418,7 +418,7 @@ function Row({
         )}
       </td>
       <td className="px-3 py-3 text-right">
-        <div className="font-mono tnum text-ink">{formatINR(r.period_cost, { precision: 0 })}</div>
+        <div className="font-mono tnum text-ink">{formatMoney(r.period_cost, { precision: 0 })}</div>
         {r.period_cost > 0 && (
           <div className="mt-1 h-[4px] rounded bg-bg-sunken overflow-hidden" title={`${formatPercent((r.period_cost / maxCost) * 100, 0)} of this vendor's largest API cost`}>
             <div

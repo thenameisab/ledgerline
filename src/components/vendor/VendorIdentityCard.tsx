@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, Check, Loader2, Pencil, Plus, X } from "lucide-react";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { useSettleAfterSave } from "./useSettleAfterSave";
 
 // The vendor's registry entry, and the editor for it.
@@ -230,7 +230,7 @@ export function VendorIdentityCard({
             ) : chargesSandbox ? (
               <>
                 {formatNumber(sandbox.hits)} sandbox hit{sandbox.hits === 1 ? "" : "s"} in this
-                period carry {formatINR(sandbox.cost, { precision: 0 })} of this vendor&rsquo;s
+                period carry {formatMoney(sandbox.cost, { precision: 0 })} of this vendor&rsquo;s
                 cost. Set this to <em>does not charge</em> only from the contract — while the
                 answer is unknown, charging is the safer error.
               </>

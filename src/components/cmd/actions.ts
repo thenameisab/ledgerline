@@ -105,7 +105,7 @@ export const ACTIONS: CmdAction[] = [
     icon: ListChecks,
     roles: EDITS,
     kind: "nav",
-    href: "/admin/api-review",
+    href: "/admin/sku-review",
   },
   {
     id: "price-unpriced-pairs",

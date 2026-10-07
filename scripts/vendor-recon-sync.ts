@@ -41,7 +41,7 @@ async function main() {
     );
     for (const n of r.unmatched_names) console.log(`  - ${n}`);
     console.log(
-      "\nAdd each as an alias on the right API (/admin/api-review or the API form)," +
+      "\nAdd each as an alias on the right API (/admin/sku-review or the API form)," +
         " then re-run this sync to repair history."
     );
   }

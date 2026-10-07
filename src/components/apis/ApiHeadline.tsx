@@ -1,5 +1,5 @@
 import { Activity, Users, CircleDollarSign, ArrowLeftRight } from "lucide-react";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { DeltaPill, Stat } from "@/components/dashboard/Headline";
 import { MarginBullet } from "@/components/dashboard/MarginBullet";
 import { CostConfidence } from "@/components/vendor/CostConfidence";
@@ -49,7 +49,7 @@ export function ApiHeadline({
                 className="block font-serif text-5xl text-ink leading-none tnum landmark-wipe"
                 style={{ fontWeight: 600 }}
               >
-                {formatINR(revenue, { precision: 0 })}
+                {formatMoney(revenue, { precision: 0 })}
               </span>
               <span className="block h-px bg-accent mt-2 landmark-rail" aria-hidden="true" />
             </span>

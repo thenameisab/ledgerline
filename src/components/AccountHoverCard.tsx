@@ -5,7 +5,7 @@ import { EntityHoverCard, SkelBar } from "@/components/ui/EntityHoverCard";
 import { AccountLogo } from "@/components/accounts/AccountLogo";
 import { StatusChip } from "@/components/chips/StatusChip";
 import { Sparkline } from "@/components/Sparkline";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import type { AccountHoverCard as Data } from "@/lib/repos/hover";
 
 // Rich hover for any account name. Wrap the existing name link:
@@ -57,7 +57,7 @@ function Card({ d }: { d: Data }) {
         <div>
           <div className="text-[11px] uppercase tracking-wide text-ink-faint">{d.periodLabel} revenue</div>
           <div className="font-serif text-2xl text-ink tnum leading-none mt-1">
-            {d.revenue > 0 ? formatINR(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
+            {d.revenue > 0 ? formatMoney(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
           </div>
         </div>
         <Sparkline data={d.spark} width={96} height={30} stroke={sparkStroke} />

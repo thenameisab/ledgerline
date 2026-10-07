@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
-import { formatINR, formatPercent } from "@/lib/format";
+import { formatMoney, formatPercent } from "@/lib/format";
 
 export type PortfolioCell = {
   client_id: number;
@@ -112,7 +112,7 @@ function CellNode(props: any) {
           className="tnum"
           style={{ pointerEvents: "none" }}
         >
-          {formatINR(revenue, { compact: true })}
+          {formatMoney(revenue, { compact: true })}
           {delta_pct != null && !isOthers
             ? `  ${delta_pct > 0 ? "+" : ""}${Math.round(delta_pct)}%`
             : ""}
@@ -135,7 +135,7 @@ function CellTooltip({ active, payload }: any) {
       }}
     >
       <div className="text-ink font-medium">{n.name}</div>
-      <div className="text-ink-muted tnum">{formatINR(n.revenue)}</div>
+      <div className="text-ink-muted tnum">{formatMoney(n.revenue)}</div>
       {!n.isOthers && n.delta_pct != null && (
         <div className={n.delta_pct >= 0 ? "text-success-ink tnum" : "text-bad-ink tnum"}>
           {n.delta_pct > 0 ? "+" : ""}
@@ -206,7 +206,7 @@ export function PortfolioMap({
             {cells.map((c) => (
               <tr key={c.client_id}>
                 <td>{c.name}</td>
-                <td>{formatINR(c.revenue)}</td>
+                <td>{formatMoney(c.revenue)}</td>
                 <td>{formatPercent(total > 0 ? (c.revenue / total) * 100 : 0, 1)}</td>
                 <td>{c.delta_pct == null ? "new" : formatPercent(c.delta_pct, 0)}</td>
               </tr>

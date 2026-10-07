@@ -22,7 +22,7 @@ import { getIncludeSandbox } from "@/lib/repos/settings";
 import { prevMonthOf } from "@/lib/repos/periods";
 import { resolvePeriod } from "@/lib/period";
 import { briefingComposer } from "@/lib/briefing";
-import { formatINR, formatNumber, formatPrice } from "@/lib/format";
+import { formatMoney, formatNumber, formatPrice } from "@/lib/format";
 import { Users } from "lucide-react";
 
 export default async function ApiProfilePage({
@@ -241,7 +241,7 @@ export default async function ApiProfilePage({
                           </div>
                         </td>
                         <td className="px-3 py-3 text-right font-mono tabular-nums text-ink">
-                          {formatINR(c.revenue ?? 0, { precision: 0 })}
+                          {formatMoney(c.revenue ?? 0, { precision: 0 })}
                         </td>
                       </tr>
                     );

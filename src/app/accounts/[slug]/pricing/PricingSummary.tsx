@@ -1,6 +1,6 @@
 "use client";
 
-import { formatINR, formatDate } from "@/lib/format";
+import { formatMoney, formatDate } from "@/lib/format";
 
 // The landmark for the pricing page: one Instrument-Serif sentence that answers
 // "what does this account's pricing look like, and where's the leak?" before the
@@ -66,7 +66,7 @@ export function PricingSummary({
       <p className="mt-1 text-sm text-ink-muted">
         {totalRevenue > 0 ? (
           <>
-            <span className="tnum text-ink">{formatINR(totalRevenue, { compact: true })}</span>{" "}
+            <span className="tnum text-ink">{formatMoney(totalRevenue, { compact: true })}</span>{" "}
             earned in the last {windowDays} days of traffic
             {latestDate && (
               <span className="text-ink-faint">

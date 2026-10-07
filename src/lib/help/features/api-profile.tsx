@@ -8,7 +8,7 @@ export const meta: FeatureMeta = {
     "One API across all its consumers: revenue, margin, a 90-day heatmap, and a price ladder showing exactly who pays what for the same product.",
   group: "APIs",
   role: "all",
-  routes: ["/apis"],
+  routes: ["/skus"],
 };
 
 export default function Body() {

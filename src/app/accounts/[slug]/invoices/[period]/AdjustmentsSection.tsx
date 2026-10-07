@@ -2,7 +2,7 @@
 import { useState, useTransition } from "react";
 import { Plus, X, Loader2, Minus } from "lucide-react";
 import type { StatementAdjustment } from "@/lib/repos/statements";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { addInvoiceAdjustment, removeInvoiceAdjustment } from "./actions";
 
@@ -69,7 +69,7 @@ export function AdjustmentsSection({
               }`}
               style={{ fontWeight: 500 }}
             >
-              {formatINR(subtotal, { precision: 2 })}
+              {formatMoney(subtotal, { precision: 2 })}
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ function AdjustmentRow({
         }`}
         style={{ fontWeight: 500 }}
       >
-        {formatINR(adj.amount, { precision: 2 })}
+        {formatMoney(adj.amount, { precision: 2 })}
       </div>
       <div className="col-span-1 text-right">
         {editable && (

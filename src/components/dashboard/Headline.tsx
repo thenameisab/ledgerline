@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown, Truck, Users, Activity } from "lucide-react";
-import { formatINR, formatNumber, formatPercent } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent } from "@/lib/format";
 import { ApiStatusChart } from "@/components/charts/ApiStatusChart";
 import { RollingText } from "@/components/ui/RollingText";
 import { MonthPace } from "./MonthPace";
@@ -108,7 +108,7 @@ export function Headline({
                 style={{ fontWeight: 600 }}
               >
                 <RollingText
-                  text={formatINR(kpis.revenue, { precision: 0 })}
+                  text={formatMoney(kpis.revenue, { precision: 0 })}
                   options={{ direction: "up" }}
                   colorOnChange="rise-good"
                   signValue={kpis.revenue}
@@ -147,14 +147,14 @@ export function Headline({
               <Stat
                 icon={<Truck size={12} strokeWidth={1.5} />}
                 label="Vendor cost"
-                value={formatINR(kpis.vendor_cost!, { compact: true })}
+                value={formatMoney(kpis.vendor_cost!, { compact: true })}
                 signValue={kpis.vendor_cost!}
                 riseTone="rise-bad"
               />
               <Stat
                 icon={<TrendingUp size={12} strokeWidth={1.5} />}
                 label="Margin"
-                value={`${formatINR(kpis.margin!, { compact: true })} · ${formatPercent(kpis.margin_pct!, 0)}`}
+                value={`${formatMoney(kpis.margin!, { compact: true })} · ${formatPercent(kpis.margin_pct!, 0)}`}
                 signValue={kpis.margin!}
                 muted={lowCost}
               />

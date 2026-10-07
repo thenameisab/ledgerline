@@ -314,7 +314,7 @@ GET /
           only, with <code>api_code_overrides</code> as the only fallback.
           Unresolved rows keep a NULL id and appear on{" "}
           <FilePath>/admin/aliases</FilePath> or{" "}
-          <FilePath>/admin/api-review</FilePath>.
+          <FilePath>/admin/sku-review</FilePath>.
         </li>
         <li>
           In one transaction, deletes that date&apos;s{" "}

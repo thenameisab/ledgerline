@@ -305,7 +305,7 @@ export function buildUsageUpdateEmail(
       ${chip(`${dq.unmappedApis} unmapped API${dq.unmappedApis === 1 ? "" : "s"}`, dqTone(dq.unmappedApis))}&nbsp;
       ${chip(`${dq.unpricedPairs} unpriced pair${dq.unpricedPairs === 1 ? "" : "s"}`, dqTone(dq.unpricedPairs))}
     </div>
-    <div style="margin-top:8px;font-family:${FONT};font-size:11px;color:${C.faint};">Unmapped rows are excluded from every number above until resolved in <a href="${appUrl}/admin/api-review" style="color:${C.accent};">API review</a> and <a href="${appUrl}/admin/aliases" style="color:${C.accent};">Aliases</a>.</div>`;
+    <div style="margin-top:8px;font-family:${FONT};font-size:11px;color:${C.faint};">Unmapped rows are excluded from every number above until resolved in <a href="${appUrl}/admin/sku-review" style="color:${C.accent};">API review</a> and <a href="${appUrl}/admin/aliases" style="color:${C.accent};">Aliases</a>.</div>`;
 
   const html = shell({
     subject,

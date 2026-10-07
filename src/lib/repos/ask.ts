@@ -13,7 +13,7 @@
 // needs vendor allocation we don't have (see StatusChip note).
 
 import { generateSlug } from "@/lib/slug";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { mtdRange, prevMonthRange } from "@/lib/repos/periods";
 import { getAccountSummaries, getGroupSummaries, type AccountSummary, type GroupSummary } from "@/lib/repos/accounts";
 import { fuzzyFilter } from "@/lib/fuzzy";
@@ -219,7 +219,7 @@ export async function answerSpec(
     if (!match) return { ok: false, message: "Couldn't find that group. Try the group name." };
     return {
       ok: true,
-      value: formatINR(match.revenue, { compact: true }),
+      value: formatMoney(match.revenue, { compact: true }),
       label: `${match.name} · ${periodLabel} · revenue`,
       assumptions,
       drilldown: { href: `/accounts/groups/${match.id}`, label: "View group" },
@@ -239,7 +239,7 @@ export async function answerSpec(
       drilldown: { href: "/dashboard", label: "View dashboard" },
       rows: top.map((c) => ({
         label: c.display_name,
-        value: formatINR(c.revenue, { compact: true }),
+        value: formatMoney(c.revenue, { compact: true }),
         sub: `${formatNumber(c.hits)} hits`,
         href: `/accounts/${generateSlug(c.display_name)}`,
       })),
@@ -254,16 +254,16 @@ export async function answerSpec(
     const isHits = spec.metric === "hits";
     return {
       ok: true,
-      value: isHits ? formatNumber(match.hits) : formatINR(match.revenue, { compact: true }),
+      value: isHits ? formatNumber(match.hits) : formatMoney(match.revenue, { compact: true }),
       label: `${match.display_name} · ${periodLabel} · ${isHits ? "hits" : "revenue"}`,
       assumptions,
       drilldown: { href: `/accounts/${generateSlug(match.display_name)}`, label: "View account" },
       series: isHits ? undefined : { points: match.spark, label: "Daily revenue" },
       rows: match.top_apis.slice(0, 5).map((a) => ({
         label: a.api_name ?? a.api_code,
-        value: formatINR(a.revenue, { compact: true }),
+        value: formatMoney(a.revenue, { compact: true }),
         sub: `${formatNumber(a.hits)} hits`,
-        href: `/apis/${encodeURIComponent(a.api_code)}`,
+        href: `/skus/${encodeURIComponent(a.api_code)}`,
       })),
     };
   }
@@ -274,7 +274,7 @@ export async function answerSpec(
   const totalHits = summaries.reduce((n, c) => n + c.hits, 0);
   return {
     ok: true,
-    value: isHits ? formatNumber(totalHits) : formatINR(totalRevenue, { compact: true }),
+    value: isHits ? formatNumber(totalHits) : formatMoney(totalRevenue, { compact: true }),
     label: `All accounts · ${periodLabel} · ${isHits ? "hits" : "revenue"}`,
     assumptions,
     drilldown: { href: "/dashboard", label: "View dashboard" },

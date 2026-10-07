@@ -11,7 +11,7 @@ import { GitMerge, Trash2, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { RollingText } from "@/components/ui/RollingText";
-import { formatINR, formatDateTime } from "@/lib/format";
+import { formatMoney, formatDateTime } from "@/lib/format";
 import {
   RowCountsSummary,
   BlockingStatementsPanel,
@@ -132,12 +132,12 @@ export function ApprovalCard({
             <p className="text-xs text-ink leading-relaxed">
               {mergePreview ? (
                 <>
-                  Moves <span className="font-medium tabular-nums">{formatINR(mergePreview.revenueMoved)}</span> of revenue.
+                  Moves <span className="font-medium tabular-nums">{formatMoney(mergePreview.revenueMoved)}</span> of revenue.
                 </>
               ) : (
                 <>
                   All-time revenue:{" "}
-                  <span className="font-medium tabular-nums">{formatINR(deletePreview!.revenue)}</span>
+                  <span className="font-medium tabular-nums">{formatMoney(deletePreview!.revenue)}</span>
                 </>
               )}
             </p>

@@ -53,7 +53,7 @@ async function main() {
     "/accounts",
     'a[href^="/accounts/"]:not([href^="/accounts/groups"])'
   );
-  const apiHref = await firstHref(page, "/apis", 'a[href^="/apis/"]');
+  const apiHref = await firstHref(page, "/skus", 'a[href^="/skus/"]');
   const vendorHref = await firstHref(page, "/vendors", 'a[href^="/vendors/"]:not([href="/vendors/reconciliation"])');
   console.log({ accountHref, apiHref, vendorHref });
 
@@ -61,7 +61,7 @@ async function main() {
   await shot(page, "/dashboard", "dashboard");
   await shot(page, "/dashboard", "dashboard-full", { fullPage: true });
   await shot(page, "/accounts", "accounts");
-  await shot(page, "/apis", "apis");
+  await shot(page, "/skus", "apis");
   await shot(page, "/login", "login");
 
   if (accountHref) {
@@ -89,7 +89,7 @@ async function main() {
   await shot(page, "/admin/sync", "admin-sync");
   await shot(page, "/admin/settings", "admin-settings");
   await shot(page, "/admin/audit", "admin-audit");
-  await shot(page, "/admin/api-review", "admin-api-review", { fullPage: true });
+  await shot(page, "/admin/sku-review", "admin-api-review", { fullPage: true });
 
   // ── Slab (tiered) pricing modal ──────────────────────────────────────
   // Opens the SlabModal off a flat pricing row's "tier" toggle. Read-only:

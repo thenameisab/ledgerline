@@ -168,7 +168,7 @@ export default function EndpointsPage() {
         <RoleChip role="editor" />
       </Endpoint>
       <p>
-        Clears entries from <a href="/help/api/database#api-code-overrides">/admin/api-review</a> —
+        Clears entries from <a href="/help/api/database#api-code-overrides">/admin/sku-review</a> —
         the queue of usage rows whose Product Code didn&apos;t match an active catalog code, plus
         name-drift flags. The body is a discriminated union on <code>action</code>:
       </p>

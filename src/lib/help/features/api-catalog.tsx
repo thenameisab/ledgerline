@@ -8,7 +8,7 @@ export const meta: FeatureMeta = {
     "Every API ranked by revenue, with hits, consumers, average price, share, and margin — plus filters that surface the high-volume, low-margin, and inactive ones.",
   group: "APIs",
   role: "all",
-  routes: ["/apis"],
+  routes: ["/skus"],
 };
 
 export default function Body() {

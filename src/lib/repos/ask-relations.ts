@@ -6,7 +6,7 @@
 
 import getSql from "@/lib/db";
 import { generateSlug } from "@/lib/slug";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { mtdRange } from "@/lib/repos/periods";
 import { listAccounts } from "@/lib/repos/accounts";
 import { fuzzyFilter } from "@/lib/fuzzy";
@@ -80,10 +80,10 @@ export async function answerRelation(
       value: `${total} account${total === 1 ? "" : "s"}`,
       label: `Using ${api.name} (${api.product_code})${shown} · this month`,
       assumptions: opts.includeSandbox ? "sandbox included" : "sandbox excluded",
-      drilldown: { href: `/apis/${api.product_code}`, label: "View API" },
+      drilldown: { href: `/skus/${api.product_code}`, label: "View API" },
       rows: rows.map((r) => ({
         label: r.client_name,
-        value: formatINR(Number(r.rev), { compact: true }),
+        value: formatMoney(Number(r.rev), { compact: true }),
         href: `/accounts/${generateSlug(r.client_name)}`,
       })),
     };
@@ -116,8 +116,8 @@ export async function answerRelation(
     drilldown: { href: `/accounts/${generateSlug(account.display_name)}`, label: "View account" },
     rows: rows.map((r) => ({
       label: `${r.api_name} · ${r.api_code}`,
-      value: formatINR(Number(r.rev), { compact: true }),
-      href: `/apis/${r.api_code}`,
+      value: formatMoney(Number(r.rev), { compact: true }),
+      href: `/skus/${r.api_code}`,
     })),
   };
 }

@@ -8,7 +8,7 @@ import { AccountsViewToggle } from "@/components/AccountsViewToggle";
 import { getGroupSummaries } from "@/lib/repos/accounts";
 import { getSessionUser, can } from "@/lib/access";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatDateRange } from "@/lib/format";
+import { formatMoney, formatDateRange } from "@/lib/format";
 
 export default async function GroupsPage({
   searchParams,
@@ -30,7 +30,7 @@ export default async function GroupsPage({
     <main>
       <StatusBar
         title="Groups"
-        subtitle={`${groups.length} group${groups.length === 1 ? "" : "s"} · ${formatINR(totalRev, { compact: true })} revenue · ${formatDateRange(from, to)}`}
+        subtitle={`${groups.length} group${groups.length === 1 ? "" : "s"} · ${formatMoney(totalRev, { compact: true })} revenue · ${formatDateRange(from, to)}`}
         actions={canCreate ? <GroupCreateModal /> : undefined}
       />
 

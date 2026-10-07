@@ -7,7 +7,7 @@ import { recordAudit } from "@/lib/repos/audit";
 import { parseAliases } from "@/lib/repos/apis";
 import { revalidateRevenue } from "@/lib/cache";
 
-// Actions for the code-only API review page (/admin/api-review):
+// Actions for the code-only API review page (/admin/sku-review):
 //  - accept-code: take an unknown/retired Product Code into the catalog (create
 //    or reactivate), then backfill its quarantined usage rows.
 //  - override: an explicit raw-name → code exception (for blank-code rows),

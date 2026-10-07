@@ -6,7 +6,7 @@ import { ApisFilterBar } from "./ApisFilterBar";
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { getApiSummaries } from "@/lib/repos/apis";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatNumber, formatDateRange } from "@/lib/format";
+import { formatMoney, formatNumber, formatDateRange } from "@/lib/format";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { ApiHoverCard } from "@/components/ApiHoverCard";
 import { getSessionUser, canViewCost } from "@/lib/access";
@@ -114,7 +114,7 @@ export default async function ApisPage({
                     >
                       <td className="px-4 py-3 min-w-0">
                         <ApiHoverCard code={a.product_code} side="right">
-                        <Link href={`/apis/${a.product_code}`} className="block min-w-0 hover:text-accent-ink">
+                        <Link href={`/skus/${a.product_code}`} className="block min-w-0 hover:text-accent-ink">
                           <TruncateTooltip
                             as="div"
                             text={a.name}
@@ -136,7 +136,7 @@ export default async function ApisPage({
                         {a.avg_unit_price > 0 ? `₹${a.avg_unit_price.toFixed(2)}` : <span className="text-ink-faint">—</span>}
                       </td>
                       <td className="px-3 py-3 text-right font-mono tabular-nums text-ink" style={{ fontWeight: a.revenue > 0 ? 500 : 400 }}>
-                        {a.revenue > 0 ? formatINR(a.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
+                        {a.revenue > 0 ? formatMoney(a.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
                       </td>
                       <td className="px-3 py-3">
                         <div className={`h-[8px] rounded overflow-hidden ${negative ? "bg-bad-bg-hover" : silent ? "bg-warn-bg-hover" : "bg-bg-sunken"}`}>
@@ -171,7 +171,7 @@ export default async function ApisPage({
                           ) : (
                             <>
                               <span className={negative ? "text-bad-ink" : coverage(a) < 1 ? "text-ink-muted" : "text-ink"}>
-                                {formatINR(a.margin ?? 0, { compact: true })}
+                                {formatMoney(a.margin ?? 0, { compact: true })}
                               </span>
                               {marginPct != null && (
                                 <span className={`text-[11px] ml-1 ${negative ? "text-bad-ink" : "text-ink-faint"}`}>
@@ -207,7 +207,7 @@ export default async function ApisPage({
                           A rate covers {measuredCount} of {trafficked.length} APIs with traffic
                           this period, so this filter can only see {measuredCount}
                           {measuredCount === 1 ? " of them" : " of them"}.{" "}
-                          <Link href="/apis?filter=cost-unknown" className="text-accent-ink underline">
+                          <Link href="/skus?filter=cost-unknown" className="text-accent-ink underline">
                             See the {trafficked.length - measuredCount} it cannot
                           </Link>
                           .

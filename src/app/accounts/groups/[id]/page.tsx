@@ -8,7 +8,7 @@ import { GroupManageControls } from "@/components/groups/GroupManageControls";
 import { getGroupDetail, listGroups } from "@/lib/repos/accounts";
 import { getSessionUser, can } from "@/lib/access";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatDateRange } from "@/lib/format";
+import { formatMoney, formatDateRange } from "@/lib/format";
 
 export default async function GroupDetailPage({
   params,
@@ -38,7 +38,7 @@ export default async function GroupDetailPage({
     <main>
       <StatusBar
         title={detail.name}
-        subtitle={`${detail.members.length} account${detail.members.length === 1 ? "" : "s"} · ${formatINR(totalRev, { compact: true })} revenue · ${formatDateRange(from, to)}`}
+        subtitle={`${detail.members.length} account${detail.members.length === 1 ? "" : "s"} · ${formatMoney(totalRev, { compact: true })} revenue · ${formatDateRange(from, to)}`}
         actions={
           canManage ? (
             <GroupManageControls

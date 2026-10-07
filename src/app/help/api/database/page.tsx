@@ -358,7 +358,7 @@ export default function DatabaseSchemaPage() {
           { name: "api_code", type: "text | null", desc: "FK → apis.product_code, ON DELETE SET NULL. NULL = quarantined." },
           { name: "raw_client_name", type: "text", desc: "Name exactly as the log reported it; alias resolution heals quarantine by this." },
           { name: "raw_api_name", type: "text", desc: "Raw API name from the log." },
-          { name: "raw_api_code", type: "text | null", desc: "Product code as the log reported it. Kept when api_code is NULL so /admin/api-review can show it." },
+          { name: "raw_api_code", type: "text | null", desc: "Product code as the log reported it. Kept when api_code is NULL so /admin/sku-review can show it." },
           { name: "hits_via", type: "text | null", desc: "Integration, Console, or Bulk." },
           { name: "vendor", type: "text | null", desc: "The vendor name exactly as the source reported it, kept beside the key like raw_client_name is." },
           { name: "vendor_id", type: "bigint | null", desc: "FK → vendors.id. Resolved on write through the registry. vendor_pricing joins on it." },

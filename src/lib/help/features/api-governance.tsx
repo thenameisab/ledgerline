@@ -8,7 +8,7 @@ export const meta: FeatureMeta = {
     "Admin controls that keep the catalog clean: create and edit APIs, manage code identity, and catch hygiene issues like identifiers claimed by more than one API.",
   group: "APIs",
   role: "admin",
-  routes: ["/apis"],
+  routes: ["/skus"],
 };
 
 export default function Body() {

@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { AccountLogo } from "@/components/accounts/AccountLogo";
 import { StatusChip } from "@/components/chips/StatusChip";
-import { formatINR, formatPercent, formatDateTime } from "@/lib/format";
+import { formatMoney, formatPercent, formatDateTime } from "@/lib/format";
 import { fuzzyFilter } from "@/lib/fuzzy";
 import { useRecents, type RecentType, type RecentItem } from "@/components/cmd/useRecents";
 import { useCommandContext } from "@/components/cmd/useCommandContext";
@@ -142,7 +142,7 @@ const ITEM_BASE =
 function Money({ value }: { value: number }) {
   return (
     <span className="shrink-0 font-mono text-[11px] text-ink-muted tabular-nums">
-      {formatINR(value, { compact: true })}
+      {formatMoney(value, { compact: true })}
     </span>
   );
 }
@@ -304,7 +304,7 @@ export function CommandPalette({ role }: { role: Role }) {
     if (!open || !context) return;
     if (context.kind === "account") record({ type: "account", href: `/accounts/${context.slug}`, label: context.name });
     else if (context.kind === "group") record({ type: "group", href: `/accounts/groups/${context.id}`, label: context.name });
-    else if (context.kind === "api") record({ type: "api", href: `/apis/${context.code}`, label: context.name, sub: context.code });
+    else if (context.kind === "api") record({ type: "api", href: `/skus/${context.code}`, label: context.name, sub: context.code });
     else if (context.kind === "invoice")
       record({
         type: "invoice",
@@ -497,7 +497,7 @@ export function CommandPalette({ role }: { role: Role }) {
   const currentHref =
     context?.kind === "account" ? `/accounts/${context.slug}`
     : context?.kind === "group" ? `/accounts/groups/${context.id}`
-    : context?.kind === "api" ? `/apis/${context.code}`
+    : context?.kind === "api" ? `/skus/${context.code}`
     : context?.kind === "invoice" ? `/accounts/${context.slug}/invoices?period=${context.periodId}`
     : null;
   const visibleRecents = askMeOn ? [] : recents.filter((r) => r.href !== currentHref);
@@ -975,7 +975,7 @@ export function CommandPalette({ role }: { role: Role }) {
                     <Command.Item
                       key={`api-${a.code}`}
                       value={`api-${a.code}`}
-                      onSelect={() => goEntity({ type: "api", href: `/apis/${a.code}`, label: a.name, sub: a.code })}
+                      onSelect={() => goEntity({ type: "api", href: `/skus/${a.code}`, label: a.name, sub: a.code })}
                       className={ITEM_BASE}
                     >
                       <Zap size={13} strokeWidth={1.5} className="shrink-0 text-ink-faint" />

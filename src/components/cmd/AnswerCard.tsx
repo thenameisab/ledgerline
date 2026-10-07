@@ -19,7 +19,7 @@
 // mount cost is the one thing that would make the resize stutter.
 
 import type { AskResult } from "@/lib/repos/ask";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { AiReveal } from "@/components/ui/AiReveal";
 
 function AnswerChart({ points, label }: { points: number[]; label: string }) {
@@ -47,7 +47,7 @@ function AnswerChart({ points, label }: { points: number[]; label: string }) {
       <figcaption className="flex items-baseline justify-between text-[10px] font-mono uppercase tracking-widest text-ink-faint">
         <span>{label}</span>
         <span className="tabular-nums normal-case tracking-normal">
-          peak {formatINR(max, { compact: true })}
+          peak {formatMoney(max, { compact: true })}
         </span>
       </figcaption>
       <svg
@@ -55,7 +55,7 @@ function AnswerChart({ points, label }: { points: number[]; label: string }) {
         preserveAspectRatio="none"
         className="mt-2 h-24 w-full overflow-visible"
         role="img"
-        aria-label={`${label}. Peak ${formatINR(max, { compact: true })}.`}
+        aria-label={`${label}. Peak ${formatMoney(max, { compact: true })}.`}
       >
         <defs>
           <linearGradient id="cmd-answer-fill" x1="0" y1="0" x2="0" y2="1">

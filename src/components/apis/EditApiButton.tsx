@@ -25,7 +25,7 @@ export function EditApiButton({ api }: { api: ApiFormInitial & { product_code: s
           onSaved={(saved) => {
             setOpen(false);
             if (saved.product_code !== api.product_code) {
-              router.push(`/apis/${saved.product_code}`);
+              router.push(`/skus/${saved.product_code}`);
             } else {
               router.refresh();
             }

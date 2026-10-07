@@ -9,7 +9,7 @@
 import { deriveStatement, listBillingPeriods, type StatementLine } from "./statements";
 import { listAccounts } from "./accounts";
 import { fuzzyFilter } from "@/lib/fuzzy";
-import { formatINR } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { generateSlug } from "@/lib/slug";
 import type { AskResult } from "./ask";
 
@@ -20,7 +20,7 @@ export function isVarianceQuestion(raw: string): boolean {
 
 function signed(n: number): string {
   const sign = n >= 0 ? "+" : "−";
-  return `${sign}${formatINR(Math.abs(n), { compact: true })}`;
+  return `${sign}${formatMoney(Math.abs(n), { compact: true })}`;
 }
 
 const VAR_MONTH_RE =

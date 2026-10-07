@@ -17,7 +17,7 @@ export default function Body() {
         The API lens answers a different question than the account lens: for one product, who
         consumes it, how is it priced across accounts, and is it making money?
       </p>
-      <OpenInApp href="/apis" label="Open APIs" />
+      <OpenInApp href="/skus" label="Open APIs" />
 
       <H2 id="catalog">Scan the catalog</H2>
       <Figure

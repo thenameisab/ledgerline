@@ -11,7 +11,7 @@
 
 import { type AlertConfig, type AlertRule, type AlertSeverity } from "./config";
 import type { AlertData, Series } from "./data";
-import { formatDate, formatINR, formatNumber } from "../format";
+import { formatDate, formatMoney, formatNumber } from "../format";
 
 export type AlertDraft = {
   rule: AlertRule;
@@ -46,7 +46,7 @@ const sum = (a: Series, lo: number, hi: number) => {
 const wkBase = (a: Series, i: number) => (i < 28 ? NaN : (a[i - 7] + a[i - 14] + a[i - 21] + a[i - 28]) / 4);
 const wkActive = (a: Series, i: number) => (i < 28 ? 0 : [7, 14, 21, 28].filter((k) => a[i - k] > 0).length);
 const int = (x: number) => formatNumber(Math.round(x));
-const inr = (x: number) => formatINR(Math.round(x));
+const inr = (x: number) => formatMoney(Math.round(x));
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 const signedPct = (x: number) => `${x >= 0 ? "+" : "−"}${Math.abs(x * 100).toFixed(1)}%`;
 const monthName = (iso: string) =>

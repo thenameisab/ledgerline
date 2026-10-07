@@ -11,7 +11,7 @@ import {
   MIN_HITS_FOR_FLAG,
 } from "@/lib/repos/vendor-recon";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatNumber, formatPercent, formatDateRange, formatDay } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent, formatDateRange, formatDay } from "@/lib/format";
 import { ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -75,7 +75,7 @@ export default async function VendorReconPage({
                 Unexplained vendor spend
               </h2>
               <div className="font-serif text-4xl text-ink tnum mt-[6px]" style={{ fontWeight: 600 }}>
-                {summary.open_delta_cost > 0 ? formatINR(summary.open_delta_cost) : "₹0"}
+                {summary.open_delta_cost > 0 ? formatMoney(summary.open_delta_cost) : "₹0"}
               </div>
               <div className="text-xs text-ink-faint mt-1">
                 priced gaps only — most pairs still have no rate
@@ -138,7 +138,7 @@ export default async function VendorReconPage({
                 ))}
             </div>
             <Link
-              href="/admin/api-review"
+              href="/admin/sku-review"
               className="inline-flex items-center gap-1 text-xs text-accent-ink hover:underline mt-3"
             >
               API review <ArrowRight size={11} strokeWidth={1.75} />

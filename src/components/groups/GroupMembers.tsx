@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Combobox } from "@/components/ui/Combobox";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { AccountLogo } from "@/components/accounts/AccountLogo";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { generateSlug } from "@/lib/slug";
 import type { GroupMember } from "@/lib/repos/accounts";
 
@@ -124,7 +124,7 @@ function MemberRow({
       </td>
       <td className="px-3 py-3 align-middle text-right font-mono tnum text-sm">
         {member.revenue > 0 ? (
-          <span className="text-ink" style={{ fontWeight: 500 }}>{formatINR(member.revenue, { compact: true })}</span>
+          <span className="text-ink" style={{ fontWeight: 500 }}>{formatMoney(member.revenue, { compact: true })}</span>
         ) : (
           <span className="text-ink-faint">—</span>
         )}

@@ -5,7 +5,7 @@ import { ConfidenceBar } from "@/components/vendor/ConfidenceBar";
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { costWorklist, listVendors } from "@/lib/repos/vendor-cost";
 import { resolvePeriod } from "@/lib/period";
-import { formatINR, formatNumber, formatPercent, formatDateRange } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent, formatDateRange } from "@/lib/format";
 import { Truck } from "lucide-react";
 
 export default async function VendorLibraryPage({
@@ -61,7 +61,7 @@ export default async function VendorLibraryPage({
                 className="block font-serif text-5xl text-ink leading-none tnum landmark-wipe"
                 style={{ fontWeight: 600 }}
               >
-                {formatINR(totalCost, { precision: 0 })}
+                {formatMoney(totalCost, { precision: 0 })}
               </span>
               <span className="block h-px bg-accent mt-2 landmark-rail" aria-hidden="true" />
             </span>
@@ -151,7 +151,7 @@ export default async function VendorLibraryPage({
                   <div>
                     <div className="text-xs text-ink-faint">Vendor cost</div>
                     <div className="font-serif text-3xl text-ink tnum leading-none mt-1" style={{ fontWeight: 600 }}>
-                      {formatINR(v.total_cost, { compact: true })}
+                      {formatMoney(v.total_cost, { compact: true })}
                     </div>
                     {/* A total larger than the sum of this vendor's APIs is not
                         an error — it is the floor binding. Say which part. */}
@@ -160,7 +160,7 @@ export default async function VendorLibraryPage({
                         className="text-[10px] text-warn-ink mt-1"
                         title="A monthly minimum topped light months up to the contracted floor. It belongs to no API, so the rate card rows sum to less than this."
                       >
-                        incl. {formatINR(v.minimum_top_up, { compact: true })} minimum
+                        incl. {formatMoney(v.minimum_top_up, { compact: true })} minimum
                       </div>
                     )}
                   </div>

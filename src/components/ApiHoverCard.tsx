@@ -2,7 +2,7 @@
 import { EntityHoverCard, SkelBar } from "@/components/ui/EntityHoverCard";
 import { Footer } from "@/components/AccountHoverCard";
 import { isLowConfidence, confirmedShare, formatShare } from "@/lib/vendor-confidence";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import type { ApiHoverCard as Data } from "@/lib/repos/hover";
 
 // Rich hover for any API name. Wrap the existing name link:
@@ -57,7 +57,7 @@ function Card({ d }: { d: Data }) {
         <div>
           <div className="text-[11px] uppercase tracking-wide text-ink-faint">{d.periodLabel} revenue</div>
           <div className="font-serif text-2xl text-ink tnum leading-none mt-1">
-            {d.revenue > 0 ? formatINR(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
+            {d.revenue > 0 ? formatMoney(d.revenue, { compact: true }) : <span className="text-ink-faint">—</span>}
           </div>
         </div>
         <div className="text-right">
@@ -81,7 +81,7 @@ function Card({ d }: { d: Data }) {
           // title carries the figure instead.
           <Metric
             label="Margin"
-            value={marginPct != null ? `${marginPct.toFixed(0)}%` : formatINR(d.margin, { compact: true })}
+            value={marginPct != null ? `${marginPct.toFixed(0)}%` : formatMoney(d.margin, { compact: true })}
             tone={negative ? "bad" : lowConfidence ? "muted" : "default"}
             title={
               lowConfidence && d.costConfidence
@@ -118,7 +118,7 @@ function Card({ d }: { d: Data }) {
         </div>
       )}
 
-      <Footer href={`/apis/${encodeURIComponent(d.productCode)}`} label="Open API view" />
+      <Footer href={`/skus/${encodeURIComponent(d.productCode)}`} label="Open API view" />
     </div>
   );
 }

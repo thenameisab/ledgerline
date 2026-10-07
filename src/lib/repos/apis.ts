@@ -162,7 +162,7 @@ export async function listCatalogDuplicates(): Promise<DuplicateGroup[]> {
 
 // ── API review page: code-only matching surfaces ──────────────────────────
 // Code-only ingestion quarantines anything whose Product Code isn't an active
-// catalog code. These reads power /admin/api-review.
+// catalog code. These reads power /admin/sku-review.
 
 export type UnknownCode = {
   code: string; sample_name: string; rows: number; hits: number; last_seen: string;

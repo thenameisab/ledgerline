@@ -110,7 +110,7 @@ export default async function AuditLogPage({
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
                       {r.entity_type === "api" ? (
-                        <Link href={`/apis/${r.entity_id}`} className="text-ink hover:text-accent-ink font-mono text-xs">
+                        <Link href={`/skus/${r.entity_id}`} className="text-ink hover:text-accent-ink font-mono text-xs">
                           {r.entity_type} · {r.entity_id}
                         </Link>
                       ) : (

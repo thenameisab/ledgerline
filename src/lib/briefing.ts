@@ -1,4 +1,4 @@
-import { formatINR, formatNumber, formatPercent } from "./format";
+import { formatMoney, formatNumber, formatPercent } from "./format";
 import { formatShare, LOW_CONFIDENCE_PCT } from "./vendor-confidence";
 
 // Deterministic briefing composer for v0.1.
@@ -65,7 +65,7 @@ export class DeterministicComposer implements BriefingComposer {
     // Sentence 1 — headline number + scale.
     sentences.push(
       o.revenue > 0
-        ? `${o.display_name} drove ${formatINR(o.revenue, { precision: 0 })} MTD across ${o.apis_used} API${o.apis_used === 1 ? "" : "s"} on ${formatNumber(o.hits)} hits.`
+        ? `${o.display_name} drove ${formatMoney(o.revenue, { precision: 0 })} MTD across ${o.apis_used} API${o.apis_used === 1 ? "" : "s"} on ${formatNumber(o.hits)} hits.`
         : `${o.display_name} ran ${formatNumber(o.hits)} hits across ${o.apis_used} API${o.apis_used === 1 ? "" : "s"} but produced no billable revenue this period — likely missing pricing.`
     );
 
@@ -104,7 +104,7 @@ export class DeterministicComposer implements BriefingComposer {
     const sentences: string[] = [];
 
     sentences.push(
-      `${o.name} (${o.product_code}) ran ${formatNumber(o.total_hits)} hits across ${o.unique_accounts} account${o.unique_accounts === 1 ? "" : "s"}, generating ${formatINR(o.revenue, { precision: 0 })} MTD.`
+      `${o.name} (${o.product_code}) ran ${formatNumber(o.total_hits)} hits across ${o.unique_accounts} account${o.unique_accounts === 1 ? "" : "s"}, generating ${formatMoney(o.revenue, { precision: 0 })} MTD.`
     );
 
     if (o.revenue > 0) {
@@ -117,7 +117,7 @@ export class DeterministicComposer implements BriefingComposer {
           ? `${price}.`
           : lowConfidence
           ? `${price}; margin is not measured — vendor cost is confirmed on ${formatShare(o.cost_confirmed_pct!)} of hits.`
-          : `${price}; margin sits at ${formatPercent(o.margin_pct, 0)} (${formatINR(o.margin, { precision: 0 })}).`
+          : `${price}; margin sits at ${formatPercent(o.margin_pct, 0)} (${formatMoney(o.margin, { precision: 0 })}).`
       );
     }
 

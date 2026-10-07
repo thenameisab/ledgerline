@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Combobox } from "@/components/ui/Combobox";
 import { RollingText } from "@/components/ui/RollingText";
 import { ApiFormModal } from "@/components/apis/ApiFormModal";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 
 type AccountOpt = { id: number; display_name: string; is_sandbox: number };
 type ApiOpt = { product_code: string; name: string; category: string | null; vendor_type: string | null };
@@ -445,7 +445,7 @@ export function ManualEntryWizard({
                         )}
                       </td>
                       <td className="px-3 py-2 text-right tnum text-ink">
-                        {formatINR(l.revenue, { precision: 2 })}
+                        {formatMoney(l.revenue, { precision: 2 })}
                       </td>
                       <td className="px-3 py-2">
                         {l.has_pricing ? (
@@ -468,7 +468,7 @@ export function ManualEntryWizard({
                 Total{" "}
                 <span className="font-serif tnum text-ink text-2xl leading-none" style={{ fontWeight: 600 }}>
                   <RollingText
-                    text={formatINR(total, { precision: 2 })}
+                    text={formatMoney(total, { precision: 2 })}
                     options={{ direction: "up" }}
                     colorOnChange="rise-good"
                     signValue={total}
@@ -477,7 +477,7 @@ export function ManualEntryWizard({
                 {requiresApproval && (
                   <span className="ml-3 inline-flex items-center gap-1 text-xs text-warn-ink">
                     <AlertTriangle size={11} strokeWidth={1.5} />
-                    Exceeds {formatINR(serverPreview.threshold, { compact: true })} — admin approval required
+                    Exceeds {formatMoney(serverPreview.threshold, { compact: true })} — admin approval required
                   </span>
                 )}
               </div>

@@ -194,7 +194,7 @@ function DuplicatesPanel({
                   {d.apis.map((a) => (
                     <Link
                       key={a.product_code}
-                      href={`/apis/${a.product_code}`}
+                      href={`/skus/${a.product_code}`}
                       className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-bg-sunken text-ink hover:text-accent-ink"
                     >
                       {a.product_code} – {a.name}

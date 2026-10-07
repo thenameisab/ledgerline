@@ -2,7 +2,7 @@ import React from "react";
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 import { pdf } from "./tokens";
 import { registerPdfFonts } from "./fonts";
-import { formatINR, formatPrice, formatPercent, formatNumber, formatDateLong } from "../format";
+import { formatMoney, formatPrice, formatPercent, formatNumber, formatDateLong } from "../format";
 import type { StatementData, StatementLine, StatementAdjustment } from "../repos/statements";
 import { confirmedShare, formatShare } from "../vendor-confidence";
 
@@ -492,17 +492,17 @@ function TotalsStripInternal({ data }: { data: StatementData }) {
     <View style={s.totalsStrip}>
       <View style={s.totalsCell}>
         <Text style={s.totalsLabel}>Revenue</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.revenue)}</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.revenue)}</Text>
         <Text style={s.totalsSubvalue}>{formatNumber(data.totals.hits)} hits</Text>
       </View>
       <View style={[s.totalsCell, s.totalsCellDivider]}>
         <Text style={s.totalsLabel}>Vendor cost</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.vendor_cost)}</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.vendor_cost)}</Text>
         <Text style={s.totalsSubvalue}>{data.totals.lines} APIs billed</Text>
       </View>
       <View style={[s.totalsCell, s.totalsCellDivider]}>
         <Text style={s.totalsLabel}>Margin</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.margin)}</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.margin)}</Text>
         <Text style={s.totalsSubvalue}>{formatPercent(data.totals.margin_pct, 1)} of revenue</Text>
       </View>
     </View>
@@ -515,7 +515,7 @@ function TotalsStripCustomer({ data }: { data: StatementData }) {
     <View style={s.totalsStrip}>
       <View style={s.totalsCell}>
         <Text style={s.totalsLabel}>Total due</Text>
-        <Text style={s.totalsValue}>{formatINR(data.totals.revenue)}</Text>
+        <Text style={s.totalsValue}>{formatMoney(data.totals.revenue)}</Text>
         <Text style={s.totalsSubvalue}>Excl. taxes</Text>
       </View>
       <View style={[s.totalsCell, s.totalsCellDivider]}>
@@ -585,9 +585,9 @@ function InternalLines({ lines }: { lines: StatementLine[] }) {
             </View>
             <Text style={[s.tdMono, { flex: 1.0, textAlign: "right" }]}>{formatNumber(l.hits)}</Text>
             <Text style={[s.tdMono, { flex: 1.2, textAlign: "right" }]}>{formatPrice(unitPrice)}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.revenue, { precision: 2 })}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.vendor_cost, { precision: 2 })}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.margin, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.revenue, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.vendor_cost, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.margin, { precision: 2 })}</Text>
           </View>
         );
       })}
@@ -614,7 +614,7 @@ function CustomerLines({ lines }: { lines: StatementLine[] }) {
             </View>
             <Text style={[s.tdMono, { flex: 1.2, textAlign: "right" }]}>{formatNumber(l.hits)}</Text>
             <Text style={[s.tdMono, { flex: 1.4, textAlign: "right" }]}>{formatPrice(unitPrice)}</Text>
-            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatINR(l.revenue, { precision: 2 })}</Text>
+            <Text style={[s.tdMono, { flex: 1.6, textAlign: "right" }]}>{formatMoney(l.revenue, { precision: 2 })}</Text>
           </View>
         );
       })}
@@ -639,13 +639,13 @@ function InternalTotalsRow({
       </Text>
       <View style={{ flex: 1.2 }} />
       <Text style={[s.totalsValueCell, s.totalsValueInternal, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.revenue, { precision: 2 })}
+        {formatMoney(totals.revenue, { precision: 2 })}
       </Text>
       <Text style={[s.totalsValueCell, s.totalsValueInternal, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.vendor_cost, { precision: 2 })}
+        {formatMoney(totals.vendor_cost, { precision: 2 })}
       </Text>
       <Text style={[s.totalsValueCell, s.totalsValueInternal, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.margin, { precision: 2 })}
+        {formatMoney(totals.margin, { precision: 2 })}
       </Text>
     </View>
   );
@@ -668,7 +668,7 @@ function CustomerTotalsRow({
       </Text>
       <View style={{ flex: 1.4 }} />
       <Text style={[s.totalsValueCell, { flex: 1.6, textAlign: "right" }]}>
-        {formatINR(totals.revenue, { precision: 2 })}
+        {formatMoney(totals.revenue, { precision: 2 })}
       </Text>
     </View>
   );
@@ -710,7 +710,7 @@ function AdjustmentsBlock({
                   isCredit ? s.adjustmentAmountCredit : s.adjustmentAmountCharge,
                 ]}
               >
-                {formatINR(adj.amount, { precision: 2 })}
+                {formatMoney(adj.amount, { precision: 2 })}
               </Text>
             </View>
           );
@@ -725,7 +725,7 @@ function AdjustmentsBlock({
               subtotal < 0 ? s.adjustmentAmountCredit : s.adjustmentAmountCharge,
             ]}
           >
-            {formatINR(subtotal, { precision: 2 })}
+            {formatMoney(subtotal, { precision: 2 })}
           </Text>
         </View>
       </View>
@@ -737,7 +737,7 @@ function GrandTotalRow({ total }: { total: number }) {
   return (
     <View style={s.grandTotalRow}>
       <Text style={s.grandTotalLabel}>Grand total</Text>
-      <Text style={s.grandTotalValue}>{formatINR(total, { precision: 2 })}</Text>
+      <Text style={s.grandTotalValue}>{formatMoney(total, { precision: 2 })}</Text>
     </View>
   );
 }

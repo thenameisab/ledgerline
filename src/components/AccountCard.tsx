@@ -3,7 +3,7 @@ import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { StatusChip, type StatusKind } from "@/components/chips/StatusChip";
 import { Sparkline } from "@/components/Sparkline";
-import { formatINR, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 import { ChevronDown, ArrowUpRight, Calendar, Activity, Layers } from "lucide-react";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 
@@ -115,7 +115,7 @@ export function AccountCard({
             <div className="text-[11px] uppercase tracking-wide text-ink-faint">MTD revenue</div>
             <div className="font-serif text-2xl text-ink tnum leading-none mt-1">
               {data.revenue > 0 ? (
-                formatINR(data.revenue, { compact: true })
+                formatMoney(data.revenue, { compact: true })
               ) : (
                 <span className="text-ink-faint">—</span>
               )}
@@ -306,7 +306,7 @@ function ThresholdCTA({
 
       {/* Middle — live evidence in mono */}
       <div className="hidden md:flex items-center gap-5 text-xs text-ink-muted shrink-0">
-        <Stat label="Revenue" value={revenue > 0 ? formatINR(revenue, { compact: true }) : "—"} />
+        <Stat label="Revenue" value={revenue > 0 ? formatMoney(revenue, { compact: true }) : "—"} />
         <span className="text-border" aria-hidden="true">/</span>
         <Stat label="Hits" value={formatNumber(hits)} />
         <span className="text-border" aria-hidden="true">/</span>

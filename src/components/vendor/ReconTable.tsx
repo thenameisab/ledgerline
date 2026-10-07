@@ -4,7 +4,7 @@ import { FilterPill } from "@/components/ui/FilterPill";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { ReconDismissButton } from "@/components/vendor/ReconDismissButton";
 import { isOpen, DELTA_THRESHOLD_PCT, type ReconRow } from "@/lib/repos/vendor-recon";
-import { formatINR, formatNumber, formatPercent } from "@/lib/format";
+import { formatMoney, formatNumber, formatPercent } from "@/lib/format";
 
 // The reconciliation worklist: filter strip, empty states, table.
 //
@@ -121,7 +121,7 @@ export function ReconTable({
                       <div className="flex items-baseline gap-2">
                         {r.api_code ? (
                           <Link
-                            href={`/apis/${r.api_code}`}
+                            href={`/skus/${r.api_code}`}
                             className="font-mono text-xs text-ink-muted hover:text-accent-ink"
                           >
                             {r.api_code}
@@ -174,7 +174,7 @@ export function ReconTable({
                           className="text-bad-ink"
                           title="Volume the vendor served that Ledgerline never costed, at this vendor's rate for this API"
                         >
-                          {formatINR(r.delta_cost, { precision: 0 })}
+                          {formatMoney(r.delta_cost, { precision: 0 })}
                         </span>
                       ) : (
                         // Shown, not blanked: the reader needs to see that a
@@ -183,7 +183,7 @@ export function ReconTable({
                           className="text-ink-faint"
                           title="Ledgerline counted more hits than the vendor reports serving — a discrepancy, but no money at stake"
                         >
-                          −{formatINR(Math.abs(r.delta_cost), { precision: 0 })}
+                          −{formatMoney(Math.abs(r.delta_cost), { precision: 0 })}
                         </span>
                       )}
                     </td>

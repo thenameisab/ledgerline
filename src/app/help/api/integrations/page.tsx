@@ -82,7 +82,7 @@ export default function IntegrationsPage() {
         <li>Insert a <code>sync_runs</code> row with <code>status=&apos;running&apos;</code>, so the run is visible if it stops part way.</li>
         <li>Get the rows for the date (simulated or real). Drop the &quot;ALL CLIENTS TOTAL / ALL APIs&quot; checksum row if it is present.</li>
         <li>Resolve catalog ids. <strong>Accounts</strong> match by <code>display_name</code> and <code>log_aliases</code>. <strong>APIs</strong> match by <code>Product Code</code> only: a row maps when its code is an active catalog code (<code>apis.is_active=1</code>). When the code is blank or unknown, the only fallback is an <code>api_code_overrides</code> entry (raw API name to code).</li>
-        <li>Store unmatched rows with a NULL id. They are never auto-created. An unmatched account appears on /admin/aliases. An unmatched API keeps its raw code in <code>raw_api_code</code> and appears on /admin/api-review.</li>
+        <li>Store unmatched rows with a NULL id. They are never auto-created. An unmatched account appears on /admin/aliases. An unmatched API keeps its raw code in <code>raw_api_code</code> and appears on /admin/sku-review.</li>
         <li>Group rows by (account, API, hits-via) so duplicate rows add up instead of breaking the unique index.</li>
         <li>In one transaction, delete the date&apos;s <code>source=&apos;log&apos;</code> rows and insert the new rows in chunks of 500. Running a date again gives the same result.</li>
         <li>Finish the <code>sync_runs</code> row with row counts, unmapped counts, and total hits. On failure, set <code>status=&apos;error&apos;</code> with the message cut to 2,000 characters. An error on one date does not stop the next date.</li>
