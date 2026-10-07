@@ -16,7 +16,7 @@ export default function Body() {
     <>
       <p>
         The directory is the roster: every account Ledgerline knows about, grouped under their parent
-        group, with enough signal per row — revenue, hits, a sparkline, a status badge — to spot
+        group, with enough signal per row — revenue, units, a sparkline, a status badge — to spot
         which ones need attention without opening them.
       </p>
 
@@ -42,8 +42,8 @@ export default function Body() {
         </li>
         <li>
           <strong>Per row</strong> — avatar (emoji or initials), name with group beneath, a
-          status badge (<em>OK</em> / <em>leak</em> / <em>sandbox</em>), MTD revenue, hit count,
-          distinct APIs used, and a 14-day revenue sparkline.
+          status badge (<em>OK</em> / <em>leak</em> / <em>sandbox</em>), MTD revenue, unit count,
+          distinct SKUs used, and a 14-day revenue sparkline.
         </li>
       </ul>
       <p>
@@ -65,8 +65,8 @@ export default function Body() {
         </li>
         <li>
           <strong>Create an account (admin)</strong> — the "Create account" button opens a modal:
-          display name (required), parent group, GSTIN, billing entity, and an
-          "is sandbox" checkbox. On save the list refreshes in place with the new account. GSTIN
+          display name (required), parent group, Tax ID, billing entity, and an
+          "is sandbox" checkbox. On save the list refreshes in place with the new account. Tax ID
           and billing entity flow straight onto the account&rsquo;s invoices, so filling them here
           saves a correction later.
         </li>

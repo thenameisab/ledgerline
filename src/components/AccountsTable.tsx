@@ -77,11 +77,11 @@ export function AccountsTable({ rows }: { rows: AccountSummary[] }) {
                         />
                         {c.active_unpriced_pairs > 0 ? (
                           <div className="text-[11px] text-bad-ink mt-[2px] truncate">
-                            {c.active_unpriced_pairs} unpriced · {formatNumber(c.active_unpriced_hits)} hits
+                            {c.active_unpriced_pairs} unpriced · {formatNumber(c.active_unpriced_hits)} units
                           </div>
                         ) : c.historical_unpriced_pairs > 0 ? (
                           <div className="text-[11px] text-warn-ink mt-[2px] truncate">
-                            {c.historical_unpriced_pairs} historical · {formatNumber(c.historical_unpriced_hits)} hits
+                            {c.historical_unpriced_pairs} historical · {formatNumber(c.historical_unpriced_hits)} units
                           </div>
                         ) : null}
                       </div>

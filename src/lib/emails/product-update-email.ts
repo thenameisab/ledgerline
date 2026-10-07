@@ -1,5 +1,5 @@
 /**
- * Weekly product update email (API usage). Pure functions: subject + HTML +
+ * Weekly product update email (SKU usage). Pure functions: subject + HTML +
  * plaintext, no sending. Same table-based layout, inline styles and palette as
  * roundup-email.ts; charts are table-cell bars so nothing is blocked by image
  * proxies.
@@ -174,13 +174,13 @@ export function buildUsageUpdateEmail(
     data.hits.pct === null
       ? ""
       : ` (${data.hits.pct >= 0 ? "▲" : "▼"}${Math.abs(data.hits.pct).toFixed(0)}% vs prior week)`;
-  const subject = `${title} — ${formatNumber(data.hits.value)} hits · ${data.week.label}${deltaTxt}`;
+  const subject = `${title} — ${formatNumber(data.hits.value)} units · ${data.week.label}${deltaTxt}`;
 
   const text = [
     `${title} · ${data.week.label}`,
     ``,
-    `Hits: ${formatNumber(data.hits.value)}${pctText(data.hits)}`,
-    `Success rate: ${data.successRate.pct.toFixed(1)}% · Active accounts: ${data.activeAccounts.value} · APIs used: ${data.apisUsed.value}`,
+    `Units: ${formatNumber(data.hits.value)}${pctText(data.hits)}`,
+    `Success rate: ${data.successRate.pct.toFixed(1)}% · Active accounts: ${data.activeAccounts.value} · SKUs used: ${data.apisUsed.value}`,
     ...(data.missingDays.length
       ? [``, `Warning: ${data.missingDays.length} day(s) in this week have no synced usage: ${data.missingDays.join(", ")}.`]
       : []),
@@ -188,15 +188,15 @@ export function buildUsageUpdateEmail(
     `Channels:`,
     ...data.channels.map((c) => `  ${c.name} — ${formatNumber(c.hits)} (${c.share.toFixed(0)}%)`),
     ``,
-    `Top APIs by volume:`,
-    ...data.topApis.map((a) => `  ${a.name} — ${formatNumber(a.hits)} hits · ${a.accounts} accounts`),
+    `Top SKUs by volume:`,
+    ...data.topApis.map((a) => `  ${a.name} — ${formatNumber(a.hits)} units · ${a.accounts} accounts`),
     ``,
     `Top accounts by volume:`,
-    ...data.topAccounts.map((c) => `  ${c.name} — ${formatNumber(c.hits)} hits`),
+    ...data.topAccounts.map((c) => `  ${c.name} — ${formatNumber(c.hits)} units`),
     ...(data.newAccounts.length ? [``, `Newly active: ${data.newAccounts.map((c) => c.name).join(", ")}`] : []),
     ...(data.quietAccounts.length ? [``, `Went quiet: ${data.quietAccounts.map((c) => c.name).join(", ")}`] : []),
     ``,
-    `Data quality: ${data.dataQuality.unmappedAccounts} unmapped accounts · ${data.dataQuality.unmappedApis} unmapped APIs · ${data.dataQuality.unpricedPairs} unpriced pairs`,
+    `Data quality: ${data.dataQuality.unmappedAccounts} unmapped accounts · ${data.dataQuality.unmappedApis} unmapped SKUs · ${data.dataQuality.unpricedPairs} unpriced pairs`,
     ``,
     `Open Ledgerline: ${appUrl}`,
   ].join("\n");
@@ -205,7 +205,7 @@ export function buildUsageUpdateEmail(
   const outcomeTotal = o.successful + o.successful_no_data + o.failed + o.in_progress;
 
   const hero = `
-    <div style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:40px;font-weight:600;color:${C.ink};letter-spacing:-0.02em;margin-top:4px;">${formatNumber(data.hits.value)}<span style="font-family:${FONT};font-size:14px;font-weight:500;color:${C.muted};letter-spacing:0;"> &nbsp;hits</span></div>
+    <div style="font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:40px;font-weight:600;color:${C.ink};letter-spacing:-0.02em;margin-top:4px;">${formatNumber(data.hits.value)}<span style="font-family:${FONT};font-size:14px;font-weight:500;color:${C.muted};letter-spacing:0;"> &nbsp;units</span></div>
     <div style="margin-top:8px;">${deltaChip(data.hits.pct, data.week.priorLabel)}</div>
     ${
       data.missingDays.length
@@ -226,7 +226,7 @@ export function buildUsageUpdateEmail(
       </tr>`
         )
         .join("")
-    : `<tr><td>${muted("No API traffic this week")}</td></tr>`;
+    : `<tr><td>${muted("No SKU usage this week")}</td></tr>`;
 
   const accountRows = data.topAccounts.length
     ? data.topAccounts
@@ -263,11 +263,11 @@ export function buildUsageUpdateEmail(
     <table role="presentation" width="100%" cellpadding="0" cellspacing="6" style="margin-top:14px;"><tr>
       ${kpiCell("Success rate", `${data.successRate.pct.toFixed(1)}%`, smallDeltaPoints(data.successRate.pct, data.successRate.prevPct))}
       ${kpiCell("Active accounts", String(data.activeAccounts.value), smallDelta(data.activeAccounts.pct))}
-      ${kpiCell("APIs used", String(data.apisUsed.value), smallDelta(data.apisUsed.pct))}
-      ${kpiCell("Failed", formatNumber(o.failed), `<span style="font-family:${FONT};font-size:11px;color:${C.faint};">${outcomeTotal > 0 ? ((o.failed / outcomeTotal) * 100).toFixed(1) : "0"}% of hits</span>`)}
+      ${kpiCell("SKUs used", String(data.apisUsed.value), smallDelta(data.apisUsed.pct))}
+      ${kpiCell("Failed", formatNumber(o.failed), `<span style="font-family:${FONT};font-size:11px;color:${C.faint};">${outcomeTotal > 0 ? ((o.failed / outcomeTotal) * 100).toFixed(1) : "0"}% of units</span>`)}
     </tr></table>
 
-    ${sectionTitle("Hits by day")}
+    ${sectionTitle("Units by day")}
     ${hbars(data.daily.map((d) => ({ label: d.label, value: d.hits })))}
 
     ${sectionTitle("Outcomes")}
@@ -281,7 +281,7 @@ export function buildUsageUpdateEmail(
     ${sectionTitle("Channels")}
     ${stackedBar(data.channels.map((c, i) => ({ name: c.name, value: c.hits, color: CHANNEL_COLORS[i % CHANNEL_COLORS.length] })))}
 
-    ${sectionTitle("Top APIs by volume")}
+    ${sectionTitle("Top SKUs by volume")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${apiRows}</table>
 
     ${sectionTitle("Top accounts by volume")}
@@ -290,7 +290,7 @@ export function buildUsageUpdateEmail(
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
       <td width="48%" valign="top">
         ${sectionTitle("Newly active")}
-        ${listCol(data.newAccounts.map((c) => ({ name: c.name, n: c.hits })), " hits", "good")}
+        ${listCol(data.newAccounts.map((c) => ({ name: c.name, n: c.hits })), " units", "good")}
       </td>
       <td width="4%"></td>
       <td width="48%" valign="top">
@@ -302,10 +302,10 @@ export function buildUsageUpdateEmail(
     ${sectionTitle("Data quality this week")}
     <div>
       ${chip(`${dq.unmappedAccounts} unmapped account${dq.unmappedAccounts === 1 ? "" : "s"}`, dqTone(dq.unmappedAccounts))}&nbsp;
-      ${chip(`${dq.unmappedApis} unmapped API${dq.unmappedApis === 1 ? "" : "s"}`, dqTone(dq.unmappedApis))}&nbsp;
+      ${chip(`${dq.unmappedApis} unmapped SKU${dq.unmappedApis === 1 ? "" : "s"}`, dqTone(dq.unmappedApis))}&nbsp;
       ${chip(`${dq.unpricedPairs} unpriced pair${dq.unpricedPairs === 1 ? "" : "s"}`, dqTone(dq.unpricedPairs))}
     </div>
-    <div style="margin-top:8px;font-family:${FONT};font-size:11px;color:${C.faint};">Unmapped rows are excluded from every number above until resolved in <a href="${appUrl}/admin/sku-review" style="color:${C.accent};">API review</a> and <a href="${appUrl}/admin/aliases" style="color:${C.accent};">Aliases</a>.</div>`;
+    <div style="margin-top:8px;font-family:${FONT};font-size:11px;color:${C.faint};">Unmapped rows are excluded from every number above until resolved in <a href="${appUrl}/admin/sku-review" style="color:${C.accent};">SKU review</a> and <a href="${appUrl}/admin/aliases" style="color:${C.accent};">Aliases</a>.</div>`;
 
   const html = shell({
     subject,
@@ -313,7 +313,7 @@ export function buildUsageUpdateEmail(
     periodLabel: data.week.label,
     hero,
     body,
-    cta: { label: "Open APIs", href: `${appUrl}/apis` },
+    cta: { label: "Open SKUs", href: `${appUrl}/skus` },
     footer: "Ledgerline — sent to the product update list configured in Admin → Settings. Usage only; revenue is in the roundups.",
   });
 

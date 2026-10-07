@@ -21,6 +21,8 @@ export type ApiSummary = {
   name: string;
   category: string;
   vendor_type: string;
+  /** What one billed unit is, e.g. "1M tokens", "minute". */
+  unit: string;
   total_hits: number;
   revenue: number;
   // Null for viewers without cost access — see canViewCost().
@@ -43,7 +45,7 @@ export type ApiSummary = {
 export async function listApis(): Promise<any[]> {
   const sql = getSql();
   return sql`
-    SELECT product_code, name, category, vendor_type
+    SELECT product_code, name, category, vendor_type, unit
     FROM apis WHERE is_active = 1 ORDER BY name
   ` as unknown as Promise<any[]>;
 }
@@ -319,7 +321,7 @@ async function getApiSummariesImpl(opts: {
         ORDER BY revenue DESC
       `;
 
-  const apiCatalog = await sql`SELECT product_code, name, category, vendor_type FROM apis`;
+  const apiCatalog = await sql`SELECT product_code, name, category, vendor_type, unit FROM apis`;
   const catMap = new Map(
     (apiCatalog as any[]).map((a) => [a.product_code, a])
   );
@@ -363,6 +365,7 @@ async function getApiSummariesImpl(opts: {
         name: cat?.name ?? r.api_name ?? r.api_code,
         category: cat?.category ?? "",
         vendor_type: cat?.vendor_type ?? "",
+        unit: cat?.unit ?? "call",
         total_hits: Number(r.total_hits ?? 0),
         revenue,
         vendor_cost: opts.includeCost ? vendor_cost : null,

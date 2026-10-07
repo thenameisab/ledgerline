@@ -57,7 +57,7 @@ export default async function DashboardPage({
     includeCost ? costConfidence({ from, to, includeSandbox }) : Promise.resolve(null),
   ]);
 
-  // Tiered (slab) revenue is a per-month total the daily view prices at ₹0, so
+  // Tiered (slab) revenue is a per-month total the daily view prices at $0, so
   // the chart bars exclude it and won't sum to the KPI. A vendor's monthly
   // minimum is the same shape on the cost side, and worse: it belongs to no day
   // at all, so no allocation would put it on a bar honestly. Surface both gaps
@@ -115,7 +115,7 @@ export default async function DashboardPage({
         ? isLowConfidence(confidence)
           ? `; margin not measured — vendor cost is confirmed on ${formatShare(
               confirmedShare(confidence!)
-            )} of hits`
+            )} of units`
           : `; margin holding at ${formatPercent(kpis.margin_pct, 0)}`
         : ""}
       .{" "}
@@ -304,7 +304,7 @@ export default async function DashboardPage({
           >
             <TopList title="Top accounts by revenue" rows={accountRows} />
             <div className="hairline pt-5">
-              <TopList title="Top APIs by revenue" rows={apiRows} />
+              <TopList title="Top SKUs by revenue" rows={apiRows} />
             </div>
             <Link
               href="/accounts"

@@ -11,14 +11,16 @@ export type ApiOption = {
   vendor_type: string | null;
 };
 
-type EntityType = "Business" | "Individual" | "Both" | "";
 type VendorType = "InHouse" | "Vendor" | "Stitched" | "Journey" | "";
+
+/** Product lines offered as category suggestions. Any other text is still accepted. */
+const CATEGORIES = ["Models", "Agents", "Media", "Voice", "Messaging", "Data", "Compute"];
 
 export type ApiFormInitial = {
   product_code?: string;
   name?: string;
   category?: string | null;
-  entity_type?: string | null;
+  unit?: string | null;
   vendor_type?: string | null;
   default_vendor?: string | null;
   log_aliases?: string[];
@@ -26,7 +28,7 @@ export type ApiFormInitial = {
 };
 
 /**
- * Create/edit form for an API catalog entry, rendered as a modal.
+ * Create/edit form for a SKU catalog entry, rendered as a modal.
  * Create POSTs /api/apis (optionally resolving a raw usage name in the same
  * call); edit PATCHes /api/apis/[code] — including product-code renames.
  */
@@ -51,7 +53,7 @@ export function ApiFormModal({
   const [productCode, setProductCode] = useState(originalCode);
   const [name, setName] = useState(initial.name ?? "");
   const [category, setCategory] = useState(initial.category ?? "");
-  const [entityType, setEntityType] = useState<EntityType>((initial.entity_type as EntityType) ?? "");
+  const [unit, setUnit] = useState(initial.unit ?? "");
   const [vendorType, setVendorType] = useState<VendorType>((initial.vendor_type as VendorType) ?? "");
   const [defaultVendor, setDefaultVendor] = useState(initial.default_vendor ?? "");
   const [aliasesText, setAliasesText] = useState((initial.log_aliases ?? []).join(", "));
@@ -67,15 +69,16 @@ export function ApiFormModal({
   async function submit() {
     setError(null);
     const code = productCode.trim().toUpperCase();
-    if (!code) return setError("Product code is required.");
+    if (!code) return setError("SKU code is required.");
     if (mode === "create" && existingCodes?.has(code)) return setError(`${code} already exists.`);
     if (!name.trim()) return setError("Name is required.");
+    if (!unit.trim()) return setError("Billing unit is required.");
 
     const payload = {
       product_code: code,
       name: name.trim(),
       category: category.trim() || null,
-      entity_type: entityType || null,
+      unit: unit.trim(),
       vendor_type: vendorType || null,
       default_vendor: defaultVendor.trim() || null,
       log_aliases: aliasesText
@@ -122,7 +125,7 @@ export function ApiFormModal({
     >
       <div className="bg-bg-raised border border-border rounded-md p-6 max-w-lg w-full shadow-mid">
         <h3 className="font-serif text-xl text-ink mb-1" style={{ fontWeight: 600 }}>
-          {mode === "create" ? "Create new API" : `Edit API ${originalCode}`}
+          {mode === "create" ? "Create new SKU" : `Edit SKU ${originalCode}`}
         </h3>
         <p className="text-sm text-ink-muted mb-4">
           {mode === "create" ? (
@@ -135,17 +138,17 @@ export function ApiFormModal({
               "Add it to the catalog so the entry can reference it. Set pricing for this account afterwards in the pricing editor."
             )
           ) : (
-            "Changes apply everywhere this API appears. Renaming the product code moves its pricing, usage and statement history to the new code."
+            "Changes apply everywhere this SKU appears. Renaming the SKU code moves its pricing, usage and statement history to the new code."
           )}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Field label="Product code" required>
+          <Field label="SKU code" required>
             <input
               type="text"
               value={productCode}
               onChange={(e) => setProductCode(e.target.value)}
-              placeholder="IV2099"
+              placeholder="ATL-PRO-IN"
               className="w-full bg-bg text-ink border border-border rounded px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </Field>
@@ -154,7 +157,7 @@ export function ApiFormModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Aadhaar Masking V2"
+              placeholder="Atlas Pro · input tokens"
               className="w-full bg-bg text-ink border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </Field>
@@ -163,21 +166,24 @@ export function ApiFormModal({
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="Govt. Identity"
+              placeholder="Models"
+              list="sku-category-options"
               className="w-full bg-bg text-ink border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
             />
+            <datalist id="sku-category-options">
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
           </Field>
-          <Field label="Entity type">
-            <select
-              value={entityType}
-              onChange={(e) => setEntityType(e.target.value as EntityType)}
+          <Field label="Billing unit" required>
+            <input
+              type="text"
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+              placeholder="1M tokens"
               className="w-full bg-bg text-ink border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
-            >
-              <option value="">—</option>
-              <option value="Business">Business</option>
-              <option value="Individual">Individual</option>
-              <option value="Both">Both</option>
-            </select>
+            />
           </Field>
           <Field label="Vendor type">
             <select
@@ -206,7 +212,7 @@ export function ApiFormModal({
               type="text"
               value={aliasesText}
               onChange={(e) => setAliasesText(e.target.value)}
-              placeholder="Aadhaar Masking, Aadhaar Mask V2"
+              placeholder="atlas-pro-input, Atlas Pro Input"
               className="w-full bg-bg text-ink border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </Field>
@@ -234,7 +240,7 @@ export function ApiFormModal({
             Cancel
           </Button>
           <Button variant="primary" size="sm" onClick={submit} disabled={pending}>
-            {mode === "create" ? "Create API" : "Save changes"}
+            {mode === "create" ? "Create SKU" : "Save changes"}
           </Button>
         </div>
       </div>

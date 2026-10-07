@@ -4,7 +4,7 @@
  * Run against a dev server started with AUTH_BYPASS=true:
  *   BASE_URL=http://localhost:3001 npx tsx scripts/capture-help-shots.ts
  *
- * Dynamic routes (account slug, API code, vendor, invoice period) are
+ * Dynamic routes (account slug, SKU code, vendor, invoice period) are
  * discovered by reading links off the rendered list pages, so the script
  * works on any seeded database.
  */

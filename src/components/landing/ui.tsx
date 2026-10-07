@@ -171,19 +171,22 @@ export function Kbd({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Rupees, Indian grouping, no decimals. */
-export function inr(n: number): string {
+/** Dollars, no decimals: $12,480. */
+export function usd(n: number): string {
   const v = Math.round(n);
-  const s = Math.abs(v).toString();
-  const last3 = s.slice(-3);
-  const rest = s.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ",");
-  return `${v < 0 ? "−" : ""}₹${rest ? rest + "," : ""}${last3}`;
+  return `${v < 0 ? "−" : ""}$${Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 }
 
-/** Rupees in lakh / thousand shorthand: ₹1.43L, ₹33.0K. */
-export function inrCompact(n: number): string {
+/** Dollars in shorthand: $1.24M, $33.0K. */
+export function usdCompact(n: number): string {
   const a = Math.abs(n);
-  if (a >= 100_000) return `₹${(n / 100_000).toFixed(2)}L`;
-  if (a >= 1_000) return `₹${(n / 1_000).toFixed(1)}K`;
-  return inr(n);
+  if (a >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
+  if (a >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
+  return usd(n);
+}
+
+/** A unit price. Keeps up to 4 decimals for prices below one cent: $0.0079. */
+export function usdPrice(n: number): string {
+  const precision = Number.isInteger(Math.round(n * 1e6) / 1e4) ? 2 : 4;
+  return `$${n.toFixed(precision)}`;
 }

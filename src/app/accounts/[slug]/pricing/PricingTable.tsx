@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/Button";
 import { Combobox } from "@/components/ui/Combobox";
 import { RollingText, SUCCESS_ROLL } from "@/components/ui/RollingText";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
+import { formatNumber, formatPrice } from "@/lib/format";
 import type { PricingRow, SlabTier, PricingContext } from "@/lib/repos/pricing";
 import type { VolumeModel } from "@/lib/pricing/slabs";
 import type { AccountBundle } from "@/lib/repos/bundles";
@@ -93,7 +94,7 @@ export function PricingTable({
   accountName: string;
   rows: PricingRow[];
   bundles: AccountBundle[];
-  availableApis: { product_code: string; name: string }[];
+  availableApis: { product_code: string; name: string; unit: string }[];
   context: PricingContext;
 }) {
   const router = useRouter();
@@ -240,7 +241,7 @@ export function PricingTable({
     setDiscardConfirm(false);
 
     if (addRow !== null && !addRow.api_code) {
-      setErrors((prev) => ({ ...prev, __new__: "Select an API before saving." }));
+      setErrors((prev) => ({ ...prev, __new__: "Select a SKU before saving." }));
       return;
     }
 
@@ -352,7 +353,7 @@ export function PricingTable({
               onClick={openAddRow}
               leadingIcon={<Plus size={14} strokeWidth={1.75} />}
             >
-              Add API
+              Add SKU
             </Button>
           )}
         </div>
@@ -387,11 +388,11 @@ export function PricingTable({
             </colgroup>
             <thead className="bg-bg-sunken text-ink-faint text-[11px] uppercase tracking-wide">
               <tr className="text-left">
-                <th className="px-4 py-3 font-medium">API</th>
-                <th className="px-3 py-3 font-medium text-right">S (₹/hit)</th>
-                <th className="px-3 py-3 font-medium text-right">ND (₹/hit)</th>
-                <th className="px-3 py-3 font-medium text-right">F (₹/hit)</th>
-                <th className="px-3 py-3 font-medium text-right">IP (₹/hit)</th>
+                <th className="px-4 py-3 font-medium">SKU</th>
+                <th className="px-3 py-3 font-medium text-right">S ($/unit)</th>
+                <th className="px-3 py-3 font-medium text-right">ND ($/unit)</th>
+                <th className="px-3 py-3 font-medium text-right">F ($/unit)</th>
+                <th className="px-3 py-3 font-medium text-right">IP ($/unit)</th>
                 <th className="px-3 py-3 font-medium">Effective from</th>
                 <th />
               </tr>
@@ -424,7 +425,7 @@ export function PricingTable({
                       onClick={openAddRow}
                       className="text-accent underline underline-offset-2 hover:text-accent-ink"
                     >
-                      Add the first API
+                      Add the first SKU
                     </button>
                   </td>
                 </tr>
@@ -593,6 +594,7 @@ export function PricingTable({
               }}
               apiName={row.api_name}
               apiCode={row.api_code}
+              unit={row.unit}
               initialModel={cur.pricing_model !== "flat" ? cur.pricing_model : "slab"}
               initialSlabs={cur.pricing_model !== "flat" ? cur.slabs : row.slabs}
               onSave={(model, slabs) => applyTiers(row.api_code, row, model, slabs)}
@@ -677,9 +679,10 @@ function PriceRow({
         <TruncateTooltip as="div" text={row.api_name} className="text-sm text-ink" />
         <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
           <span className="text-[11px] text-ink-faint font-mono">{row.api_code}</span>
+          <span className="text-[11px] text-ink-faint">per {row.unit}</span>
           {row.unpriced && !isDirty && (
             <span
-              title={`${(row.usage_hits ?? 0).toLocaleString("en-IN")} hits since ${row.first_used} earn nothing until priced`}
+              title={`${formatNumber(row.usage_hits ?? 0)} units since ${row.first_used} earn nothing until priced`}
               className="inline-flex items-center text-[11px] text-bad-ink px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-bad"
             >
               unpriced
@@ -732,7 +735,7 @@ function PriceRow({
               {volumeLabel} · {current.slabs.length} bracket
               {current.slabs.length === 1 ? "" : "s"}
               <span className="text-ink-faint font-mono ml-2">
-                {current.slabs.map((s) => `₹${s.price_successful}`).join(" → ")}
+                {current.slabs.map((s) => formatPrice(s.price_successful)).join(" → ")}
               </span>
             </span>
             <Pencil
@@ -813,8 +816,8 @@ function PriceRow({
 
 // ─── BundleRows ──────────────────────────────────────────────────────────────
 // A stitched bundle renders as a header row (name + editable bundle price)
-// followed by one row per member API. Only the anchor's hits bill — at the
-// bundle rate; other members show as included at ₹0.
+// followed by one row per member SKU. Only the anchor's usage bills — at the
+// bundle rate; other members show as included at $0.
 
 function BundleRows({
   bundle,
@@ -849,7 +852,7 @@ function BundleRows({
           </div>
           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
             <span className="inline-flex items-center text-[11px] text-accent-ink bg-accent-bg px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-accent/30">
-              stitched · {bundle.members.length} APIs
+              stitched · {bundle.members.length} SKUs
             </span>
             {isDirty && !error && (
               <span className="inline-flex items-center text-[11px] text-accent-ink bg-accent-bg px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-accent/30">
@@ -867,7 +870,7 @@ function BundleRows({
             )}
             {confirming && (
               <span className="inline-flex items-center gap-1.5 text-[11px] text-ink-muted">
-                Unstitch {bundle.members.length} APIs?
+                Unstitch {bundle.members.length} SKUs?
                 <button
                   onClick={onUnstitchConfirm}
                   className="text-bad-ink underline underline-offset-2 hover:text-bad"
@@ -958,14 +961,14 @@ function BundleRows({
                     <span className="text-[11px] text-ink-faint font-mono">{m.api_code}</span>
                     {isAnchor ? (
                       <span
-                        title="Bills the stitch: each hit of this API counts as one stitched call at the agreed price"
+                        title="Bills the stitch: each unit of this SKU counts as one stitched call at the agreed price"
                         className="inline-flex items-center text-[11px] text-accent-ink px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-accent/30"
                       >
                         anchor
                       </span>
                     ) : (
                       <span
-                        title="Included in the stitched price — its own hits bill ₹0"
+                        title="Included in the stitched price — its own usage bills $0"
                         className="inline-flex items-center text-[11px] text-ink-faint px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-border"
                       >
                         included
@@ -979,10 +982,10 @@ function BundleRows({
               <span
                 className="text-[11px] text-ink-faint font-mono"
                 title={
-                  isAnchor ? "Billed at the stitch price above" : "Covered by the stitch — bills ₹0"
+                  isAnchor ? "Billed at the stitch price above" : "Covered by the stitch — bills $0"
                 }
               >
-                {isAnchor ? "bills stitch price" : "₹0 · in stitch"}
+                {isAnchor ? "bills stitch price" : "$0 · in stitch"}
               </span>
             </td>
             <td className="px-3 py-2" />
@@ -1018,7 +1021,7 @@ function PriceInput({ value, onChange }: { value: number; onChange: (v: number) 
 
   return (
     <label className="inline-flex items-center gap-0.5 px-1.5 py-1 rounded border border-border bg-bg w-[78px] text-sm transition-colors duration-fast ease-expo focus-within:border-accent focus-within:bg-bg-raised">
-      <span className="text-ink-faint text-xs shrink-0">₹</span>
+      <span className="text-ink-faint text-xs shrink-0">$</span>
       <input
         value={local}
         placeholder="0"
@@ -1068,7 +1071,7 @@ function AddApiRow({
   addRow: AddRow;
   onChange: (r: AddRow) => void;
   onCancel: () => void;
-  availableApis: { product_code: string; name: string }[];
+  availableApis: { product_code: string; name: string; unit: string }[];
   error?: string;
 }) {
   return (
@@ -1081,9 +1084,14 @@ function AddApiRow({
           getValue={(a) => a.product_code}
           getLabel={(a) => `${a.product_code} – ${a.name}`}
           keys={["product_code", "name"]}
-          emptyLabel="Select API…"
+          emptyLabel="Select SKU…"
           searchPlaceholder="Search code or name…"
         />
+        {addRow.api_code && (
+          <div className="text-[11px] text-ink-faint mt-1">
+            Prices are per {availableApis.find((a) => a.product_code === addRow.api_code)?.unit ?? "unit"}
+          </div>
+        )}
         {error && <div className="text-[11px] text-bad-ink mt-1">{error}</div>}
       </td>
 

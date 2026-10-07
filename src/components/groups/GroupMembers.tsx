@@ -50,7 +50,7 @@ export function GroupMembers({
             <th className="px-4 py-3 font-medium">Account</th>
             <th className="px-3 py-3 font-medium">Status</th>
             <th className="px-3 py-3 font-medium text-right">MTD revenue</th>
-            <th className="px-3 py-3 font-medium text-right">Hits</th>
+            <th className="px-3 py-3 font-medium text-right">Units</th>
             {canManage && <th className="px-4 py-3 font-medium">Group</th>}
           </tr>
         </thead>

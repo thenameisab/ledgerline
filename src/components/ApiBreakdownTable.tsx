@@ -3,7 +3,7 @@ import { PriceCell } from "@/components/PriceCell";
 import { TruncateTooltip } from "@/components/ui/TruncateTooltip";
 import { LeakDismissButton } from "@/components/accounts/LeakDismissButton";
 import { SlabBandsDisclosure } from "@/components/accounts/SlabBandsDisclosure";
-import { formatMoney, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber, formatPrice } from "@/lib/format";
 import type { AccountApiBreakdown } from "@/lib/repos/accounts";
 
 // v0.1: vendor cost + margin columns deliberately omitted at the per-(account, api)
@@ -46,8 +46,8 @@ export function ApiBreakdownTable({
           </colgroup>
           <thead className="bg-bg-sunken text-ink-faint text-[11px] uppercase tracking-wide">
             <tr className="text-left">
-              <th className="px-4 py-3 font-medium">API</th>
-              <th className="px-3 py-3 font-medium text-right">Hits</th>
+              <th className="px-4 py-3 font-medium">SKU</th>
+              <th className="px-3 py-3 font-medium text-right">Units</th>
               {editable && <th className="px-3 py-3 font-medium">Unit pricing</th>}
               <th className="px-3 py-3 font-medium text-right">Revenue</th>
             </tr>
@@ -81,7 +81,7 @@ export function ApiBreakdownTable({
                       )}
                       {b.manual_hits > 0 && (
                         <span
-                          title={`Includes ${b.manual_hits.toLocaleString("en-IN")} hits from approved manual / bulk entries`}
+                          title={`Includes ${formatNumber(b.manual_hits)} units from approved manual / bulk entries`}
                           className="inline-flex items-center gap-0.5 text-[11px] text-accent-ink bg-accent-bg px-1 py-0.5 rounded font-mono uppercase tracking-wider"
                         >
                           <FileEdit size={9} strokeWidth={1.75} />
@@ -101,8 +101,8 @@ export function ApiBreakdownTable({
                         <span
                           title={
                             b.bundle_anchor
-                              ? `Anchor of "${b.bundle_name}" — its hits bill the stitched price`
-                              : `Stitched into "${b.bundle_name}" — billed via the stitch, own hits bill ₹0`
+                              ? `Anchor of "${b.bundle_name}" — its units bill the stitched price`
+                              : `Stitched into "${b.bundle_name}" — billed via the stitch, own units bill $0`
                           }
                           className="inline-flex items-center text-[11px] text-accent-ink px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-accent/30"
                         >
@@ -114,19 +114,19 @@ export function ApiBreakdownTable({
                       <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                         {b.leak_state === "active" && (
                           <span
-                            title="No price in effect — these hits aren't being billed"
+                            title="No price in effect — these units aren't being billed"
                             className="inline-flex items-center text-[11px] text-bad-ink border border-bad-ink/30 px-1 py-0.5 rounded font-mono uppercase tracking-wider"
                           >
-                            unpriced · {formatNumber(b.unpriced_hits)} hits
+                            unpriced · {formatNumber(b.unpriced_hits)} units
                           </span>
                         )}
                         {b.leak_state === "historical" && (
                           <>
                             <span
-                              title="Priced now, but these earlier hits ran before the price took effect"
+                              title="Priced now, but these earlier units ran before the price took effect"
                               className="inline-flex items-center text-[11px] text-warn-ink border border-warn-ink/30 px-1 py-0.5 rounded font-mono uppercase tracking-wider"
                             >
-                              historical · {formatNumber(b.unpriced_hits)} hits
+                              historical · {formatNumber(b.unpriced_hits)} units
                             </span>
                             {canDismiss && slug && (
                               <LeakDismissButton accountId={accountId} apiCode={b.api_code} slug={slug} dismissed={false} />
@@ -163,14 +163,14 @@ export function ApiBreakdownTable({
                       {b.bundle_id != null ? (
                         <span
                           className="text-[11px] text-ink-faint"
-                          title="Unit prices don't apply — this API is billed through its stitch. Manage it on the pricing page."
+                          title="Unit prices don't apply — this SKU is billed through its stitch. Manage it on the pricing page."
                         >
                           priced via stitch “{b.bundle_name}”
                         </span>
                       ) : b.is_slab ? (
                         <span
                           className="text-[11px] text-ink-faint"
-                          title="Flat unit prices don't apply — this API uses volume pricing. Manage the brackets on the pricing page."
+                          title="Flat unit prices don't apply — this SKU uses volume pricing. Manage the brackets on the pricing page."
                         >
                           priced by volume
                         </span>
@@ -181,7 +181,7 @@ export function ApiBreakdownTable({
                           </div>
                           {b.in_progress > 0 && (
                             <div className="text-[10px] text-ink-faint mt-1">
-                              IP: {b.in_progress} · ₹{b.price_ip.toFixed(2)}
+                              IP: {b.in_progress} · {formatPrice(b.price_ip)}
                             </div>
                           )}
                         </>

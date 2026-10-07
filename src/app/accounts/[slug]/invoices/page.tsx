@@ -177,9 +177,9 @@ export default async function AccountInvoicesPage({
                               {s.period.label}
                             </div>
                             <div className="text-[11px] text-ink-faint mt-[2px]">
-                              {formatNumber(s.totals.hits)} hit{s.totals.hits === 1 ? "" : "s"}
+                              {formatNumber(s.totals.hits)} unit{s.totals.hits === 1 ? "" : "s"}
                               {s.totals.lines > 0 && (
-                                <> · {s.totals.lines} API{s.totals.lines === 1 ? "" : "s"}</>
+                                <> · {s.totals.lines} SKU{s.totals.lines === 1 ? "" : "s"}</>
                               )}
                             </div>
                             {s.totals.revenue > 0 && (

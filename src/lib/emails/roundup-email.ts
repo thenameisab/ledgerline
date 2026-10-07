@@ -15,7 +15,7 @@ import type {
   QuadrantAccount,
 } from "../roundup";
 import type { RoundupKind } from "../repos/settings";
-import { formatMoney, formatNumber } from "../format";
+import { formatMoney, formatNumber, formatPrice } from "../format";
 
 // The design tokens as literal hex. Email clients have no CSS custom
 // properties, so this is a hand-kept mirror of src/styles/design-tokens.css —
@@ -250,7 +250,7 @@ export function buildRoundupEmail(
     `${title} · ${data.periodLabel}`,
     ``,
     `Revenue: ${formatMoney(data.revenue)}${data.deltaPct === null ? "" : ` (${data.deltaPct >= 0 ? "+" : ""}${data.deltaPct.toFixed(1)}% vs ${data.compareLabel})`}${data.prior && data.prior.deltaPct !== null ? ` (${data.prior.deltaPct >= 0 ? "+" : ""}${data.prior.deltaPct.toFixed(1)}% vs ${data.prior.label})` : ""}`,
-    `Hits: ${formatNumber(data.hits)} · Active accounts: ${data.activeAccounts} · Avg ₹/hit: ${data.avgPerHit.toFixed(2)} · Success rate: ${data.successRate.pct.toFixed(0)}%`,
+    `Units: ${formatNumber(data.hits)} · Active accounts: ${data.activeAccounts} · Avg revenue per unit: ${formatPrice(data.avgPerHit)} · Success rate: ${data.successRate.pct.toFixed(0)}%`,
     ...(data.mtd ? [`${data.mtd.label}: ${formatMoney(data.mtd.revenue)}${data.mtd.deltaPct === null ? "" : ` (${data.mtd.deltaPct >= 0 ? "+" : ""}${data.mtd.deltaPct.toFixed(1)}%)`}`] : []),
     `Top account is ${data.concentration.topShare.toFixed(0)}% of revenue.`,
     ``,
@@ -329,9 +329,9 @@ export function buildRoundupEmail(
           <tr>
             <td style="padding:20px 32px 0 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="6"><tr>
-                ${kpiCell("Hits", formatNumber(data.hits))}
+                ${kpiCell("Units", formatNumber(data.hits))}
                 ${kpiCell("Active accounts", String(data.activeAccounts))}
-                ${kpiCell("Avg ₹ / hit", `₹${data.avgPerHit.toFixed(2)}`)}
+                ${kpiCell("Avg $ / unit", formatPrice(data.avgPerHit))}
                 ${kpiCell("Success rate", `${data.successRate.pct.toFixed(0)}%`, smallDeltaPoints(data.successRate.pct, data.successRate.prevPct))}
               </tr></table>
               ${

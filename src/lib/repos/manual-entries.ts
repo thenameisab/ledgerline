@@ -72,9 +72,9 @@ export type ManualEntryDetail = ManualEntrySummary & {
 
 export function approvalThreshold(): number {
   const raw = process.env.MANUAL_ENTRY_APPROVAL_THRESHOLD;
-  if (!raw) return 50_000;
+  if (!raw) return 500;
   const n = Number(raw);
-  return Number.isFinite(n) ? n : 50_000;
+  return Number.isFinite(n) ? n : 500;
 }
 
 type PriceTuple = {

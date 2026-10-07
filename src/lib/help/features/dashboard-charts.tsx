@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "dashboard-charts",
   title: "Daily charts: revenue, margin & volume",
   summary:
-    "Two daily-resolution charts — revenue with margin overlaid, and raw hit volume — plus the call-status mix that explains the difference between the two.",
+    "Two daily-resolution charts — revenue with margin overlaid, and raw unit volume — plus the call-status mix that explains the difference between the two.",
   group: "Dashboard",
   role: "all",
   routes: ["/dashboard"],
@@ -17,7 +17,7 @@ export default function Body() {
       <p>
         Totals hide shape. The dashboard&rsquo;s charts restore it: a daily revenue line with
         margin overlaid shows <em>when</em> the money came in and at what quality, while the
-        volume bars underneath show the raw quantity of API hits behind it. Revenue can hold
+        volume bars underneath show the raw quantity of units behind it. Revenue can hold
         steady while volume shifts — a change in price mix or outcome mix — and only seeing both
         makes that visible.
       </p>
@@ -35,11 +35,11 @@ export default function Body() {
           line is revenue; the green line is margin. Hovering any day shows the exact figures.
         </li>
         <li>
-          <strong>Daily usage volume</strong> — a bar per day of total API hits, with thousands
+          <strong>Daily usage volume</strong> — a bar per day of total units, with thousands
           abbreviated ("12K"). This is quantity with no pricing applied.
         </li>
         <li>
-          <strong>Call status</strong> — a compact breakdown of how hits resolved: successful,
+          <strong>Usage outcome</strong> — a compact breakdown of how usage resolved: successful,
           no-data, failed, in-progress. Because the four outcomes are priced differently, the mix
           here is often the missing explanation when revenue and volume diverge.
         </li>
@@ -52,7 +52,7 @@ export default function Body() {
           of the dashboard.
         </li>
         <li>
-          <strong>Hover for exact values</strong> — tooltips show the date, hits, and rupee
+          <strong>Hover for exact values</strong> — tooltips show the date, units, and dollar
           figures per point or bar.
         </li>
         <li>
@@ -70,7 +70,7 @@ export default function Body() {
         </li>
         <li>
           <strong>Today&rsquo;s partial day</strong> — usage lands via the daily sync, so the most
-          recent day can restate as in-progress hits settle; the trailing days are re-pulled
+          recent day can restate as in-progress units settle; the trailing days are re-pulled
           automatically each morning.
         </li>
         <li>

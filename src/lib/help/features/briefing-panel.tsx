@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "briefing-panel",
   title: "Briefing panel",
   summary:
-    "A short written narrative on the dashboard, every account profile, and every API profile — composed deterministically from the same numbers the page shows.",
+    "A short written narrative on the dashboard, every account profile, and every SKU page — composed deterministically from the same numbers the page shows.",
   group: "Dashboard",
   role: "all",
   routes: ["/dashboard"],
@@ -16,7 +16,7 @@ export default function Body() {
     <>
       <p>
         Numbers answer "what"; the briefing answers "so what". On the dashboard, each account
-        profile, and each API profile, a short paragraph reads the figures for you: how the period
+        profile, and each SKU page, a short paragraph reads the figures for you: how the period
         is pacing, where revenue is concentrated, and whether anything is leaking. It exists so
         that someone glancing at a page for ten seconds leaves with the same conclusion as someone
         who studied it.
@@ -29,13 +29,13 @@ export default function Body() {
           amount currently at risk.
         </li>
         <li>
-          <strong>Account briefing</strong> — headline revenue and scale ("drove ₹X MTD across N
-          APIs on M hits"), a concentration warning when a single API contributes 60% or more of
-          revenue, a leak warning when (account, API) pairs have traffic but no pricing, and the
+          <strong>Account briefing</strong> — headline revenue and scale ("drove $X MTD across N
+          SKUs on M units"), a concentration warning when a single SKU contributes 60% or more of
+          revenue, a leak warning when (account, SKU) pairs have traffic but no pricing, and the
           month-over-month move when it is 5% or larger.
         </li>
         <li>
-          <strong>API briefing</strong> — the top consumer and their share, margin, and the price
+          <strong>SKU briefing</strong> — the top consumer and their share, margin, and the price
           spread when different accounts pay meaningfully different rates.
         </li>
       </ul>
@@ -54,7 +54,7 @@ export default function Body() {
         </li>
         <li>
           <strong>Act on its warnings</strong> — leak sentences correspond to rows on the pricing
-          page; concentration sentences to the API breakdown below.
+          page; concentration sentences to the SKU breakdown below.
         </li>
       </ul>
 
@@ -69,7 +69,7 @@ export default function Body() {
           than an empty paragraph.
         </li>
         <li>
-          <strong>Hits but no revenue</strong> — the briefing flags "produced no billable revenue
+          <strong>Usage but no revenue</strong> — the briefing flags "produced no billable revenue
           this period — likely missing pricing", which is the cue to open the pricing page.
         </li>
         <li>
@@ -81,7 +81,7 @@ export default function Body() {
       <Related
         links={[
           { href: "/help/features/account-profile", label: "Account profile" },
-          { href: "/help/features/api-profile", label: "API profile" },
+          { href: "/help/features/sku-page", label: "SKU page" },
           { href: "/help/features/money-at-risk", label: "Money at risk" },
         ]}
       />

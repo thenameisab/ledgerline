@@ -52,9 +52,9 @@ export default function Body() {
           from the Users row each time it checks the session, so a role change applies at once.
         </li>
         <li>
-          <strong>Roles</strong> — <em>members</em> read everything: dashboard, accounts, APIs,
+          <strong>Roles</strong> — <em>members</em> read everything: dashboard, accounts, SKUs,
           invoices, and exports. <em>Editors</em> also edit account pricing, create and approve
-          manual entries, resolve aliases and API review, and set sandbox billing rules.{" "}
+          manual entries, resolve aliases and SKU review, and set sandbox billing rules.{" "}
           <em>Admins</em> can do all of that, and also set vendor costs, finalize and issue
           invoices, manage users, run syncs, and read the audit log. Admins and editors can see
           margin and vendor cost, because an editor sets the account price and needs to see the

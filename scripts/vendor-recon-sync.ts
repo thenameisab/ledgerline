@@ -37,11 +37,11 @@ async function main() {
   );
   if (r.unmatched_rows > 0) {
     console.log(
-      `\n${r.unmatched_rows} rows (${r.unmatched_hits.toLocaleString("en-IN")} hits) matched no API in the catalog:`
+      `\n${r.unmatched_rows} rows (${r.unmatched_hits.toLocaleString("en-US")} units) matched no SKU in the catalog:`
     );
     for (const n of r.unmatched_names) console.log(`  - ${n}`);
     console.log(
-      "\nAdd each as an alias on the right API (/admin/sku-review or the API form)," +
+      "\nAdd each as an alias on the right SKU (/admin/sku-review or the SKU form)," +
         " then re-run this sync to repair history."
     );
   }

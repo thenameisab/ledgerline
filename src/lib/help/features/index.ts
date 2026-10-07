@@ -18,9 +18,9 @@ import * as stitchedBundles from "./stitched-bundles";
 import * as slabPricing from "./slab-pricing";
 import * as unpricedTraffic from "./unpriced-traffic";
 import * as sandboxControls from "./sandbox-controls";
-import * as apiCatalog from "./api-catalog";
-import * as apiProfile from "./api-profile";
-import * as apiGovernance from "./api-governance";
+import * as apiCatalog from "./sku-catalog";
+import * as apiProfile from "./sku-page";
+import * as apiGovernance from "./sku-governance";
 import * as vendorCosts from "./vendor-costs";
 import * as vendorReconciliation from "./vendor-reconciliation";
 import * as aliases from "./aliases";
@@ -63,7 +63,7 @@ export const features: FeatureModule[] = [
   { meta: unpricedTraffic.meta, Body: unpricedTraffic.default },
   // Sandbox
   { meta: sandboxControls.meta, Body: sandboxControls.default },
-  // APIs
+  // SKUs
   { meta: apiCatalog.meta, Body: apiCatalog.default },
   { meta: apiProfile.meta, Body: apiProfile.default },
   { meta: apiGovernance.meta, Body: apiGovernance.default },

@@ -17,7 +17,7 @@ export const releases: ReleaseNote[] = [
         code, then selects <strong>Enter as Admin</strong> or <strong>Enter as Member</strong>.
       </>,
       <>
-        All accounts, APIs, vendors, and amounts are fictional. The database resets every night,
+        All accounts, SKUs, vendors, and amounts are fictional. The database resets every night,
         so changes that visitors make stay until the next reset.
       </>,
       <>
@@ -46,7 +46,7 @@ export const releases: ReleaseNote[] = [
     title: "Command palette",
     highlights: [
       <>
-        Press <code>⌘K</code> to search accounts, APIs, invoices, vendors, and pages from any
+        Press <code>⌘K</code> to search accounts, SKUs, invoices, vendors, and pages from any
         screen.
       </>,
       <>
@@ -77,7 +77,7 @@ export const releases: ReleaseNote[] = [
     title: "Vendor cost and reconciliation",
     highlights: [
       <>
-        Each API can have a vendor and a vendor rate. Ledgerline uses the rate to calculate the
+        Each SKU can have a vendor and a vendor rate. Ledgerline uses the rate to calculate the
         cost and the margin for each usage row.
       </>,
       <>
@@ -95,8 +95,8 @@ export const releases: ReleaseNote[] = [
     milestoneLabel: "Billing core",
     highlights: [
       <>
-        Set a price for each API on each account. The pricing models are flat, tiered
-        (graduated), slab (whole volume), and bundles that bill several APIs as one line.
+        Set a price for each SKU on each account. The pricing models are flat, tiered
+        (graduated), slab (whole volume), and bundles that bill several SKUs as one line.
       </>,
       <>
         Prices have effective dates. A price change applies from a chosen day, and earlier usage
@@ -107,7 +107,7 @@ export const releases: ReleaseNote[] = [
         review a draft, finalize it, and export it as PDF or CSV.
       </>,
       <>
-        Aliases map unknown usage names to known accounts and APIs. Roles control access: admins
+        Aliases map unknown usage names to known accounts and SKUs. Roles control access: admins
         manage everything, editors change pricing and catalog data, and members can only read.
       </>,
     ],

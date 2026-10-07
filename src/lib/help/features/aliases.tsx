@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "aliases",
   title: "Aliases & unmapped names",
   summary:
-    "The triage desk for raw account names that don't resolve to a record — map them or create the missing account, and quarantined revenue starts counting. (API identity is code-based now — see API review.)",
+    "The triage desk for raw account names that don't resolve to a record — map them or create the missing account, and quarantined revenue starts counting. (SKU identity is code-based now — see SKU review.)",
   group: "Admin",
   role: "admin",
   routes: ["/admin/aliases"],
@@ -21,48 +21,48 @@ export default function Body() {
         each one: map it to an existing account, or create the account it should be.
       </p>
 
-      <Callout variant="info" title="APIs are matched by Product Code now">
-        Since the API identity upgrade, usage resolves to an API by its <em>Product Code</em>, not
-        its name — so unrecognised <em>API</em> codes are triaged on{" "}
-        <a href="/help/features/api-review">API review</a>, not here. This page is the home for{" "}
-        <em>account</em> names (which have no code). The APIs and Duplicates tabs remain for catalog
-        hygiene, but mapping an API name no longer drives ingestion matching.
+      <Callout variant="info" title="SKUs are matched by SKU code">
+        Usage resolves to a SKU by its <em>SKU code</em>, not its name — so unrecognised{" "}
+        <em>SKU</em> codes are triaged on{" "}
+        <a href="/help/features/sku-review">SKU review</a>, not here. This page is the home for{" "}
+        <em>account</em> names (which have no code). The SKUs and Duplicates tabs remain for catalog
+        hygiene, but mapping a SKU name does not drive ingestion matching.
       </Callout>
 
       <Figure
         src="/help/shots/admin-aliases.png"
-        alt="Aliases page with unmapped account names, hit counts, and inline resolution dropdowns"
-        caption="Unmapped names with their hit counts and an inline resolver per row."
+        alt="Aliases page with unmapped account names, unit counts, and inline resolution dropdowns"
+        caption="Unmapped names with their unit counts and an inline resolver per row."
       />
 
       <H2 id="what-you-see">What you see</H2>
       <ul>
         <li>
-          <strong>Accounts tab</strong> — unmapped account names with their MTD hits and last-seen
-          date, headed by an "unattributed hits" KPI quantifying what the quarantine is costing.
+          <strong>Accounts tab</strong> — unmapped account names with their MTD units and last-seen
+          date, headed by an "unattributed units" KPI quantifying what the quarantine is costing.
         </li>
         <li>
-          <strong>APIs tab</strong> — raw API names with no resolved code; mapping one heals
-          already-quarantined rows by name, but day-to-day API resolution is code-based on{" "}
-          <a href="/help/features/api-review">API review</a>. Names never seen before carry a{" "}
+          <strong>SKUs tab</strong> — raw SKU names with no resolved code; mapping one heals
+          already-quarantined rows by name, but day-to-day SKU resolution is code-based on{" "}
+          <a href="/help/features/sku-review">SKU review</a>. Names never seen before carry a{" "}
           <em>new</em> chip.
         </li>
         <li>
-          <strong>Duplicates tab</strong> — identifiers claimed by more than one API, where the
+          <strong>Duplicates tab</strong> — identifiers claimed by more than one SKU, where the
           importer would resolve ambiguously (see{" "}
-          <a href="/help/features/api-governance">API governance</a>).
+          <a href="/help/features/sku-governance">SKU governance</a>).
         </li>
       </ul>
 
       <H2 id="what-you-can-do">What you can do</H2>
       <ul>
         <li>
-          <strong>Map to an existing record</strong> — pick the account or API from a searchable
+          <strong>Map to an existing record</strong> — pick the account or SKU from a searchable
           dropdown; the raw name is saved as an alias on it.
         </li>
         <li>
           <strong>Create the missing record</strong> — a short modal (account: name, group,
-          GSTIN; API: unique product code, name, category, vendor type) creates it with the raw
+          Tax ID; SKU: unique SKU code, name, category, vendor type) creates it with the raw
           name attached as an alias.
         </li>
       </ul>
@@ -95,10 +95,10 @@ export default function Body() {
 
       <Related
         links={[
-          { href: "/help/features/api-review", label: "API review (unmapped codes)" },
+          { href: "/help/features/sku-review", label: "SKU review (unmapped codes)" },
           { href: "/help/features/usage-sync", label: "Usage sync" },
           { href: "/help/features/money-at-risk", label: "Money at risk" },
-          { href: "/help/features/api-governance", label: "API governance" },
+          { href: "/help/features/sku-governance", label: "SKU governance" },
         ]}
       />
     </>

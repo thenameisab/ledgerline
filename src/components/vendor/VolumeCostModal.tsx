@@ -313,19 +313,19 @@ export function VolumeCostModal({
             {model === "slab" ? (
               <>
                 <span className="text-ink-muted">Slab (whole-volume):</span> the month bills
-                at the single bracket its total hits land in. A month of 45,000 hits with
-                brackets 0&ndash;40k @ &#8377;15 and 40k+ @ &#8377;13 costs all 45,000 &times;
-                &#8377;13.
+                at the single bracket its total units land in. A month of 45,000 units with
+                brackets 0&ndash;40k @ $0.15 and 40k+ @ $0.13 costs all 45,000 &times;
+                $0.13.
               </>
             ) : (
               <>
                 <span className="text-ink-muted">Tiered (graduated):</span> costs are
-                graduated on the month&rsquo;s total hits, like tax brackets. The same 45,000
-                hits cost 40,000 &times; &#8377;15 + 5,000 &times; &#8377;13.
+                graduated on the month&rsquo;s total units, like tax brackets. The same 45,000
+                units cost 40,000 &times; $0.15 + 5,000 &times; $0.13.
               </>
             )}{" "}
             Brackets reset every calendar month, and count{" "}
-            <span className="text-ink-muted">every account&rsquo;s</span> hits on this API
+            <span className="text-ink-muted">every account&rsquo;s</span> units on this SKU
             from {vendorName} — that is the volume {vendorName} invoices.
           </p>
 
@@ -353,7 +353,7 @@ export function VolumeCostModal({
               </colgroup>
               <thead className="bg-bg-sunken text-ink-faint text-[10px] uppercase tracking-wide">
                 <tr className="text-left">
-                  <th className="px-3 py-2 font-medium">Hits range</th>
+                  <th className="px-3 py-2 font-medium">Units range</th>
                   {COST_FIELDS.map((f) => (
                     <th key={f.key} className="px-2 py-2 font-medium text-right">
                       {f.label}
@@ -371,11 +371,11 @@ export function VolumeCostModal({
                       <td className="px-3 py-2 align-middle">
                         {isLast ? (
                           <span className="text-xs font-mono text-ink-muted">
-                            {min.toLocaleString("en-IN")}+ &nbsp;and above
+                            {min.toLocaleString("en-US")}+ &nbsp;and above
                           </span>
                         ) : (
                           <span className="flex items-center gap-1 text-xs font-mono text-ink-muted">
-                            <span className="shrink-0">{min.toLocaleString("en-IN")}</span>
+                            <span className="shrink-0">{min.toLocaleString("en-US")}</span>
                             <span className="text-ink-faint shrink-0">&ndash;</span>
                             <input
                               value={t.capStr}
@@ -392,7 +392,7 @@ export function VolumeCostModal({
                       {COST_FIELDS.map((f) => (
                         <td key={f.key} className="px-2 py-2">
                           <span className="inline-flex items-center gap-0.5 px-1.5 py-1 rounded border border-border bg-bg w-full text-sm focus-within:border-accent">
-                            <span className="text-ink-faint text-xs shrink-0">&#8377;</span>
+                            <span className="text-ink-faint text-xs shrink-0">$</span>
                             <input
                               value={t[f.key]}
                               placeholder="0"

@@ -26,7 +26,7 @@ export function SyncBackfillForm() {
       } else {
         const hits = body.results.reduce((a: number, r: any) => a + (r.hits ?? 0), 0);
         toast.success(
-          `Backfilled ${body.results.length} day${body.results.length === 1 ? "" : "s"} — ${hits.toLocaleString("en-IN")} hits`
+          `Backfilled ${body.results.length} day${body.results.length === 1 ? "" : "s"} — ${hits.toLocaleString("en-US")} units`
         );
         setFrom("");
         setTo("");

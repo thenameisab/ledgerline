@@ -159,7 +159,7 @@ export default async function ManualEntriesPage({
                   <th className="text-left font-medium px-4 py-2.5">Effective date</th>
                   <th className="text-left font-medium px-4 py-2.5">Account</th>
                   <th className="text-left font-medium px-4 py-2.5">Reason</th>
-                  <th className="text-right font-medium px-4 py-2.5 tnum">APIs · Hits</th>
+                  <th className="text-right font-medium px-4 py-2.5 tnum">SKUs · Units</th>
                   <th className="text-right font-medium px-4 py-2.5 tnum">Revenue</th>
                   <th className="text-left font-medium px-4 py-2.5 w-[110px]">Share</th>
                   <th className="text-left font-medium px-4 py-2.5">Status</th>

@@ -17,7 +17,7 @@ export default function DatabaseSchemaPage() {
     <DocPage
       crumbs={[{ href: "/help/api", label: "API reference" }]}
       title="Database schema"
-      lede="The tables in the Ledgerline database, grouped by domain, and the usage_daily_with_revenue view that turns raw hits into revenue and margin numbers."
+      lede="The tables in the Ledgerline database, grouped by domain, and the usage_daily_with_revenue view that turns raw usage into revenue and margin numbers."
     >
       <p>
         The full schema is one file, <FilePath>migrations/0001_baseline.sql</FilePath>.{" "}
@@ -121,18 +121,19 @@ export default function DatabaseSchemaPage() {
       </p>
 
       <H3 id="apis">apis</H3>
-      <p>The API catalog. The product code is the primary key — renames re-point every child table transactionally (see <a href="/help/api/endpoints#update-api">PATCH /api/apis/[code]</a>).</p>
+      <p>The SKU catalog. The SKU code is the primary key — renames re-point every child table transactionally (see <a href="/help/api/endpoints#update-api">PATCH /api/apis/[code]</a>).</p>
       <ParamTable
         nameHeader="Column"
         rows={[
           { name: "product_code", type: "text PK", desc: "Uppercase code, 1–32 chars." },
-          { name: "name", type: "text", desc: "Display name; must not collide with another API's name or alias." },
+          { name: "name", type: "text", desc: "Display name; must not collide with another SKU's name or alias." },
           { name: "log_aliases", type: "text (JSON)", desc: "JSON array of raw log names. Default []." },
-          { name: "category", type: "text | null", desc: "Free-text grouping (KYC, Banking, …)." },
-          { name: "entity_type", type: "text | null", desc: <><code>Business</code> | <code>Individual</code> | <code>Both</code>.</> },
+          { name: "category", type: "text | null", desc: "Free-text product line (Models, Messaging, …)." },
+          { name: "unit", type: "text", desc: "What one billed unit is: 1M tokens, minute, message, GPU-hour. Default call." },
+          { name: "entity_type", type: "text | null", desc: "Legacy column. The app no longer writes it." },
           { name: "vendor_type", type: "text | null", desc: <><code>InHouse</code> | <code>Vendor</code> | <code>Stitched</code> | <code>Journey</code>.</> },
           { name: "default_vendor", type: "text | null", desc: "Vendor stamped on synced usage rows for cost attribution." },
-          { name: "is_active", type: "integer", desc: "0/1, default 1. Inactive APIs drop out of search and pickers." },
+          { name: "is_active", type: "integer", desc: "0/1, default 1. Inactive SKUs drop out of search and pickers." },
         ]}
       />
 
@@ -141,7 +142,7 @@ export default function DatabaseSchemaPage() {
 
       <H3 id="pricing-table">pricing</H3>
       <p>
-        Account sell rates, four tiers per row, with full temporal history — a (account, API) pair
+        Account sell rates, four tiers per row, with full temporal history — an (account, SKU) pair
         accumulates rows over time and the view picks the latest row whose{" "}
         <code>effective_from</code> is on or before the usage date.
       </p>
@@ -151,10 +152,10 @@ export default function DatabaseSchemaPage() {
           { name: "id", type: "bigserial PK", desc: "Row id." },
           { name: "client_id", type: "bigint", desc: "FK → clients.id, ON DELETE CASCADE." },
           { name: "api_code", type: "text", desc: "FK → apis.product_code, ON DELETE CASCADE." },
-          { name: "price_successful", type: "numeric(14,4)", desc: "Per successful hit. Default 0." },
-          { name: "price_successful_no_data", type: "numeric(14,4)", desc: "Per successful-no-data hit. Default 0." },
-          { name: "price_failed", type: "numeric(14,4)", desc: "Per failed hit. Default 0." },
-          { name: "price_in_progress", type: "numeric(14,4)", desc: "Per in-progress hit. Default 0." },
+          { name: "price_successful", type: "numeric(14,4)", desc: "Per successful unit. Default 0." },
+          { name: "price_successful_no_data", type: "numeric(14,4)", desc: "Per successful-no-data unit. Default 0." },
+          { name: "price_failed", type: "numeric(14,4)", desc: "Per failed unit. Default 0." },
+          { name: "price_in_progress", type: "numeric(14,4)", desc: "Per in-progress unit. Default 0." },
           { name: "pricing_model", type: "text", desc: <>CHECK <code>flat</code> | <code>tier</code> | <code>slab</code>; default <code>flat</code>. <code>tier</code> (graduated) and <code>slab</code> (whole-volume) ignore the four price_* columns and read brackets from <code>pricing_slab</code>.</> },
           { name: "effective_from", type: "date", desc: "Default 2026-01-01. New rows from the UI default to today. Billed pairs supersede at today." },
           { name: "created_at", type: "timestamptz", desc: "Default NOW()." },
@@ -181,7 +182,7 @@ export default function DatabaseSchemaPage() {
       </p>
 
       <H3 id="vendor-pricing">vendor_pricing</H3>
-      <p>Cost rates per (vendor, API) pair — the cost side of margin math. Same temporal model, no billing lock (costs are internal).</p>
+      <p>Cost rates per (vendor, SKU) pair — the cost side of margin math. Same temporal model, no billing lock (costs are internal).</p>
       <ParamTable
         nameHeader="Column"
         rows={[
@@ -206,7 +207,7 @@ export default function DatabaseSchemaPage() {
 
       <H3 id="vendor-usage-daily">vendor_usage_daily</H3>
       <p>
-        What each vendor says it served, per day per API — the outside record computed cost is
+        What each vendor says it served, per day per SKU — the outside record computed cost is
         checked against. With a real source it comes from the upstream table{" "}
         <code>vendor_usage_report</code>. In the demo it is simulated from local usage. It is
         written by <code>npm run vendor-sync</code>, <code>/api/cron/vendor-recon-sync</code>, and
@@ -218,7 +219,7 @@ export default function DatabaseSchemaPage() {
           { name: "id", type: "bigserial PK", desc: "Row id." },
           { name: "date", type: "date", desc: "The vendor's report_date." },
           { name: "vendor", type: "text", desc: "Canonical spelling, resolved through the vendor registry at sync time so it matches usage_daily.vendor." },
-          { name: "api_code", type: "text | null", desc: "FK → apis.product_code, ON DELETE SET NULL. NULL when the vendor's API name matches nothing in the catalog — the source carries no product code, so the match runs on apis.name + log_aliases." },
+          { name: "api_code", type: "text | null", desc: "FK → apis.product_code, ON DELETE SET NULL. NULL when the vendor-reported name matches nothing in the catalog — the source carries no SKU code, so the match runs on apis.name + log_aliases." },
           { name: "raw_api_name", type: "text", desc: "vendor_usage_report.type_label: the display name the catalog match runs on." },
           { name: "raw_api_slug", type: "text", desc: "vendor_usage_report.api_name: the endpoint slug. Neither name nor slug is unique alone." },
           { name: "successful", type: "bigint", desc: "Vendor-side count." },
@@ -229,7 +230,7 @@ export default function DatabaseSchemaPage() {
       />
       <p>
         <strong>There is no in_progress column</strong>, because the source has none. Every
-        reconciliation therefore excludes in-progress hits on our side too, or the delta would be
+        reconciliation therefore excludes in-progress units on our side too, or the delta would be
         an artifact of the schema rather than a finding. Constraints: UNIQUE{" "}
         <code>(date, vendor, raw_api_name, raw_api_slug)</code>. The real-source query takes MAX
         per key, so exact duplicate rows in the source collapse to one. Indexes:{" "}
@@ -265,8 +266,8 @@ export default function DatabaseSchemaPage() {
 
       <H3 id="api-bundles">api_bundles</H3>
       <p>
-        Stitched API groups: several catalog APIs billed to one account as a single product. The
-        anchor API&apos;s hits carry the bundle price; other members bill at 0.
+        Stitched SKU groups: several catalog SKUs billed to one account as a single product. The
+        anchor SKU&apos;s units carry the bundle price; other members bill at 0.
       </p>
       <ParamTable
         nameHeader="Column"
@@ -274,7 +275,7 @@ export default function DatabaseSchemaPage() {
           { name: "id", type: "bigserial PK", desc: "Bundle id." },
           { name: "client_id", type: "bigint", desc: "FK → clients.id, ON DELETE CASCADE. Bundles are per-account." },
           { name: "name", type: "text", desc: "Stitch name; appears as the line label on invoices." },
-          { name: "anchor_api_code", type: "text", desc: "FK → apis.product_code. The member whose hits are billed." },
+          { name: "anchor_api_code", type: "text", desc: "FK → apis.product_code. The member whose units are billed." },
           { name: "created_at", type: "timestamptz", desc: "Default NOW()." },
         ]}
       />
@@ -291,7 +292,7 @@ export default function DatabaseSchemaPage() {
       />
       <p>
         Constraints: PRIMARY KEY <code>(bundle_id, api_code)</code> and UNIQUE{" "}
-        <code>(client_id, api_code)</code> — an API can belong to at most one stitch per account,
+        <code>(client_id, api_code)</code> — a SKU can belong to at most one stitch per account,
         which is what lets the revenue view join membership without ambiguity. Index:{" "}
         <code>idx_bundle_members_client</code> (client_id, api_code).
       </p>
@@ -303,11 +304,11 @@ export default function DatabaseSchemaPage() {
         rows={[
           { name: "id", type: "bigserial PK", desc: "Row id." },
           { name: "bundle_id", type: "bigint", desc: "FK → api_bundles.id, ON DELETE CASCADE." },
-          { name: "price_successful", type: "numeric(14,4)", desc: "Bundle rate per successful anchor hit. Default 0." },
+          { name: "price_successful", type: "numeric(14,4)", desc: "Bundle rate per successful anchor unit. Default 0." },
           { name: "price_successful_no_data", type: "numeric(14,4)", desc: "Default 0." },
           { name: "price_failed", type: "numeric(14,4)", desc: "Default 0." },
           { name: "price_in_progress", type: "numeric(14,4)", desc: "Default 0." },
-          { name: "effective_from", type: "date", desc: "Usage before the bundle's earliest row bills at individual API pricing." },
+          { name: "effective_from", type: "date", desc: "Usage before the bundle's earliest row bills at individual SKU pricing." },
           { name: "created_at", type: "timestamptz", desc: "Default NOW()." },
         ]}
       />
@@ -316,7 +317,7 @@ export default function DatabaseSchemaPage() {
       <H3 id="pricing-slab">pricing_slab</H3>
       <p>
         Volume brackets for a <code>pricing</code> row whose <code>pricing_model</code> is{" "}
-        <code>tier</code> or <code>slab</code>. Brackets apply to the period&rsquo;s total hits (see{" "}
+        <code>tier</code> or <code>slab</code>. Brackets apply to the period&rsquo;s total units (see{" "}
         <a href="/help/math#slabs">the volume pricing math</a>). Each bracket prices the four
         outcomes separately. <code>vendor_pricing_slab</code> has the same shape for vendor
         costs, keyed by <code>vendor_pricing_id</code>.
@@ -328,7 +329,7 @@ export default function DatabaseSchemaPage() {
           { name: "pricing_id", type: "bigint", desc: "FK → pricing.id, ON DELETE CASCADE. The slab set is versioned with its parent pricing row." },
           { name: "min_hits", type: "integer", desc: "Exclusive lower bound (the previous tier's cap); 0 for the first tier." },
           { name: "max_hits", type: "integer | null", desc: "Inclusive upper cap; NULL marks the single open-ended top tier." },
-          { name: "price_successful", type: "numeric(14,4)", desc: "Per successful hit in this tier. Default 0." },
+          { name: "price_successful", type: "numeric(14,4)", desc: "Per successful unit in this tier. Default 0." },
           { name: "price_successful_no_data", type: "numeric(14,4)", desc: "Default 0." },
           { name: "price_failed", type: "numeric(14,4)", desc: "Default 0." },
           { name: "price_in_progress", type: "numeric(14,4)", desc: "Default 0." },
@@ -345,7 +346,7 @@ export default function DatabaseSchemaPage() {
 
       <H3 id="usage-daily">usage_daily</H3>
       <p>
-        The fact table: one row per (date, account, API, hits-via) with hit counts by outcome.
+        The fact table: one row per (date, account, SKU, <code>hits_via</code>) with unit counts by outcome.
         Rows come from the usage sync (<code>source=&apos;log&apos;</code>), rows loaded with{" "}
         <code>source=&apos;import&apos;</code>, and manual entries (<code>&apos;manual&apos;</code>).
       </p>
@@ -357,12 +358,12 @@ export default function DatabaseSchemaPage() {
           { name: "client_id", type: "bigint | null", desc: "FK → clients.id, ON DELETE SET NULL. NULL = quarantined (unmapped raw name)." },
           { name: "api_code", type: "text | null", desc: "FK → apis.product_code, ON DELETE SET NULL. NULL = quarantined." },
           { name: "raw_client_name", type: "text", desc: "Name exactly as the log reported it; alias resolution heals quarantine by this." },
-          { name: "raw_api_name", type: "text", desc: "Raw API name from the log." },
-          { name: "raw_api_code", type: "text | null", desc: "Product code as the log reported it. Kept when api_code is NULL so /admin/sku-review can show it." },
+          { name: "raw_api_name", type: "text", desc: "Raw SKU name from the log." },
+          { name: "raw_api_code", type: "text | null", desc: "SKU code as the log reported it. Kept when api_code is NULL so /admin/sku-review can show it." },
           { name: "hits_via", type: "text | null", desc: "Integration, Console, or Bulk." },
           { name: "vendor", type: "text | null", desc: "The vendor name exactly as the source reported it, kept beside the key like raw_client_name is." },
           { name: "vendor_id", type: "bigint | null", desc: "FK → vendors.id. Resolved on write through the registry. vendor_pricing joins on it." },
-          { name: "successful", type: "integer", desc: "Hit count, default 0." },
+          { name: "successful", type: "integer", desc: "Unit count, default 0." },
           { name: "successful_no_data", type: "integer", desc: "Default 0." },
           { name: "failed", type: "integer", desc: "Default 0." },
           { name: "in_progress", type: "integer", desc: "Default 0." },
@@ -447,7 +448,7 @@ export default function DatabaseSchemaPage() {
           { name: "issued_at / issued_by", type: "timestamptz / bigint | null", desc: "Set at issue." },
           { name: "notes", type: "text | null", desc: "Internal notes." },
           { name: "created_at", type: "timestamptz", desc: "Default NOW()." },
-          { name: "cost_hits / cost_contracted / cost_quoted / cost_estimated / cost_not_billed / cost_unknown", type: "integer | null", desc: "Hit counts by vendor-cost confidence, snapshotted at finalize." },
+          { name: "cost_hits / cost_contracted / cost_quoted / cost_estimated / cost_not_billed / cost_unknown", type: "integer | null", desc: "Unit counts by vendor-cost confidence, snapshotted at finalize." },
         ]}
       />
       <p>
@@ -459,7 +460,7 @@ export default function DatabaseSchemaPage() {
 
       <H3 id="statement-lines">statement_lines</H3>
       <p>
-        Per-API snapshot lines: hit counts, the unit prices in force, and computed revenue/cost/
+        Per-SKU snapshot lines: unit counts, the unit prices in force, and computed revenue/cost/
         margin — frozen so later pricing edits can never rewrite an issued invoice.
       </p>
       <ParamTable
@@ -467,9 +468,9 @@ export default function DatabaseSchemaPage() {
         rows={[
           { name: "id", type: "bigserial PK", desc: "Line id." },
           { name: "statement_id", type: "bigint", desc: "FK → statements.id, ON DELETE CASCADE." },
-          { name: "api_code", type: "text", desc: "Plain text, not an FK — survives catalog deletions. For a bundle line, the anchor API's code." },
+          { name: "api_code", type: "text", desc: "Plain text, not an FK — survives catalog deletions. For a bundle line, the anchor SKU's code." },
           { name: "api_name", type: "text", desc: "Snapshot of the display name; for a bundle line, the stitch name." },
-          { name: "successful / successful_no_data / failed / in_progress", type: "bigint", desc: "Hit counts. Default 0." },
+          { name: "successful / successful_no_data / failed / in_progress", type: "bigint", desc: "Unit counts. Default 0." },
           { name: "price_successful / …_no_data / …_failed / …_in_progress", type: "numeric(14,4)", desc: "Unit prices in force at finalize. Default 0." },
           { name: "vendor_cost / revenue / margin", type: "numeric(14,4)", desc: "Computed line totals. Default 0." },
           { name: "is_bundle", type: "integer", desc: "0/1, default 0. 1 = this line is a stitched bundle rolled up to one row." },
@@ -543,7 +544,7 @@ export default function DatabaseSchemaPage() {
           { name: "status", type: "text", desc: <>CHECK <code>running</code> | <code>success</code> | <code>error</code>; default <code>running</code>.</> },
           { name: "rows_fetched / rows_inserted / rows_deleted", type: "integer | null", desc: "Counts from the pull and the delete and insert." },
           { name: "unmapped_clients / unmapped_apis", type: "integer | null", desc: "Quarantine counts — distinct raw names that didn't resolve." },
-          { name: "total_hits", type: "bigint | null", desc: "Sum of all four hit counts inserted." },
+          { name: "total_hits", type: "bigint | null", desc: "Sum of all four unit counts inserted." },
           { name: "error", type: "text | null", desc: "Failure message, truncated to 2,000 chars." },
           { name: "started_at / finished_at", type: "timestamptz", desc: "started_at default NOW(); finished_at null while running." },
         ]}
@@ -555,13 +556,13 @@ export default function DatabaseSchemaPage() {
 
       <H3 id="api-code-overrides">api_code_overrides</H3>
       <p>
-        Admin-curated mapping from a raw API name to a catalog code, used by the usage sync when a
-        row&apos;s product code is blank or unknown. Written by the API review queue.
+        Admin-curated mapping from a raw SKU name to a catalog code, used by the usage sync when a
+        row&apos;s SKU code is blank or unknown. Written by the SKU review queue.
       </p>
       <ParamTable
         nameHeader="Column"
         rows={[
-          { name: "raw_api_name", type: "text PK", desc: "Raw API name as the log reports it." },
+          { name: "raw_api_name", type: "text PK", desc: "Raw SKU name as the log reports it." },
           { name: "api_code", type: "text", desc: "FK → apis.product_code, ON DELETE CASCADE." },
           { name: "note", type: "text | null", desc: "Optional note." },
           { name: "created_by / created_at", type: "bigint | null / timestamptz", desc: "created_by FK → users.id." },
@@ -575,7 +576,7 @@ export default function DatabaseSchemaPage() {
           { name: "app_settings", type: "key text PK", desc: "Key and value pairs: the app-wide sandbox default, digest recipient lists, alert settings. updated_by holds the actor's email." },
           { name: "leak_dismissals", type: "UNIQUE (client_id, api_code)", desc: "Historical leaks marked as expected. A row hides the pair from leak surfaces." },
           { name: "sandbox_classifications", type: "UNIQUE (client_id, api_code, effective_from)", desc: "Effective-dated per-pair sandbox flag. The view uses it for effective_is_sandbox." },
-          { name: "sandbox_billing_rules", type: "id PK", desc: "Effective-dated number of billable sandbox hits per account (api_code NULL) or per (account, API). NULL billable_hits means bill all." },
+          { name: "sandbox_billing_rules", type: "id PK", desc: "Effective-dated number of billable sandbox units per account (api_code NULL) or per (account, SKU). NULL billable_hits means bill all." },
           { name: "vendor_commitments", type: "UNIQUE (vendor_id, effective_from)", desc: "A vendor's monthly minimum, effective-dated, with status estimated | quoted | contracted." },
           { name: "client_operations", type: "id PK", desc: "Account merge and delete requests: kind merge | delete, status pending | rejected | executed | reversed | purged, and the reverse_deadline that ends the undo window." },
           { name: "client_slugs", type: "slug PK", desc: "Every slug an account has had, so old URLs redirect after a rename. is_current marks the live one." },
@@ -645,7 +646,7 @@ export default function DatabaseSchemaPage() {
       <p>
         A pricing row with <code>pricing_model</code> <code>tier</code> or <code>slab</code> keeps
         its flat <code>price_*</code> columns at 0, so the view emits 0 revenue for it. Volume
-        pricing depends on the period&rsquo;s total hits and cannot be resolved one day at a time.{" "}
+        pricing depends on the period&rsquo;s total units and cannot be resolved one day at a time.{" "}
         <code>deriveStatement</code> and <FilePath>src/lib/repos/slab-revenue.ts</FilePath>{" "}
         compute that revenue at the period level (see{" "}
         <a href="/help/math#slabs">the volume pricing math</a>). The view exposes{" "}
@@ -663,7 +664,7 @@ export default function DatabaseSchemaPage() {
         Log and import rows always count; rows belonging to a manual entry are invisible to all
         revenue math until the entry is approved, and drop out again when it is voided (voiding
         nulls the back-pointer). Revenue and vendor cost are then plain sums —{" "}
-        <code>hits × effective rate</code> across the four outcome tiers — emitted alongside the
+        <code>units × effective rate</code> across the four outcome tiers — emitted alongside the
         mapped <code>client_name</code> / <code>api_name</code>, <code>account_id</code>,{" "}
         <code>is_sandbox</code>, <code>effective_is_sandbox</code>, <code>vendor_billable</code>,{" "}
         <code>vendor_cost_status</code>, <code>vendor_cost_basis</code>,{" "}

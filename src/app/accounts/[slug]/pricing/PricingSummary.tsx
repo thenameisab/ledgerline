@@ -37,7 +37,7 @@ export function PricingSummary({
           <>
             {pricedCount > 0 && (
               <span>
-                {pricedCount} {pricedCount === 1 ? "API" : "APIs"} priced
+                {pricedCount} {pricedCount === 1 ? "SKU" : "SKUs"} priced
               </span>
             )}
             {bundledCount > 0 && (
@@ -54,9 +54,9 @@ export function PricingSummary({
                 <button
                   onClick={onJumpToLeak}
                   className="text-bad-ink underline decoration-bad/40 decoration-1 underline-offset-4 hover:decoration-bad transition-colors ease-expo"
-                  title="Jump to the unpriced APIs — traffic on these earns nothing"
+                  title="Jump to the unpriced SKUs — usage on these earns nothing"
                 >
-                  {unpricedCount} leaking ₹0
+                  {unpricedCount} leaking $0
                 </button>
               </>
             )}

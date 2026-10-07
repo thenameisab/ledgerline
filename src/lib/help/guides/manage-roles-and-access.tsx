@@ -16,7 +16,7 @@ export default function Body() {
       <p>
         Roles and access are managed inline on the Users page. There are three roles:{" "}
         <strong>member</strong> (read everything), <strong>editor</strong> (also edit account
-        pricing, manual entries, aliases, API review, sandbox billing rules, the API catalog,
+        pricing, manual entries, aliases, SKU review, sandbox billing rules, the SKU catalog,
         account profiles, and groups), and{" "}
         <strong>admin</strong> (all of that plus vendor costs, users, syncs, and the audit log —
         and the only role that sees cost/margin figures).

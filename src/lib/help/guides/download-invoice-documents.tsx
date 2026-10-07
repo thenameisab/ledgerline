@@ -38,7 +38,7 @@ export default function Body() {
         </li>
         <li>
           <strong>CSV</strong> — the internal data (line items, prices, vendor cost, margin) as a
-          flat file for pasting into Tally, QuickBooks, or a spreadsheet.
+          flat file for pasting into QuickBooks, Xero, or a spreadsheet.
         </li>
       </ul>
 

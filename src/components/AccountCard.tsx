@@ -184,7 +184,7 @@ function ExpandedPanel({
               label="Peak day"
               value={
                 data.peakDay
-                  ? `${formatShortDate(data.peakDay.date)} · ${formatNumber(data.peakDay.hits)} hits`
+                  ? `${formatShortDate(data.peakDay.date)} · ${formatNumber(data.peakDay.hits)} units`
                   : "—"
               }
             />
@@ -196,11 +196,11 @@ function ExpandedPanel({
               <div className="mt-0.5 leading-relaxed">
                 {data.unpricedPairs} (account, api) pair
                 {data.unpricedPairs === 1 ? "" : "s"} have traffic but no
-                pricing — {formatNumber(data.unpricedHits)} hits at risk this period.
+                pricing — {formatNumber(data.unpricedHits)} units at risk this period.
               </div>
             </div>
           ) : (
-            <div className="mt-5 text-xs text-ink-faint">All used APIs are priced.</div>
+            <div className="mt-5 text-xs text-ink-faint">All used SKUs are priced.</div>
           )}
         </div>
 
@@ -211,14 +211,14 @@ function ExpandedPanel({
             <Sparkline data={data.spark} width={320} height={64} stroke={sparkStroke} />
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-            <Metric label="Hits" value={formatNumber(data.hits)} />
-            <Metric label="APIs used" value={String(data.apisUsed)} />
+            <Metric label="Units" value={formatNumber(data.hits)} />
+            <Metric label="SKUs used" value={String(data.apisUsed)} />
           </div>
         </div>
 
         {/* Column 3 — top APIs by hits */}
         <div className="p-6">
-          <SectionLabel>Top APIs</SectionLabel>
+          <SectionLabel>Top SKUs</SectionLabel>
           {data.topApis.length === 0 ? (
             <div className="mt-3 text-xs text-ink-faint">No traffic this period.</div>
           ) : (
@@ -295,7 +295,7 @@ function ThresholdCTA({
           Open the full account view
         </div>
         <div className="text-xs text-ink-faint mt-1.5">
-          Per-API breakdown · 90-day activity heatmap · pricing editor
+          Per-SKU breakdown · 90-day activity heatmap · pricing editor
         </div>
         {/* The ink rail — a 1px line that draws left-to-right on hover */}
         <span
@@ -308,9 +308,9 @@ function ThresholdCTA({
       <div className="hidden md:flex items-center gap-5 text-xs text-ink-muted shrink-0">
         <Stat label="Revenue" value={revenue > 0 ? formatMoney(revenue, { compact: true }) : "—"} />
         <span className="text-border" aria-hidden="true">/</span>
-        <Stat label="Hits" value={formatNumber(hits)} />
+        <Stat label="Units" value={formatNumber(hits)} />
         <span className="text-border" aria-hidden="true">/</span>
-        <Stat label="APIs" value={String(apis)} />
+        <Stat label="SKUs" value={String(apis)} />
       </div>
 
       {/* Right — arrow token. Outline by default, fills on hover. */}
@@ -384,11 +384,11 @@ function DetailRow({
 
 function composeRowBriefing(data: AccountCardData): string {
   if (data.unpricedPairs > 0) {
-    return `${data.unpricedPairs} unpriced pair${data.unpricedPairs === 1 ? "" : "s"} · ${formatNumber(data.unpricedHits)} hits at risk`;
+    return `${data.unpricedPairs} unpriced pair${data.unpricedPairs === 1 ? "" : "s"} · ${formatNumber(data.unpricedHits)} units at risk`;
   }
   const parts: string[] = [];
-  parts.push(`${formatNumber(data.hits)} hits`);
-  parts.push(`${data.apisUsed} API${data.apisUsed === 1 ? "" : "s"}`);
+  parts.push(`${formatNumber(data.hits)} units`);
+  parts.push(`${data.apisUsed} SKU${data.apisUsed === 1 ? "" : "s"}`);
   if (data.topApis[0]) parts.push(`top: ${data.topApis[0].api_name}`);
   return parts.join(" · ");
 }

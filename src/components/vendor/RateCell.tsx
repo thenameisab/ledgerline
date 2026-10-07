@@ -288,7 +288,7 @@ function RateEditPopover({
             mode === "amount" ? "border-accent bg-bg" : "border-border bg-bg"
           }`}
         >
-          <span className="text-ink-faint text-xs">₹</span>
+          <span className="text-ink-faint text-xs">$</span>
           <input
             ref={inputRef}
             value={amount}

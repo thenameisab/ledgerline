@@ -1,5 +1,5 @@
 import { Activity, Users, CircleDollarSign, ArrowLeftRight } from "lucide-react";
-import { formatMoney, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber, formatPrice } from "@/lib/format";
 import { DeltaPill, Stat } from "@/components/dashboard/Headline";
 import { MarginBullet } from "@/components/dashboard/MarginBullet";
 import { CostConfidence } from "@/components/vendor/CostConfidence";
@@ -18,6 +18,7 @@ export function ApiHeadline({
   hits,
   accounts,
   avgPrice,
+  unit,
   spread,
   confidence,
   costFixHref,
@@ -30,6 +31,8 @@ export function ApiHeadline({
   hits: number;
   accounts: number;
   avgPrice: number;
+  /** What one billed unit is, e.g. "1M tokens". */
+  unit: string;
   spread: { min: number; max: number } | null;
   /** Share of this API's hits whose vendor rate is known. Null for viewers who never see cost. */
   confidence?: Confidence | null;
@@ -85,19 +88,19 @@ export function ApiHeadline({
       </div>
 
       <div className="flex flex-wrap items-end gap-x-8 gap-y-4 mt-6 pt-5 border-t border-border">
-        <Stat icon={<Activity size={12} strokeWidth={1.5} />} label="Hits" value={formatNumber(hits)} />
+        <Stat icon={<Activity size={12} strokeWidth={1.5} />} label="Units" value={formatNumber(hits)} />
         <Stat icon={<Users size={12} strokeWidth={1.5} />} label="Accounts" value={String(accounts)} />
         <Stat
           icon={<CircleDollarSign size={12} strokeWidth={1.5} />}
-          label="Avg ₹/hit"
-          value={avgPrice > 0 ? `₹${avgPrice.toFixed(2)}` : "—"}
+          label="Avg price"
+          value={avgPrice > 0 ? `${formatPrice(avgPrice)} / ${unit}` : "—"}
         />
         <Stat
           icon={<ArrowLeftRight size={12} strokeWidth={1.5} />}
           label="Price spread"
           value={
             spread && spread.min > 0
-              ? `${(spread.max / spread.min).toFixed(1)}× · ₹${spread.min.toFixed(2)}–₹${spread.max.toFixed(2)}`
+              ? `${(spread.max / spread.min).toFixed(1)}× · ${formatPrice(spread.min)}–${formatPrice(spread.max)}`
               : "—"
           }
         />

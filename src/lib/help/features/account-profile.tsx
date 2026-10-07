@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "account-profile",
   title: "Account profile",
   summary:
-    "One account's whole story: headline revenue with a written briefing, a 90-day activity heatmap, daily charts, and a per-API revenue breakdown.",
+    "One account's whole story: headline revenue with a written briefing, a 90-day activity heatmap, daily charts, and a per-SKU revenue breakdown.",
   group: "Accounts",
   role: "all",
   routes: ["/accounts"],
@@ -16,8 +16,8 @@ export default function Body() {
     <>
       <p>
         The account profile is where account conversations start. It puts the account&rsquo;s
-        month-to-date revenue, usage rhythm, and per-API economics on one page, and flags — in
-        rupees — anything that should have been billed but wasn&rsquo;t.
+        month-to-date revenue, usage rhythm, and per-SKU economics on one page, and flags — in
+        dollars — anything that should have been billed but wasn&rsquo;t.
       </p>
 
       <Figure
@@ -29,7 +29,7 @@ export default function Body() {
       <H2 id="what-you-see">What you see</H2>
       <ul>
         <li>
-          <strong>Status bar</strong> — account name, group, billing entity and GSTIN, plus a
+          <strong>Status bar</strong> — account name, group, billing entity and Tax ID, plus a
           status chip (OK / leak / sandbox). On the right: an Invoices button for everyone, and a
           "+ Manual entry" button for admins.
         </li>
@@ -40,24 +40,24 @@ export default function Body() {
         </li>
         <li>
           <strong>Headline</strong> — MTD revenue with a day-scaled MoM delta pill, the written
-          briefing, and secondary stats: hits, average price per hit, APIs used, success rate, and
-          the top API with its revenue share.
+          briefing, and secondary stats: units, average price per unit, SKUs used, success rate, and
+          the top SKU with its revenue share.
         </li>
         <li>
           <strong>Leak alert</strong> — if any of this account&rsquo;s traffic is unpriced, an
-          alert states the amount at risk and the number of unpriced API pairs, with a
+          alert states the amount at risk and the number of unpriced SKU pairs, with a
           "Manage pricing" link straight to the fix.
         </li>
         <li>
           <strong>Activity heatmap</strong> — 90 days of usage in GitHub-style weekly columns;
-          darker cells mean more hits. Quiet weeks and ramp-ups are visible at a glance.
+          darker cells mean more units. Quiet weeks and ramp-ups are visible at a glance.
         </li>
         <li>
           <strong>Charts</strong> — daily revenue and margin, plus the call-status mix for this
           account.
         </li>
         <li>
-          <strong>API breakdown</strong> — a table per API: hits, successful hits, price per hit,
+          <strong>SKU breakdown</strong> — a table per SKU: units, successful units, price per unit,
           revenue, and margin. Rows with traffic but zero revenue are tinted red (unpriced), and
           rows that include manual-entry usage carry a <em>MANUAL</em> chip.
         </li>
@@ -65,8 +65,8 @@ export default function Body() {
 
       <Figure
         src="/help/shots/account-detail-full.png"
-        alt="Full account profile including charts and the per-API breakdown table"
-        caption="Further down: charts and the per-API breakdown."
+        alt="Full account profile including charts and the per-SKU breakdown table"
+        caption="Further down: charts and the per-SKU breakdown."
       />
 
       <H2 id="what-you-can-do">What you can do</H2>
@@ -86,12 +86,12 @@ export default function Body() {
           account.
         </li>
         <li>
-          <strong>Hover anything truncated</strong> — full API and account names reveal on hover.
+          <strong>Hover anything truncated</strong> — full SKU and account names reveal on hover.
         </li>
       </ul>
 
       <Callout variant="tip">
-        The red rows in the API breakdown are the same traffic counted in the dashboard&rsquo;s
+        The red rows in the SKU breakdown are the same traffic counted in the dashboard&rsquo;s
         "Money at risk" card — pricing them here clears both.
       </Callout>
 

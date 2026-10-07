@@ -69,7 +69,7 @@ export function SandboxRuleForm({
         />
       )}
       <span className="text-xs text-ink-muted tabular-nums whitespace-nowrap">
-        → bills {billed.toLocaleString("en-IN")}
+        → bills {billed.toLocaleString("en-US")}
       </span>
       <button
         onClick={save}

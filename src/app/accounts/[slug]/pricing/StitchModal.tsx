@@ -72,9 +72,9 @@ export function StitchModal({
 
   function submit() {
     if (!name.trim()) return setError("Give the stitch a name.");
-    if (selected.size < 2) return setError("Pick at least two APIs to stitch.");
+    if (selected.size < 2) return setError("Pick at least two SKUs to stitch.");
     if (!anchor || !selected.has(anchor))
-      return setError("Pick which API's hits the stitch bills on.");
+      return setError("Pick which SKU's usage the stitch bills on.");
     const parsed = Object.fromEntries(
       PRICE_FIELDS.map((f) => [f.key, prices[f.key] === "" ? 0 : parseFloat(prices[f.key])])
     ) as Record<PriceKey, number>;
@@ -116,7 +116,7 @@ export function StitchModal({
           size="sm"
           leadingIcon={<Combine size={14} strokeWidth={1.75} />}
         >
-          Stitch APIs
+          Stitch SKUs
         </Button>
       </Dialog.Trigger>
 
@@ -136,7 +136,7 @@ export function StitchModal({
         >
           <div className="flex items-center justify-between mb-2">
             <Dialog.Title className="text-lg font-semibold text-ink">
-              Stitch APIs
+              Stitch SKUs
             </Dialog.Title>
             <Dialog.Close asChild>
               <button
@@ -149,8 +149,8 @@ export function StitchModal({
           </div>
 
           <Dialog.Description id="stitch-modal-desc" className="text-xs text-ink-muted mb-5">
-            Usage still logs hits per API, but the account is billed once per hit of the
-            anchor API at the agreed price — the other stitched APIs bill ₹0 and stop
+            Usage still logs units per SKU, but the account is billed once per unit of the
+            anchor SKU at the agreed price. The other stitched SKUs bill $0 and stop
             counting as revenue leak.
           </Dialog.Description>
 
@@ -164,7 +164,7 @@ export function StitchModal({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. KYC Prefill Combo"
+                placeholder="e.g. Atlas Pro tokens"
                 autoComplete="off"
                 className="w-full rounded border border-border bg-bg px-2.5 py-1.5 text-sm focus:border-accent focus:outline-none"
               />
@@ -172,10 +172,10 @@ export function StitchModal({
 
             <div>
               <span className="block text-sm font-medium text-ink mb-1.5">
-                APIs to stitch <span className="text-bad" aria-hidden>*</span>
+                SKUs to stitch <span className="text-bad" aria-hidden>*</span>
               </span>
               <p className="text-[11px] text-ink-faint mb-2">
-                Select at least two, then mark the anchor — the API whose hit count equals
+                Select at least two, then mark the anchor — the SKU whose unit count equals
                 one stitched call (usually the entry point).
               </p>
               <div className="rounded border border-border divide-y divide-border max-h-56 overflow-y-auto">
@@ -219,7 +219,7 @@ export function StitchModal({
                 })}
                 {candidates.length === 0 && (
                   <p className="px-2.5 py-3 text-sm text-ink-muted">
-                    No APIs available to stitch.
+                    No SKUs available to stitch.
                   </p>
                 )}
               </div>
@@ -227,7 +227,7 @@ export function StitchModal({
 
             <div>
               <span className="block text-sm font-medium text-ink mb-1.5">
-                Agreed price (₹/stitched call)
+                Agreed price ($/stitched call)
               </span>
               <div className="flex items-end gap-2">
                 {PRICE_FIELDS.map((f) => (
@@ -236,7 +236,7 @@ export function StitchModal({
                       {f.label}
                     </span>
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-1 rounded border border-border bg-bg w-[84px] text-sm focus-within:border-accent">
-                      <span className="text-ink-faint text-xs shrink-0">₹</span>
+                      <span className="text-ink-faint text-xs shrink-0">$</span>
                       <input
                         value={prices[f.key]}
                         placeholder="0"
@@ -250,7 +250,7 @@ export function StitchModal({
                 ))}
               </div>
               <p className="text-[11px] text-ink-faint mt-1.5">
-                Applied to the anchor API’s successful / no-data / failed / in-progress hits.
+                Applied to the anchor SKU’s successful / no-data / failed / in-progress units.
               </p>
             </div>
 

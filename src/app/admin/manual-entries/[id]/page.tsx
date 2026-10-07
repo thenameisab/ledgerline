@@ -102,10 +102,10 @@ export default async function ManualEntryDetailPage({
           <table className="w-full text-sm">
             <thead className="bg-bg-sunken text-ink-muted">
               <tr>
-                <th className="text-left font-medium px-4 py-2.5">API</th>
+                <th className="text-left font-medium px-4 py-2.5">SKU</th>
                 <th className="text-left font-medium px-4 py-2.5">Channel</th>
                 <th className="text-left font-medium px-4 py-2.5">Vendor</th>
-                <th className="text-right font-medium px-4 py-2.5 tnum">Hits</th>
+                <th className="text-right font-medium px-4 py-2.5 tnum">Units</th>
                 <th className="text-right font-medium px-4 py-2.5 tnum">Revenue</th>
               </tr>
             </thead>

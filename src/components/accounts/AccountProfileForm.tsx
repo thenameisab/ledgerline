@@ -198,7 +198,7 @@ export function AccountProfileForm({
                 setName(e.target.value);
                 clearError("display_name");
               }}
-              placeholder="Acme Financial"
+              placeholder="Copperleaf CRM"
               autoComplete="off"
               className={inputClass(!!errors.display_name)}
             />
@@ -219,7 +219,7 @@ export function AccountProfileForm({
                   setAccountCode(e.target.value);
                   clearError("client_code");
                 }}
-                placeholder="acme-fin.01"
+                placeholder="copperleaf.01"
                 autoComplete="off"
                 className={inputClass(!!errors.client_code)}
               />
@@ -239,7 +239,7 @@ export function AccountProfileForm({
                   setWebsite(e.target.value);
                   clearError("website");
                 }}
-                placeholder="acme.com"
+                placeholder="copperleaf.com"
                 autoComplete="off"
                 className={inputClass(!!errors.website)}
               />
@@ -255,7 +255,7 @@ export function AccountProfileForm({
                 setLegalName(e.target.value);
                 clearError("billing_entity");
               }}
-              placeholder="Acme Financial Services Pvt. Ltd."
+              placeholder="Copperleaf Software, Inc."
               autoComplete="off"
               className={inputClass(!!errors.billing_entity)}
             />

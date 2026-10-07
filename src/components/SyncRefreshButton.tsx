@@ -26,11 +26,11 @@ type RefreshDiff = {
   unmapped_apis: string[];
 };
 
-const nf = (n: number) => n.toLocaleString("en-IN");
+const nf = (n: number) => n.toLocaleString("en-US");
 const signed = (n: number) => (n > 0 ? `+${nf(n)}` : nf(n));
 
 function dayLabel(iso: string): string {
-  return new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", {
+  return new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     timeZone: "UTC",
@@ -58,7 +58,7 @@ export function SyncRefreshButton() {
         body.ok
           ? delta === 0
             ? "Refreshed — no changes since the last pull"
-            : `Refreshed — ${signed(delta)} hits since the last pull`
+            : `Refreshed — ${signed(delta)} units since the last pull`
           : "Refresh finished with errors — see the run log"
       );
       router.refresh();
@@ -112,7 +112,7 @@ export function SyncRefreshButton() {
                           colorOnChange="rise-good"
                           signValue={d.hits_after}
                         />{" "}
-                        hits
+                        units
                       </span>
                       <span
                         className={`text-xs ${
@@ -152,7 +152,7 @@ export function SyncRefreshButton() {
             <div className="text-xs text-warn-ink">
               {diff.unmapped_clients.length} unmapped account name
               {diff.unmapped_clients.length === 1 ? "" : "s"} · {diff.unmapped_apis.length} unmapped
-              API name{diff.unmapped_apis.length === 1 ? "" : "s"} —{" "}
+              SKU name{diff.unmapped_apis.length === 1 ? "" : "s"} —{" "}
               <Link href="/admin/aliases" className="underline hover:text-accent-ink">
                 resolve in Aliases
               </Link>

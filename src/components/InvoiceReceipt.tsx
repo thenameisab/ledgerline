@@ -79,7 +79,7 @@ export function InvoiceReceipt({
           )}
           {data.header.account.gstin && (
             <div className="font-mono text-sm text-ink-muted tnum">
-              GSTIN {data.header.account.gstin}
+              {data.header.account.gstin}
             </div>
           )}
         </div>
@@ -105,8 +105,8 @@ export function InvoiceReceipt({
           value={formatMoney(data.totals.revenue)}
           sub={
             showCost
-              ? `${formatNumber(data.totals.hits)} hits`
-              : `${formatNumber(data.totals.hits)} hits · ${data.totals.lines} API${data.totals.lines === 1 ? "" : "s"} billed`
+              ? `${formatNumber(data.totals.hits)} units`
+              : `${formatNumber(data.totals.hits)} units · ${data.totals.lines} SKU${data.totals.lines === 1 ? "" : "s"} billed`
           }
         />
         {showCost && (
@@ -114,7 +114,7 @@ export function InvoiceReceipt({
             <TotalsCell
               label="Vendor cost"
               value={formatMoney(data.totals.vendor_cost)}
-              sub={`${data.totals.lines} API${data.totals.lines === 1 ? "" : "s"} billed`}
+              sub={`${data.totals.lines} SKU${data.totals.lines === 1 ? "" : "s"} billed`}
               divider
             />
             <TotalsCell
@@ -138,8 +138,8 @@ export function InvoiceReceipt({
             className="grid grid-cols-12 gap-2 bg-bg-sunken px-3 py-2 border-b border-border text-xs uppercase tracking-wider text-ink-muted"
             style={{ fontWeight: 500 }}
           >
-            <div className={showCost ? "col-span-3" : "col-span-4"}>API</div>
-            <div className={`${showCost ? "col-span-1" : "col-span-2"} text-right`}>Hits</div>
+            <div className={showCost ? "col-span-3" : "col-span-4"}>SKU</div>
+            <div className={`${showCost ? "col-span-1" : "col-span-2"} text-right`}>Units</div>
             <div className={`${showCost ? "col-span-2" : "col-span-3"} text-right`}>Unit price</div>
             <div className={`${showCost ? "col-span-2" : "col-span-3"} text-right`}>Subtotal</div>
             {showCost && <div className="col-span-2 text-right">Cost</div>}
@@ -165,7 +165,7 @@ export function InvoiceReceipt({
                     <div className="flex items-center gap-1.5">
                       {l.is_bundle ? (
                         <span
-                          title="Stitched product — billed once per call of the anchor API at the agreed price; vendor cost covers all stitched APIs"
+                          title="Stitched product. It is billed once per unit of the anchor SKU at the agreed price. Vendor cost covers all stitched SKUs."
                           className="inline-flex items-center text-[11px] text-accent-ink px-1 py-0.5 rounded font-mono uppercase tracking-wider border border-accent/30"
                         >
                           stitched

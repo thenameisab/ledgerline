@@ -45,7 +45,7 @@ export function AliasResolver({
         <thead className="bg-bg-sunken text-ink-muted text-xs uppercase tracking-wide">
           <tr className="text-left">
             <th className="px-4 py-3 font-medium">Raw {kind} name (from logs)</th>
-            <th className="px-3 py-3 font-medium text-right">Hits</th>
+            <th className="px-3 py-3 font-medium text-right">Units</th>
             <th className="px-3 py-3 font-medium">Last seen</th>
             <th className="px-4 py-3 font-medium">Map to</th>
             <th className="px-3 py-3 font-medium"></th>
@@ -124,15 +124,15 @@ function ResolverRow({
           {row.is_new && (
             <span
               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] uppercase tracking-wider bg-info-bg text-info-ink"
-              title="Neither the name nor a product code in the catalog matches this — it has never been billed before. Create it as a new API."
+              title="Neither the name nor a SKU code in the catalog matches this. It has never been billed before. Create it as a new SKU."
             >
               <Sparkles size={10} strokeWidth={1.5} />
-              New API
+              New SKU
             </span>
           )}
         </div>
       </td>
-      <td className="px-3 py-3 text-right font-mono tnum text-ink">{row.hits.toLocaleString("en-IN")}</td>
+      <td className="px-3 py-3 text-right font-mono tnum text-ink">{row.hits.toLocaleString("en-US")}</td>
       <td className="px-3 py-3 text-xs text-ink-muted whitespace-nowrap">{formatDay(row.last_seen)}</td>
       <td className="px-4 py-3">
         <div className="min-w-[260px]">
@@ -160,7 +160,7 @@ function ResolverRow({
               emptyLabel="Choose canonical api…"
               searchPlaceholder="Search code or name…"
               disabled={saving || done}
-              sentinel={{ value: CREATE_NEW_API_SENTINEL, label: "+ Create new API…" }}
+              sentinel={{ value: CREATE_NEW_API_SENTINEL, label: "+ Create new SKU…" }}
             />
           )}
         </div>

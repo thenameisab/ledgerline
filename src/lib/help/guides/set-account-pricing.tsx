@@ -4,7 +4,7 @@ import { H2, Steps, Step, Callout, Figure, Kbd, Related } from "@/components/hel
 export const meta: GuideMeta = {
   slug: "set-account-pricing",
   title: "Set or edit account pricing",
-  summary: "Edit per-API rates on an account's price book, add new APIs, and understand how temporal pricing protects history.",
+  summary: "Edit per-SKU rates on an account's price book, add new SKUs, and understand how temporal pricing protects history.",
   group: "Pricing",
   role: "admin",
   minutes: 4,
@@ -14,26 +14,27 @@ export default function Body() {
   return (
     <>
       <p>
-        Each account has a price book: one row per API, with four rates — per successful (S),
-        no-data (ND), failed (F), and in-progress (IP) hit. Edits are staged in the table and saved
+        Each account has a price book: one row per SKU, with four rates — per successful (S),
+        no-data (ND), failed (F), and in-progress (IP) unit. A unit is the SKU&rsquo;s billing
+        unit, for example 1M tokens or one message. Edits are staged in the table and saved
         in one batch.
       </p>
 
       <Figure
         src="/help/shots/account-pricing.png"
-        alt="The account pricing table with editable rate cells and the Stitch APIs and Add API buttons"
+        alt="The account pricing table with editable rate cells and the Stitch SKUs and Add SKU buttons"
         caption="The pricing editor. Edited rows are highlighted until you save."
       />
 
       <H2 id="edit">Edit existing rates</H2>
       <Steps>
         <Step title="Open the account’s pricing page">
-          From the account detail page, click <strong>Manage pricing</strong> (next to the API
+          From the account detail page, click <strong>Manage pricing</strong> (next to the SKU
           breakdown). The page is admin and editor only.
         </Step>
         <Step title="Type into the rate cells">
-          Each row has four ₹ inputs: <strong>S</strong>, <strong>ND</strong>, <strong>F</strong>,{" "}
-          <strong>IP</strong> (₹/hit). Press <Kbd>Enter</Kbd> or click away to commit a cell;{" "}
+          Each row has four $ inputs: <strong>S</strong>, <strong>ND</strong>, <strong>F</strong>,{" "}
+          <strong>IP</strong> ($ per unit). Press <Kbd>Enter</Kbd> or click away to commit a cell;{" "}
           <Kbd>Esc</Kbd> restores its previous value. Changed rows turn accent-tinted and gain an{" "}
           <em>edited</em> chip.
         </Step>
@@ -45,14 +46,14 @@ export default function Body() {
         </Step>
       </Steps>
 
-      <H2 id="add">Add an API to the price book</H2>
+      <H2 id="add">Add a SKU to the price book</H2>
       <Steps>
-        <Step title="Click “Add API”">
-          The button appears in the header when there are catalog APIs this account does not yet
+        <Step title="Click “Add SKU”">
+          The button appears in the header when there are catalog SKUs this account does not yet
           have a row for.
         </Step>
         <Step title="Fill the new row">
-          Pick the API from the dropdown, enter the four rates, and set{" "}
+          Pick the SKU from the dropdown, enter the four rates, and set{" "}
           <strong>Effective from</strong> (defaults to today). The row saves with the rest of the
           batch.
         </Step>
@@ -85,7 +86,7 @@ export default function Body() {
       <Related
         links={[
           { href: "/help/guides/fix-unpriced-traffic", label: "Fix unpriced traffic" },
-          { href: "/help/guides/create-a-stitched-bundle", label: "Create a stitched API bundle" },
+          { href: "/help/guides/create-a-stitched-bundle", label: "Create a stitched SKU bundle" },
           { href: "/help/guides/add-an-invoice-adjustment", label: "Add a credit or charge to an invoice" },
           { href: "/help/math", label: "Temporal pricing math" },
         ]}

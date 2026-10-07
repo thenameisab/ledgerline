@@ -148,7 +148,7 @@ export async function vendorMinimumMonths(opts: MinimumOpts): Promise<VendorMini
   `;
   if ((rows as any[]).length === 0) return [];
 
-  // Volume-priced pairs cost ₹0 in the per-day view; their real cost counts
+  // Volume-priced pairs cost $0 in the per-day view; their real cost counts
   // toward the floor like any other. One call per month, at vendor grain.
   const volumeByMonth = new Map<string, Map<string, number>>();
   const months = [...new Set((rows as any[]).map((r) => r.month_start as string))];

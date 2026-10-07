@@ -11,7 +11,7 @@
 
 import { type AlertConfig, type AlertRule, type AlertSeverity } from "./config";
 import type { AlertData, Series } from "./data";
-import { formatDate, formatMoney, formatNumber } from "../format";
+import { formatDate, formatMoney, formatNumber, formatPrice } from "../format";
 
 export type AlertDraft = {
   rule: AlertRule;
@@ -46,11 +46,11 @@ const sum = (a: Series, lo: number, hi: number) => {
 const wkBase = (a: Series, i: number) => (i < 28 ? NaN : (a[i - 7] + a[i - 14] + a[i - 21] + a[i - 28]) / 4);
 const wkActive = (a: Series, i: number) => (i < 28 ? 0 : [7, 14, 21, 28].filter((k) => a[i - k] > 0).length);
 const int = (x: number) => formatNumber(Math.round(x));
-const inr = (x: number) => formatMoney(Math.round(x));
+const money = (x: number) => formatMoney(Math.round(x));
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 const signedPct = (x: number) => `${x >= 0 ? "+" : "−"}${Math.abs(x * 100).toFixed(1)}%`;
 const monthName = (iso: string) =>
-  new Date(iso.slice(0, 7) + "-01T00:00:00Z").toLocaleDateString("en-IN", { month: "long", year: "numeric", timeZone: "UTC" });
+  new Date(iso.slice(0, 7) + "-01T00:00:00Z").toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
 const dayLabel = formatDate;
 const prevMonth = (m: string) => {
   const [y, mo] = m.split("-").map(Number);
@@ -164,7 +164,7 @@ export function evaluateDay(
   const platDrop = P.t[i] <= t.platformDropRatio * pBase;
   track("A5", "critical", "platform", platDrop, P.t[i] >= t.platformDropClearRatio * pBase, () =>
     draft("A5", "critical", "platform", {}, `Platform volume dropped ${pct(1 - P.t[i] / pBase)}`,
-      `${int(P.t[i])} hits on ${dayLabel(d)} across all accounts, against a same-weekday average of ${int(pBase)}. Per-account drop alerts are held for this day.`,
+      `${int(P.t[i])} units on ${dayLabel(d)} across all accounts, against a same-weekday average of ${int(pBase)}. Per-account drop alerts are held for this day.`,
       { hits: P.t[i], baseline: Math.round(pBase) })
   );
 
@@ -187,13 +187,13 @@ export function evaluateDay(
       else {
         track("A1", "critical", `${c}`, a1, h[i] > 0, () =>
           draft("A1", "critical", `${c}`, { clientId: c }, `${name} sent no traffic`,
-            `0 hits on ${dayLabel(d)}. On the same weekday over the last 4 weeks it averaged ${int(base)} hits.`,
+            `0 units on ${dayLabel(d)}. On the same weekday over the last 4 weeks it averaged ${int(base)} units.`,
             { hits: 0, baseline: Math.round(base) })
         );
         track("A2d", "high", `${c}`, a2, h[i] >= t.dropDailyClearRatio * base, () => {
           const b1 = wkBase(h, i - 1);
           return draft("A2d", "high", `${c}`, { clientId: c }, `${name} volume dropped ${pct(1 - h[i] / base)}`,
-            `${int(h[i])} hits on ${dayLabel(d)} and ${int(h[i - 1])} the day before, against same-weekday averages of ${int(base)} and ${int(b1)}.`,
+            `${int(h[i])} units on ${dayLabel(d)} and ${int(h[i - 1])} the day before, against same-weekday averages of ${int(base)} and ${int(b1)}.`,
             { hits: h[i], baseline: Math.round(base), prevHits: h[i - 1], prevBaseline: Math.round(b1) });
         });
       }
@@ -203,7 +203,7 @@ export function evaluateDay(
         const p4 = sum(h, i - 34, i - 7) / 4;
         track("A2w", "high", `${c}`, p4 >= t.dropWeeklyMinWeekly && l7 <= t.dropWeeklyRatio * p4, l7 >= t.dropWeeklyClearRatio * p4, () =>
           draft("A2w", "high", `${c}`, { clientId: c }, `${name} weekly volume dropped ${pct(1 - l7 / p4)}`,
-            `${int(l7)} hits in the 7 days to ${dayLabel(d)}, against a weekly average of ${int(p4)} over the 4 weeks before.`,
+            `${int(l7)} units in the 7 days to ${dayLabel(d)}, against a weekly average of ${int(p4)} over the 4 weeks before.`,
             { hits7d: l7, weeklyBaseline: Math.round(p4) })
         );
       }
@@ -211,7 +211,7 @@ export function evaluateDay(
       track("A3", "medium", `${c}`, base >= t.spikeMinBaseline && h[i] >= t.spikeRatio * base && h[i] - base >= t.spikeMinExtraHits,
         h[i] < t.spikeClearRatio * base, () =>
           draft("A3", "medium", `${c}`, { clientId: c }, `${name} volume spiked ${(h[i] / base).toFixed(1)}×`,
-            `${int(h[i])} hits on ${dayLabel(d)}, against a same-weekday average of ${int(base)}.`,
+            `${int(h[i])} units on ${dayLabel(d)}, against a same-weekday average of ${int(base)}.`,
             { hits: h[i], baseline: Math.round(base) })
       );
       // A4 one API stopped, on 2 days on which it normally has traffic
@@ -227,7 +227,7 @@ export function evaluateDay(
         track("A4", "high", k, trig, ph[i] > 0, () => {
           const avg = sum(ph, i - 29, i - 2) / 28;
           return draft("A4", "high", k, { clientId: c, apiCode: p.api }, `${name} stopped using ${apiName(p.api)}`,
-            `0 hits on ${dayLabel(data.dates[i - 1])} and ${dayLabel(d)}, while its other APIs had traffic on both days. Before that it averaged ${int(avg)} hits a day.`,
+            `0 units on ${dayLabel(data.dates[i - 1])} and ${dayLabel(d)}, while its other SKUs had traffic on both days. Before that it averaged ${int(avg)} units a day.`,
             { avgDaily: Math.round(avg) });
         });
       }
@@ -243,12 +243,12 @@ export function evaluateDay(
           if (last > 0 && mtd <= t.paceDropRatio * last)
             once("C1", `${c}:${m}`, () =>
               draft("C1", "high", `${c}:${m}`, { clientId: c }, `${name} is ${pct(1 - mtd / last)} behind last month`,
-                `Revenue ${inr(mtd)} from 1 to ${dayLabel(d)}, against ${inr(last)} for the same days of ${monthName(`${pm}-01`)}.`, metrics)
+                `Revenue ${money(mtd)} from 1 to ${dayLabel(d)}, against ${money(last)} for the same days of ${monthName(`${pm}-01`)}.`, metrics)
             );
           if (last > 0 && mtd >= t.paceSpikeRatio * last)
             once("C2", `${c}:${m}`, () =>
               draft("C2", "info", `${c}:${m}`, { clientId: c }, `${name} is ${pct(mtd / last - 1)} ahead of last month`,
-                `Revenue ${inr(mtd)} from 1 to ${dayLabel(d)}, against ${inr(last)} for the same days of ${monthName(`${pm}-01`)}.`, metrics)
+                `Revenue ${money(mtd)} from 1 to ${dayLabel(d)}, against ${money(last)} for the same days of ${monthName(`${pm}-01`)}.`, metrics)
             );
         }
       }
@@ -257,7 +257,7 @@ export function evaluateDay(
         const w = [0, 1, 2, 3, 4].map((k) => sum(a.rev, i - 7 * (k + 1), i - 7 * k - 1)); // w[0] = last full week
         const down = w[4] > w[3] && w[3] > w[2] && w[2] > w[1] && w[1] > w[0] && w[0] <= (1 - t.trendMinChange) * w[4];
         const up = w[4] > 0 && w[4] < w[3] && w[3] < w[2] && w[2] < w[1] && w[1] < w[0] && w[0] >= (1 + t.trendMinChange) * w[4];
-        const series = w.slice().reverse().map(inr).join(" → ");
+        const series = w.slice().reverse().map(money).join(" → ");
         const metrics = { w1: Math.round(w[4]), w2: Math.round(w[3]), w3: Math.round(w[2]), w4: Math.round(w[1]), w5: Math.round(w[0]) };
         track("C3", "high", `${c}`, down, w[0] > w[1], () =>
           draft("C3", "high", `${c}`, { clientId: c }, `${name} revenue fell 4 weeks in a row`, `Weekly revenue: ${series}.`, metrics)
@@ -281,8 +281,8 @@ export function evaluateDay(
             const x = rc / hc, y = rb / hb;
             if (Math.abs(x / y - 1) >= t.revPerHitChange)
               once("C5", `${c}:${cm}`, () =>
-                draft("C5", "medium", `${c}:${cm}`, { clientId: c }, `${name} revenue per hit changed ${signedPct(x / y - 1)}`,
-                  `${monthName(`${cm}-01`)}: ₹${x.toFixed(2)} per hit. ${monthName(`${bm}-01`)}: ₹${y.toFixed(2)} per hit.`,
+                draft("C5", "medium", `${c}:${cm}`, { clientId: c }, `${name} revenue per unit changed ${signedPct(x / y - 1)}`,
+                  `${monthName(`${cm}-01`)}: ${formatPrice(x)} per unit. ${monthName(`${bm}-01`)}: ${formatPrice(y)} per unit.`,
                   { revPerHit: +x.toFixed(4), prevRevPerHit: +y.toFixed(4) })
               );
           }
@@ -293,14 +293,14 @@ export function evaluateDay(
     // ---- lifecycle rules: all accounts ----
     if (data.accountFirst.get(c) === d)
       once("D1", `${c}`, () =>
-        draft("D1", "info", `${c}`, { clientId: c }, `${name} sent its first traffic`, `${int(h[i])} hits on ${dayLabel(d)}.`, { hits: h[i] })
+        draft("D1", "info", `${c}`, { clientId: c }, `${name} sent its first traffic`, `${int(h[i])} units on ${dayLabel(d)}.`, { hits: h[i] })
       );
     const S = t.silentDays;
     const first = data.accountFirst.get(c);
     if (h[i] > 0 && i >= S && first != null && first < data.dates[i - S] && sum(h, i - S, i - 1) === 0)
       once("D4", `${c}:${d}`, () =>
         draft("D4", "info", `${c}:${d}`, { clientId: c }, `${name} is active again`,
-          `${int(h[i])} hits on ${dayLabel(d)} after ${S} or more days with none.`, { hits: h[i] })
+          `${int(h[i])} units on ${dayLabel(d)} after ${S} or more days with none.`, { hits: h[i] })
       );
     if (i >= S && h[i - S] > 0 && sum(h, i - S + 1, i) === 0 && sum(h, i - S - 60, i - S) >= t.inactivePriorMinHits)
       once("D5", `${c}:${d}`, () =>
@@ -332,7 +332,7 @@ export function evaluateDay(
         }
         track("B1", "high", k, trig, fs - fb < t.failRiseClearPts, () =>
           draft("B1", "high", k, { clientId: c, apiCode: p.api }, `${label} failures rose to ${pct(fs)}`,
-            `${int(p.f[i])} of ${int(tt)} hits failed on ${dayLabel(d)}. The rate over the 28 days before was ${pct(fb)}.`,
+            `${int(p.f[i])} of ${int(tt)} units failed on ${dayLabel(d)}. The rate over the 28 days before was ${pct(fb)}.`,
             { failed: p.f[i], hits: tt, rate: +fs.toFixed(4), baselineRate: +fb.toFixed(4) })
         );
       });
@@ -341,14 +341,14 @@ export function evaluateDay(
       const ss = tt > 0 ? p.snd[i] / tt : 0, sb = bsnd / bt;
       track("B4", "medium", k, tt >= t.noDataMinHits && ss - sb >= t.noDataRisePts, ss - sb < t.noDataClearPts, () =>
         draft("B4", "medium", k, { clientId: c, apiCode: p.api }, `${label} no-data share rose to ${pct(ss)}`,
-          `${int(p.snd[i])} of ${int(tt)} hits on ${dayLabel(d)} returned no data. The share over the 28 days before was ${pct(sb)}.`,
+          `${int(p.snd[i])} of ${int(tt)} units on ${dayLabel(d)} returned no data. The share over the 28 days before was ${pct(sb)}.`,
           { noData: p.snd[i], hits: tt, share: +ss.toFixed(4), baselineShare: +sb.toFixed(4) })
       );
     }
     const ips = tt > 0 ? p.ip[i] / tt : 0;
     track("B3", "medium", k, tt >= t.stuckMinHits && ips >= t.stuckShare, ips < t.stuckClearShare, () =>
-      draft("B3", "medium", k, { clientId: c, apiCode: p.api }, `${label} has ${pct(ips)} of hits in progress`,
-        `${int(p.ip[i])} of ${int(tt)} hits on ${dayLabel(d)} were still in progress.`,
+      draft("B3", "medium", k, { clientId: c, apiCode: p.api }, `${label} has ${pct(ips)} of units in progress`,
+        `${int(p.ip[i])} of ${int(tt)} units on ${dayLabel(d)} were still in progress.`,
         { inProgress: p.ip[i], hits: tt, share: +ips.toFixed(4) })
     );
 
@@ -361,7 +361,7 @@ export function evaluateDay(
         if (v >= t.belowCostMinCost && r < v)
           once("C7", `${k}:${m}`, () =>
             draft("C7", "high", `${k}:${m}`, { clientId: c, apiCode: p.api }, `${label} revenue is below vendor cost`,
-              `From 1 to ${dayLabel(d)}: revenue ${inr(r)}, vendor cost ${inr(v)}.`, { revenue: Math.round(r), vendorCost: Math.round(v) })
+              `From 1 to ${dayLabel(d)}: revenue ${money(r)}, vendor cost ${money(v)}.`, { revenue: Math.round(r), vendorCost: Math.round(v) })
           );
       }
     }
@@ -370,7 +370,7 @@ export function evaluateDay(
     if (p.unpriced[i] > 0 && unp7 >= t.unpricedMinHits7d)
       once("C8", k, () =>
         draft("C8", "high", k, { clientId: c, apiCode: p.api }, `${label} has usage with no price`,
-          `${int(unp7)} billable hits in the 7 days to ${dayLabel(d)} had no price.`, { unpricedHits7d: unp7 })
+          `${int(unp7)} billable units in the 7 days to ${dayLabel(d)} had no price.`, { unpricedHits7d: unp7 })
       );
     // D2 existing account started using a new API
     const pf = data.pairFirst.get(k);
@@ -381,14 +381,14 @@ export function evaluateDay(
       if (since >= t.newApiMinHits)
         once("D2", k, () =>
           draft("D2", "info", k, { clientId: c, apiCode: p.api }, `${accountName(c)} started using ${apiName(p.api)}`,
-            `${int(since)} hits since its first use on ${dayLabel(pf)}.`, { hitsSinceFirst: since })
+            `${int(since)} units since its first use on ${dayLabel(pf)}.`, { hitsSinceFirst: since })
         );
     }
     // D3 sandbox to billable
     if (tt > 0 && sum(p.hits, i - 28, i - 1) === 0 && sum(p.sandbox, i - 28, i - 1) > 0)
       once("D3", k, () =>
         draft("D3", "info", k, { clientId: c, apiCode: p.api }, `${label} moved from sandbox to billable`,
-          `${int(tt)} billable hits on ${dayLabel(d)}, after only sandbox traffic in the 28 days before.`, { hits: tt })
+          `${int(tt)} billable units on ${dayLabel(d)}, after only sandbox traffic in the 28 days before.`, { hits: tt })
       );
     // C6 volume tier reached this month
     const sched = data.volumeSchedules.get(k);
@@ -404,7 +404,7 @@ export function evaluateDay(
         if (ta > tb && ta >= 1)
           once("C6", `${k}:${m}:${ta}`, () =>
             draft("C6", "info", `${k}:${m}:${ta}`, { clientId: c, apiCode: p.api }, `${label} reached tier ${ta + 1}`,
-              `${int(after)} hits in ${monthName(d)}. Tier ${ta + 1} starts after ${int(mins[ta])} hits.`, { monthHits: after, tier: ta + 1 })
+              `${int(after)} units in ${monthName(d)}. Tier ${ta + 1} starts after ${int(mins[ta])} units.`, { monthHits: after, tier: ta + 1 })
           );
       }
     }
@@ -438,7 +438,7 @@ export function evaluateDay(
     else
       track("A6", "high", ap.code, trigA6, ah[i] >= t.apiDropClearRatio * base, () =>
         draft("A6", "high", ap.code, { apiCode: ap.code }, `${ap.name} volume dropped ${pct(1 - ah[i] / base)} across accounts`,
-          `${int(ah[i])} hits on ${dayLabel(d)}, against a same-weekday average of ${int(base)}. ${nDrop} accounts are down by half or more.`,
+          `${int(ah[i])} units on ${dayLabel(d)}, against a same-weekday average of ${int(base)}. ${nDrop} accounts are down by half or more.`,
           { hits: ah[i], baseline: Math.round(base), accounts: nDrop })
       );
     const fsh = ah[i] > 0 ? ap.f[i] / ah[i] : 0, fb = bt > 0 ? bf / bt : 0;
@@ -446,7 +446,7 @@ export function evaluateDay(
     track("B2", sev, `api:${ap.code}`, bt >= t.outageMinBaselineHits && nFail >= t.outageMinAccounts && fsh - fb >= t.outageRisePts,
       fsh - fb < t.outageClearPts, () =>
         draft("B2", sev, `api:${ap.code}`, { apiCode: ap.code }, `${ap.name} failures rose across ${nFail} accounts`,
-          `${pct(fsh)} of hits failed on ${dayLabel(d)}. The rate over the 28 days before was ${pct(fb)}.`,
+          `${pct(fsh)} of units failed on ${dayLabel(d)}. The rate over the 28 days before was ${pct(fb)}.`,
           { rate: +fsh.toFixed(4), baselineRate: +fb.toFixed(4), accounts: nFail })
     );
   }
@@ -469,7 +469,7 @@ export function evaluateDay(
     track("B2", sev, `vendor:${vn}`, bt >= t.outageMinBaselineHits && nFail >= t.outageMinAccounts && fsh - fb >= t.outageRisePts,
       fsh - fb < t.outageClearPts, () =>
         draft("B2", sev, `vendor:${vn}`, { vendor: vn }, `Vendor ${vn}: failures rose across ${nFail} accounts`,
-          `${pct(fsh)} of hits failed on ${dayLabel(d)}. The rate over the 28 days before was ${pct(fb)}.`,
+          `${pct(fsh)} of units failed on ${dayLabel(d)}. The rate over the 28 days before was ${pct(fb)}.`,
           { rate: +fsh.toFixed(4), baselineRate: +fb.toFixed(4), accounts: nFail })
     );
   }
@@ -485,7 +485,7 @@ export function evaluateDay(
     const sr = P.t[i] > 0 ? P.ok[i] / P.t[i] : 0, sb = bt > 0 ? bo / bt : 0;
     track("B5", "high", "platform", sb - sr >= t.successDropPts, sb - sr < t.successClearPts, () =>
       draft("B5", "high", "platform", {}, `Platform success rate fell to ${pct(sr)}`,
-        `Successful and no-data hits were ${pct(sr)} of all hits on ${dayLabel(d)}. The rate over the 28 days before was ${pct(sb)}.`,
+        `Successful and no-data units were ${pct(sr)} of all units on ${dayLabel(d)}. The rate over the 28 days before was ${pct(sb)}.`,
         { rate: +sr.toFixed(4), baselineRate: +sb.toFixed(4) })
     );
   }
@@ -495,7 +495,7 @@ export function evaluateDay(
     if (u.first !== d) continue;
     const key = `${u.kind}:${u.name}`;
     once("F2", key, () =>
-      draft("F2", "medium", key, {}, `New unmapped ${u.kind === "account" ? "account" : "API"} name: ${u.name}`,
+      draft("F2", "medium", key, {}, `New unmapped ${u.kind === "account" ? "account" : "SKU"} name: ${u.name}`,
         `First seen in the usage for ${dayLabel(d)}. Map it in Review so its usage counts.`, { kind: u.kind })
     );
   }
@@ -514,8 +514,8 @@ export function evaluateDay(
       }
       if (nBad)
         once("F3", m, () =>
-          draft("F3", "medium", m, {}, `${nBad} vendor/API pairs did not reconcile in ${monthName(d)}`,
-            `Each differs by more than ${pct(t.reconMaxDiff)} between the hits the vendor reported and the hits Ledgerline recorded (${int(gap)} hits in total).`,
+          draft("F3", "medium", m, {}, `${nBad} vendor/SKU pairs did not reconcile in ${monthName(d)}`,
+            `Each differs by more than ${pct(t.reconMaxDiff)} between the units the vendor reported and the units Ledgerline recorded (${int(gap)} units in total).`,
             { pairs: nBad, gapHits: gap })
         );
     }

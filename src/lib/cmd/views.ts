@@ -61,22 +61,22 @@ const LIST_VIEWS: CmdView[] = [
   },
   {
     id: "view-historical",
-    label: "Accounts with historical unpriced hits",
+    label: "Accounts with historical unpriced usage",
     keywords: "historical backdated was unpriced fixed since dismissible",
     href: "/accounts?bucket=historical",
     icon: History,
   },
   {
     id: "view-apis-high-volume",
-    label: "High-volume APIs",
-    keywords: "busiest most used top traffic hits volume",
+    label: "High-volume SKUs",
+    keywords: "busiest most used top traffic units hits volume",
     href: "/skus?filter=high-volume",
     icon: TrendingUp,
   },
   {
     // The page computes this from cost — see COST above.
     id: "view-apis-low-margin",
-    label: "Low-margin APIs",
+    label: "Low-margin SKUs",
     keywords: "thin margin unprofitable cost expensive",
     href: "/skus?filter=low-margin",
     icon: TrendingDown,
@@ -84,8 +84,8 @@ const LIST_VIEWS: CmdView[] = [
   },
   {
     id: "view-apis-inactive",
-    label: "Inactive APIs",
-    keywords: "unused dormant zero traffic no hits dead",
+    label: "Inactive SKUs",
+    keywords: "unused dormant zero traffic no units dead",
     href: "/skus?filter=inactive",
     icon: MoonStar,
   },

@@ -64,7 +64,7 @@ export function VolumeCard({ data }: { data: Row[] }) {
               labelStyle={{ color: "var(--color-ink-muted)", marginBottom: 4 }}
               itemStyle={{ padding: 0 }}
               formatter={(value: any) => [
-                `${Math.round(value).toLocaleString("en-IN")} hits`,
+                `${Math.round(value).toLocaleString("en-US")} units`,
                 "Volume",
               ]}
               labelFormatter={fmtDay}

@@ -73,7 +73,7 @@ const COST_FIELDS = [
  * A volume-priced rate is written the same way, and is subject to the same
  * dating rule: the brackets hang off this row, so changing them IS changing
  * this rate. The four flat cost columns are forced to 0 on a volume row — the
- * per-day view yields ₹0 for it either way and `repos/vendor-volume-cost.ts`
+ * per-day view yields $0 for it either way and `repos/vendor-volume-cost.ts`
  * supplies the month's real cost — and the bracket set is replaced whole rather
  * than merged, so what is stored is always exactly what the editor showed.
  */
@@ -160,7 +160,7 @@ export async function POST(req: Request) {
 
     const inherit = (atDate ?? base) as any;
     // "Never priced" has to include the basis. Marking a pair in-house costs
-    // its elapsed days ₹0 — a decision, applied. Reversing it later is
+    // its elapsed days $0 — a decision, applied. Reversing it later is
     // therefore a change to a cost that has been applied, and goes through the
     // dating rule like any other; without this clause the NULL cost columns
     // would keep the first-pricing exception open forever.
@@ -205,7 +205,7 @@ export async function POST(req: Request) {
     const volume = model !== "flat";
 
     // A volume row prices from its brackets. The flat columns are forced to 0
-    // so the per-day view yields ₹0 for it and the month's real cost comes from
+    // so the per-day view yields $0 for it and the month's real cost comes from
     // repos/vendor-volume-cost.ts — exactly what savePricingBatch does on the
     // client side.
     const dbVals = volume

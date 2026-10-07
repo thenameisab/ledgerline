@@ -183,9 +183,9 @@ export function ManualEntryWizard({
     if (!accountId) return setError("Pick an account.");
     if (!reason.trim()) return setError("Reason is required so the entry is traceable.");
     const validLines = lines.filter((l) => l.api_code);
-    if (validLines.length === 0) return setError("Add at least one API line with hits.");
+    if (validLines.length === 0) return setError("Add at least one SKU line with units.");
     if (validLines.some((l) => l.successful + l.successful_no_data + l.failed + l.in_progress === 0)) {
-      return setError("Each line needs at least one non-zero hit count.");
+      return setError("Each line needs at least one non-zero unit count.");
     }
 
     startTransition(async () => {
@@ -283,7 +283,7 @@ export function ManualEntryWizard({
               type="text"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Bulk PAN run for Q2 onboarding batch"
+              placeholder="Offline batch transcription run for Q2 backfill"
               className="w-full bg-bg text-ink border border-border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </Field>
@@ -317,7 +317,7 @@ export function ManualEntryWizard({
             <div key={idx} className="rounded border border-border bg-bg p-3">
               <div className="grid grid-cols-12 gap-3 items-end">
                 <div className="col-span-12 md:col-span-4">
-                  <label className="text-[11px] uppercase tracking-wider text-ink-faint">API</label>
+                  <label className="text-[11px] uppercase tracking-wider text-ink-faint">SKU</label>
                   <div className="mt-1">
                     <Combobox
                       options={apis}
@@ -329,9 +329,9 @@ export function ManualEntryWizard({
                       getValue={(a) => a.product_code}
                       getLabel={(a) => `${a.product_code} – ${a.name}`}
                       keys={["product_code", "name", "category"]}
-                      emptyLabel="Select API…"
+                      emptyLabel="Select SKU…"
                       searchPlaceholder="Search code, name, category…"
-                      sentinel={{ value: NEW_API_SENTINEL, label: "+ Create new API…" }}
+                      sentinel={{ value: NEW_API_SENTINEL, label: "+ Create new SKU…" }}
                     />
                   </div>
                 </div>
@@ -357,7 +357,7 @@ export function ManualEntryWizard({
                     list={`vendors-${idx}`}
                     value={line.vendor}
                     onChange={(e) => updateLine(idx, { vendor: e.target.value })}
-                    placeholder="InHouse / Quantal / …"
+                    placeholder="InHouse / Cumulus Cloud / …"
                     className="w-full mt-1 bg-bg-raised text-ink border border-border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
                   />
                   <datalist id={`vendors-${idx}`}>
@@ -429,8 +429,8 @@ export function ManualEntryWizard({
               <table className="w-full text-sm">
                 <thead className="bg-bg-sunken text-ink-muted">
                   <tr>
-                    <th className="text-left font-medium px-3 py-2">API</th>
-                    <th className="text-right font-medium px-3 py-2 tnum">Hits</th>
+                    <th className="text-left font-medium px-3 py-2">SKU</th>
+                    <th className="text-right font-medium px-3 py-2 tnum">Units</th>
                     <th className="text-right font-medium px-3 py-2 tnum">Revenue</th>
                     <th className="text-left font-medium px-3 py-2">Pricing</th>
                   </tr>
@@ -493,7 +493,7 @@ export function ManualEntryWizard({
           </div>
         ) : (
           <div className="mt-4 text-sm text-ink-faint">
-            Pick an account, an API, and enter hit counts — preview will populate.
+            Pick an account and a SKU, then enter unit counts. The preview appears here.
           </div>
         )}
       </section>

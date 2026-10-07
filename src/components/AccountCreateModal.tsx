@@ -236,7 +236,7 @@ export function AccountCreateModal({
                   type="text"
                   value={fields.display_name}
                   onChange={(e) => set("display_name", e.target.value)}
-                  placeholder="Acme Corp"
+                  placeholder="Copperleaf CRM"
                   autoFocus
                   autoComplete="off"
                   className={inputClass(!!errors.display_name)}
@@ -259,7 +259,7 @@ export function AccountCreateModal({
                   type="text"
                   value={fields.billing_entity}
                   onChange={(e) => set("billing_entity", e.target.value)}
-                  placeholder="Acme Financial Services Pvt. Ltd."
+                  placeholder="Copperleaf Software, Inc."
                   autoComplete="off"
                   className={inputClass(false)}
                 />

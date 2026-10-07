@@ -29,7 +29,7 @@ function SeverityChip({ severity }: { severity: AlertSeverity }) {
 
 /**
  * The title without the account name, because the account's block header
- * already shows it: "Acme Lending is 12% ahead of last month" → "12% ahead of last month".
+ * already shows it: "Kestrel Store is 12% ahead of last month" → "12% ahead of last month".
  */
 function shortTitle(title: string, accountName: string | null): string {
   if (!accountName || !title.startsWith(accountName)) return title;

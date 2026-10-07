@@ -17,7 +17,7 @@ export default function Body() {
       <p>
         Revenue dashboards usually show what you earned. Money at risk shows what you{" "}
         <em>didn&rsquo;t</em> — billable traffic that produced no revenue, or revenue booked at a
-        loss. It sits high on the dashboard because every rupee on it is recoverable, and each row
+        loss. It sits high on the dashboard because every dollar on it is recoverable, and each row
         links straight to the screen where you recover it.
       </p>
 
@@ -28,15 +28,15 @@ export default function Body() {
       />
 
       <H2 id="what-you-see">What you see</H2>
-      <p>The card totals up to three kinds of risk, each with an amount and a hit count:</p>
+      <p>The card totals up to three kinds of risk, each with an amount and a unit count:</p>
       <ul>
         <li>
-          <strong>Revenue leak — unpriced billable pairs.</strong> (account, API) pairs that took
+          <strong>Revenue leak — unpriced billable pairs.</strong> (account, SKU) pairs that took
           traffic with no price set. The traffic happened; nothing was billed. Links to the
           account&rsquo;s pricing page.
         </li>
         <li>
-          <strong>Silent loss — unmapped log names.</strong> Account or API names in the usage logs
+          <strong>Silent loss — unmapped log names.</strong> Account or SKU names in the usage logs
           that don&rsquo;t resolve to anything in the catalog, so their revenue is excluded
           entirely. Links to the Aliases triage screen.
         </li>
@@ -53,7 +53,7 @@ export default function Body() {
 
       <Callout variant="info" title="Why some figures carry a ~">
         Unpriced and unmapped traffic has no booked price, so leak and silent-loss amounts are{" "}
-        <em>estimated</em> at the org-average rate per hit (the card footnotes the exact rate).
+        <em>estimated</em> at the org-average rate per unit (the card footnotes the exact rate).
         Margin watch is never estimated — it is computed from real prices and real vendor costs.
       </Callout>
 
@@ -61,7 +61,7 @@ export default function Body() {
       <ul>
         <li>
           <strong>Click a risk row</strong> — each one deep-links to its remedy: pricing pages for
-          leaks, Aliases for unmapped names, the API view for margin problems.
+          leaks, Aliases for unmapped names, the SKU page for margin problems.
         </li>
         <li>
           <strong>Fix the cause, watch the row shrink</strong> — pricing a pair or mapping a name

@@ -343,7 +343,7 @@ export function CommandPalette({ role }: { role: Role }) {
             body.ok
               ? delta === 0
                 ? "Refreshed — no changes since the last pull"
-                : `Refreshed — ${delta > 0 ? "+" : ""}${delta.toLocaleString("en-IN")} hits since the last pull`
+                : `Refreshed — ${delta > 0 ? "+" : ""}${delta.toLocaleString("en-US")} units since the last pull`
               : "Refresh finished with errors — see the run log"
           );
           router.refresh();
@@ -441,7 +441,7 @@ export function CommandPalette({ role }: { role: Role }) {
       return [
         {
           key: "ctx-accounts-using",
-          label: "Accounts using this API",
+          label: "Accounts using this SKU",
           icon: Users,
           run: () => setQuery(`?accounts using ${context.code}`),
         },
@@ -478,9 +478,9 @@ export function CommandPalette({ role }: { role: Role }) {
       acts.push({ key: "ctx-invoices", label: "View invoices", icon: FileText, run: () => go(`/accounts/${slug}/invoices`) });
       acts.push({
         key: "ctx-apis-used",
-        label: "APIs used by this account",
+        label: "SKUs used by this account",
         icon: Zap,
-        run: () => setQuery(`?apis used by ${context.name}`),
+        run: () => setQuery(`?skus used by ${context.name}`),
       });
     }
 
@@ -625,7 +625,7 @@ export function CommandPalette({ role }: { role: Role }) {
                     ? askMe.state.cue
                       ? `${askMe.state.cue.slots[askMe.state.slotIndex]?.label ?? ""} — type to filter`
                       : typed || "Ask me anything…"
-                    : "Search accounts, invoices, APIs, groups… or jump to a page"
+                    : "Search accounts, invoices, SKUs, groups… or jump to a page"
                 }
                 className="flex-1 h-12 text-sm bg-transparent outline-none text-ink placeholder:text-ink-faint"
               />
@@ -648,9 +648,9 @@ export function CommandPalette({ role }: { role: Role }) {
                     type="button"
                     onClick={() => setQuery(removeFilter(query, c.field))}
                     className="group inline-flex items-center gap-1 rounded border border-border bg-bg-sunken px-1.5 py-0.5 font-mono text-[10px] text-ink-muted transition-colors duration-instant hover:border-accent hover:text-accent-ink"
-                    aria-label={`Remove ${c.field} filter`}
+                    aria-label={`Remove ${c.field === "api" ? "sku" : c.field} filter`}
                   >
-                    <span className="text-ink-faint group-hover:text-accent-ink">{c.field}:</span>
+                    <span className="text-ink-faint group-hover:text-accent-ink">{c.field === "api" ? "sku" : c.field}:</span>
                     {c.value}
                     <X size={9} strokeWidth={2} className="opacity-50 group-hover:opacity-100" />
                   </button>
@@ -744,7 +744,7 @@ export function CommandPalette({ role }: { role: Role }) {
                     ? "No actions match."
                     : chips.length > 0
                       ? `Nothing matches those filters. Try removing one, or widen the term.`
-                      : `No matches for “${query}” — try an account, invoice, API code, or status:pending.`}
+                      : `No matches for “${query}” — try an account, invoice, SKU code, or status:pending.`}
                 </Command.Empty>
               )}
 
@@ -760,7 +760,7 @@ export function CommandPalette({ role }: { role: Role }) {
                   </div>
                 ) : (
                   <div className="px-3 py-6 text-center text-xs text-ink-faint">
-                    Ask about revenue, hits, or unpriced — e.g. “revenue for Acme in May”.
+                    Ask about revenue, units, or unpriced — e.g. “revenue for Copperleaf CRM in May”.
                   </div>
                 ))}
 
@@ -968,9 +968,9 @@ export function CommandPalette({ role }: { role: Role }) {
                 </Command.Group>
               )}
 
-              {/* APIs */}
+              {/* SKUs */}
               {apis.length > 0 && (
-                <Command.Group heading="APIs" className={GROUP_HEADING}>
+                <Command.Group heading="SKUs" className={GROUP_HEADING}>
                   {apis.map((a) => (
                     <Command.Item
                       key={`api-${a.code}`}
@@ -1033,7 +1033,7 @@ export function CommandPalette({ role }: { role: Role }) {
                       <DollarSign size={13} strokeWidth={1.5} className="shrink-0 text-ink-faint" />
                       <TruncateTooltip text={v.vendor_name} className="flex-1 min-w-0" />
                       <span className="shrink-0 text-[11px] text-ink-faint">
-                        {v.api_count} API{v.api_count === 1 ? "" : "s"}
+                        {v.api_count} SKU{v.api_count === 1 ? "" : "s"}
                       </span>
                       <ArrowUpRight size={11} strokeWidth={1.75} className="shrink-0 text-ink-faint opacity-60" />
                     </Command.Item>

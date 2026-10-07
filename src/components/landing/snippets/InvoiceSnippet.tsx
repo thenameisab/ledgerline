@@ -1,12 +1,13 @@
 "use client";
 
-// One month's invoice for one account: billable lines, excluded lines
-// (sandbox, unpriced), GST and the draft → final → issued lifecycle.
+// One month's invoice for one account: SKUs with different units on one
+// invoice, excluded lines (sandbox, unpriced) and the draft → final → issued
+// lifecycle.
 
 import { useState } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2, FilePen, FlaskConical, Lock, TriangleAlert } from "lucide-react";
-import { Label, Num, Snippet, inr, useInView } from "@/components/landing/ui";
+import { Label, Num, Snippet, usd, usdPrice, useInView } from "@/components/landing/ui";
 
 type Status = "draft" | "final" | "issued";
 
@@ -14,36 +15,39 @@ type Line = {
   id: string;
   code: string;
   name: string;
+  /** Quantity in the SKU's own unit. */
   hits: number;
+  /** Short unit label shown after the quantity. */
+  unit: string;
   rate: number;
   tag?: "Manual" | "Sandbox";
   note?: string;
 };
 
 const BILLABLE: Line[] = [
-  { id: "ky1001", code: "KY1001", name: "PAN Verification", hits: 48_210, rate: 3.2 },
-  { id: "bv3001", code: "BV3001", name: "Penny Drop", hits: 21_940, rate: 3.0 },
-  { id: "fr5002", code: "FR5002", name: "Mobile Risk Score", hits: 9_875, rate: 2.5, note: "Tier · first bracket" },
-  { id: "manual", code: "KY1001", name: "Offline bulk run (approved)", hits: 2_000, rate: 3.2, tag: "Manual" },
+  { id: "atl-pro-out", code: "ATL-PRO-OUT", name: "Atlas Pro · output tokens", hits: 2_610, unit: "M tok", rate: 14.25 },
+  { id: "prm-vid", code: "PRM-VID-1080", name: "Prism Video · 1080p", hits: 41_800, unit: "sec", rate: 0.24 },
+  { id: "vox-tts", code: "VOX-TTS", name: "Text-to-speech", hits: 286_400, unit: "K chars", rate: 0.014 },
+  { id: "gpu-h100", code: "GPU-H100", name: "H100 GPU · on-demand", hits: 2_880, unit: "GPU-h", rate: 2.29, note: "Tier · second bracket" },
+  { id: "manual", code: "PRM-IMG-HD", name: "Offline batch render (approved)", hits: 12_000, unit: "img", rate: 0.075, tag: "Manual" },
 ];
 const SANDBOX: Line = {
   id: "sandbox",
-  code: "KY1002",
-  name: "Aadhaar OTP Verification",
-  hits: 3_400,
-  rate: 2.0,
+  code: "VOX-CLONE",
+  name: "Voice cloning",
+  hits: 140,
+  unit: "voices",
+  rate: 1.5,
   tag: "Sandbox",
 };
-const UNPRICED = { code: "IN4004", name: "Bank Statement Analysis", hits: 612 };
+const UNPRICED = { code: "AGT-BROWSER", name: "Browser agent", hits: 6_120, unit: "browser-min" };
 
-const GST = 0.18;
-
-/** Rupees with paise, Indian grouping: ₹1,54,272.00. */
-function inr2(n: number) {
-  const paise = Math.round(n * 100);
-  return `${inr(Math.floor(paise / 100))}.${String(paise % 100).padStart(2, "0")}`;
+/** Dollars with cents: $58,729.30. */
+function usd2(n: number) {
+  const cents = Math.round(n * 100);
+  return `${usd(Math.floor(cents / 100))}.${String(cents % 100).padStart(2, "0")}`;
 }
-const count = (n: number) => n.toLocaleString("en-IN");
+const count = (n: number) => n.toLocaleString("en-US");
 
 const STATUS = {
   draft: { label: "Draft", Icon: FilePen, cls: "border-border bg-bg-sunken text-ink-muted" },
@@ -61,9 +65,8 @@ export function InvoiceSnippet() {
   const locked = status !== "draft";
 
   const lines = sandbox ? [...BILLABLE, SANDBOX] : BILLABLE;
-  const subtotal = lines.reduce((s, l) => s + l.hits * l.rate, 0);
-  const gst = Math.round(subtotal * GST * 100) / 100;
-  const totalAmt = subtotal + gst;
+  const totalAmt = lines.reduce((s, l) => s + l.hits * l.rate, 0);
+  const units = new Set(lines.map((l) => l.unit)).size;
 
   const layoutT = reduce ? { duration: 0 } : { type: "spring" as const, bounce: 0, duration: 0.35 };
   const blur = reduce
@@ -89,7 +92,7 @@ export function InvoiceSnippet() {
   return (
     <div ref={ref}>
       <Snippet
-        path="accounts / orbit-cards / invoices / sep-2026"
+        path="accounts / quillmark-studio / invoices / sep-2026"
         right={
           <AnimatePresence mode="wait" initial={false}>
             <motion.span
@@ -109,7 +112,7 @@ export function InvoiceSnippet() {
           <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
             <div>
               <Label>Invoice</Label>
-              <div className="mt-1 font-medium text-ink">Orbit Cards · Sep 2026</div>
+              <div className="mt-1 font-medium text-ink">Quillmark Studio · Sep 2026</div>
             </div>
             <div className="min-h-[36px] text-left sm:text-right">
               <Label>Number</Label>
@@ -140,9 +143,9 @@ export function InvoiceSnippet() {
                   Locked
                 </span>
               </div>
-              <div className="mt-1.5 hidden grid-cols-[1fr_72px_56px_104px] gap-x-3 border-b border-border pb-1.5 sm:grid">
-                <Label>API</Label>
-                <Label className="text-right">Hits</Label>
+              <div className="mt-1.5 hidden grid-cols-[1fr_112px_64px_96px] gap-x-3 border-b border-border pb-1.5 sm:grid">
+                <Label>SKU</Label>
+                <Label className="text-right">Quantity</Label>
                 <Label className="text-right">Rate</Label>
                 <Label className="text-right">Amount</Label>
               </div>
@@ -170,7 +173,9 @@ export function InvoiceSnippet() {
                       <span className="min-w-0 truncate text-ink-muted" title={`${UNPRICED.code} ${UNPRICED.name}`}>
                         <span className="font-mono text-ink-faint">{UNPRICED.code}</span> {UNPRICED.name}
                       </span>
-                      <span className="shrink-0 font-mono text-ink-faint">{count(UNPRICED.hits)} hits</span>
+                      <span className="shrink-0 font-mono text-ink-faint">
+                        {count(UNPRICED.hits)} {UNPRICED.unit}
+                      </span>
                     </div>
                     <div className="mt-0.5 inline-flex items-center gap-1 text-warn-ink">
                       <TriangleAlert className="h-3 w-3 shrink-0" aria-hidden />
@@ -215,9 +220,9 @@ export function InvoiceSnippet() {
                     Final invoices are locked; add an adjustment instead
                   </span>
                 ) : sandbox ? (
-                  "Sandbox hits count at ₹2.00."
+                  "Sandbox usage counts at $1.50 per voice."
                 ) : (
-                  "Sandbox hits are not billed unless you include them."
+                  "Sandbox usage is not billed unless you include it."
                 )}
               </p>
             </motion.div>
@@ -230,16 +235,14 @@ export function InvoiceSnippet() {
               className="mt-3 border-t border-border pt-3 font-mono text-[12px]"
             >
               <div className="flex justify-between gap-3 py-0.5 text-ink-muted">
-                <span className="font-sans">Subtotal</span>
-                <Num value={subtotal} format={inr2} />
-              </div>
-              <div className="flex justify-between gap-3 py-0.5 text-ink-muted">
-                <span className="font-sans">GST 18%</span>
-                <Num value={gst} format={inr2} />
+                <span className="font-sans">Lines</span>
+                <span>
+                  {lines.length} SKUs · {units} units of measure
+                </span>
               </div>
               <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border pt-2 text-ink">
                 <span className="font-sans text-[13px] font-medium">Total</span>
-                <Num value={totalAmt} format={inr2} className="font-display text-[20px] tracking-display" />
+                <Num value={totalAmt} format={usd2} className="font-display text-[20px] tracking-display" />
               </div>
             </motion.div>
 
@@ -307,7 +310,7 @@ function LineRow({ line, excluded }: { line: Line; excluded?: boolean }) {
   const amount = line.hits * line.rate;
   const full = `${line.code} ${line.name}${excluded ? " (not billed)" : ""}`;
   return (
-    <div className="border-b border-border py-2 text-[12px] sm:grid sm:grid-cols-[1fr_72px_56px_104px] sm:items-baseline sm:gap-x-3">
+    <div className="border-b border-border py-2 text-[12px] sm:grid sm:grid-cols-[1fr_112px_64px_96px] sm:items-baseline sm:gap-x-3">
       <div className="flex min-w-0 items-center gap-1.5">
         <span className={`min-w-0 truncate ${excluded ? "text-ink-muted" : "text-ink"}`} title={full}>
           <span className="font-mono text-ink-faint">{line.code}</span> {line.name}
@@ -328,14 +331,16 @@ function LineRow({ line, excluded }: { line: Line; excluded?: boolean }) {
       {/* Narrow layout: numbers on their own line. */}
       <div className="mt-0.5 flex items-baseline justify-between gap-3 font-mono text-ink-muted sm:hidden">
         <span>
-          {count(line.hits)} × ₹{line.rate.toFixed(2)}
+          {count(line.hits)} {line.unit} × {usdPrice(line.rate)}
         </span>
-        <span className={excluded ? "text-ink-faint" : "text-ink"}>{excluded ? "excluded" : inr2(amount)}</span>
+        <span className={excluded ? "text-ink-faint" : "text-ink"}>{excluded ? "excluded" : usd2(amount)}</span>
       </div>
-      <span className="hidden text-right font-mono text-ink-muted sm:block">{count(line.hits)}</span>
-      <span className="hidden text-right font-mono text-ink-muted sm:block">₹{line.rate.toFixed(2)}</span>
+      <span className="hidden truncate text-right font-mono text-ink-muted sm:block" title={`${count(line.hits)} ${line.unit}`}>
+        {count(line.hits)} <span className="text-ink-faint">{line.unit}</span>
+      </span>
+      <span className="hidden text-right font-mono text-ink-muted sm:block">{usdPrice(line.rate)}</span>
       <span className={`hidden text-right font-mono sm:block ${excluded ? "text-ink-faint" : "text-ink"}`}>
-        {excluded ? "excluded" : inr2(amount)}
+        {excluded ? "excluded" : usd2(amount)}
       </span>
     </div>
   );

@@ -84,7 +84,7 @@ export function ReconTable({
             <thead>
               <tr className="text-left text-xs text-ink-muted border-b border-border bg-bg-sunken">
                 {showVendor && <th className="px-4 py-2.5 font-medium">Vendor</th>}
-                <th className="px-4 py-2.5 font-medium">API</th>
+                <th className="px-4 py-2.5 font-medium">SKU</th>
                 <th className="px-4 py-2.5 font-medium text-right">Vendor served</th>
                 <th className="px-4 py-2.5 font-medium text-right">Ledgerline counted</th>
                 <th className="px-4 py-2.5 font-medium text-right">Difference</th>
@@ -130,7 +130,7 @@ export function ReconTable({
                           <span
                             className="bg-warn-bg text-warn-ink tracking-wide px-1.5 rounded shrink-0"
                             style={{ fontSize: 9, fontWeight: 500 }}
-                            title="This vendor-side API name matches no API in the catalog"
+                            title="This vendor-side SKU name matches no SKU in the catalog"
                           >
                             No match
                           </span>
@@ -172,7 +172,7 @@ export function ReconTable({
                       ) : owed ? (
                         <span
                           className="text-bad-ink"
-                          title="Volume the vendor served that Ledgerline never costed, at this vendor's rate for this API"
+                          title="Volume the vendor served that Ledgerline never costed, at this vendor's rate for this SKU"
                         >
                           {formatMoney(r.delta_cost, { precision: 0 })}
                         </span>
@@ -181,7 +181,7 @@ export function ReconTable({
                         // rate exists here and which way the gap runs.
                         <span
                           className="text-ink-faint"
-                          title="Ledgerline counted more hits than the vendor reports serving — a discrepancy, but no money at stake"
+                          title="Ledgerline counted more units than the vendor reports serving. This is a discrepancy, but no money is at stake."
                         >
                           −{formatMoney(Math.abs(r.delta_cost), { precision: 0 })}
                         </span>

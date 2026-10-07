@@ -119,7 +119,7 @@ export default function HelpHome() {
         </span>
         <span>
           <kbd className="rounded border border-border bg-bg-raised px-1.5 py-0.5 font-mono text-[11px]">⌘1–3</kbd>
-          <span className="ml-2">jump between Dashboard, Accounts, APIs</span>
+          <span className="ml-2">jump between Dashboard, Accounts, SKUs</span>
         </span>
         <Link href="/dashboard" className="ml-auto text-accent-ink hover:underline underline-offset-4">
           Back to the dashboard →

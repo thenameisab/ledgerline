@@ -29,9 +29,9 @@ export function SandboxGlobalToggle({
             App-wide default: sandbox traffic in reports
           </div>
           <div className="text-xs text-ink-muted mt-1 max-w-xl">
-            Applies everywhere — KPIs, charts, account &amp; API lists, and invoices. When
+            Applies everywhere — KPIs, charts, account &amp; SKU lists, and invoices. When
             excluded, sandbox usage is left out of all of them; when included, it is counted and
-            billed like production traffic. The rules below override it per account·API.
+            billed like production traffic. The rules below override it per account·SKU.
             Default: excluded.
           </div>
         </div>
@@ -65,7 +65,7 @@ export function SandboxGlobalToggle({
         ) : (
           <div
             className="flex shrink-0 items-center gap-2.5"
-            title="Admins set the app-wide default. You can still set rules per account·API below."
+            title="Admins set the app-wide default. You can still set rules per account·SKU below."
           >
             {label}
             <span

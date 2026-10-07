@@ -28,7 +28,7 @@ const isMock = () => process.env.MOCK_INTEGRATIONS === "true";
 export type VendorUsageRow = {
   report_date: string;
   vendor: string;
-  /** Display name, e.g. "Credit Bureau Pull". The catalog match runs on this. */
+  /** Display name, e.g. "Geocoding". The catalog match runs on this. */
   type_label: string;
   /** Endpoint slug, e.g. "credit-bureau-pull". */
   api_name: string;
@@ -200,7 +200,7 @@ function mockHash(str: string): number {
 
 // A vendor-side API name that the mock catalog does not have, so the
 // reconciliation page shows an unmatched row.
-const MOCK_UNMATCHED = { vendor: "DataBridge", type_label: "Address Lookup Pro", api_name: "address-lookup-pro" };
+const MOCK_UNMATCHED = { vendor: "Mapline", type_label: "Reverse Geocoding Batch", api_name: "reverse-geocoding-batch" };
 
 /**
  * The vendor side of the reconciliation, derived from our own usage_daily.

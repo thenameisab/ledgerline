@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "unpriced-traffic",
   title: "Unpriced traffic detection",
   summary:
-    "Ledgerline continuously detects (account, API) pairs that took traffic with no price row, estimates the loss, and surfaces it everywhere the fix is one click away.",
+    "Ledgerline continuously detects (account, SKU) pairs that took traffic with no price row, estimates the loss, and surfaces it everywhere the fix is one click away.",
   group: "Pricing",
   role: "all",
   routes: ["/dashboard"],
@@ -15,9 +15,9 @@ export default function Body() {
   return (
     <>
       <p>
-        The most expensive billing failure is silent: an API goes live for an account before anyone
+        The most expensive billing failure is silent: a SKU goes live for an account before anyone
         writes the price row, the traffic flows, and the invoice quietly omits it. Ledgerline treats
-        unpriced traffic as a first-class defect — detected continuously, valued in rupees, and
+        unpriced traffic as a first-class defect — detected continuously, valued in dollars, and
         shown on every surface where someone could fix it.
       </p>
 
@@ -25,7 +25,7 @@ export default function Body() {
       <ul>
         <li>
           <strong>Dashboard</strong> — the "Revenue leak" row in Money at risk totals all unpriced
-          pairs org-wide, estimated at the org-average rate per hit (marked with a ~ because no
+          pairs org-wide, estimated at the org-average price per unit (marked with a ~ because no
           booked price exists).
         </li>
         <li>
@@ -34,21 +34,21 @@ export default function Body() {
         </li>
         <li>
           <strong>Account profile</strong> — a leak alert with the amount at risk and the count of
-          unpriced pairs, plus red-tinted rows in the API breakdown (hits, zero revenue). The
+          unpriced pairs, plus red-tinted rows in the SKU breakdown (units, zero revenue). The
           briefing calls it out in words.
         </li>
         <li>
-          <strong>Pricing page</strong> — an "unpriced APIs" section listing each pair with the
+          <strong>Pricing page</strong> — an "unpriced SKUs" section listing each pair with the
           date it was first used.
         </li>
         <li>
-          <strong>API profile</strong> — consumers with no price row carry a red{" "}
+          <strong>SKU page</strong> — consumers with no price row carry a red{" "}
           <em>unpriced</em> chip.
         </li>
       </ul>
 
-      <Callout variant="info" title="₹0 is not unpriced">
-        A pair priced at ₹0 is a deliberate no-charge arrangement and is not flagged. A leak means
+      <Callout variant="info" title="$0 is not unpriced">
+        A pair priced at $0 is a deliberate no-charge arrangement and is not flagged. A leak means
         there is <em>no price row at all</em> — nobody has decided what this traffic costs.
       </Callout>
 
@@ -77,7 +77,7 @@ export default function Body() {
           when the price was actually agreed.
         </li>
         <li>
-          <strong>Different from unmapped names</strong> — a leak is a known account and API with
+          <strong>Different from unmapped names</strong> — a leak is a known account and SKU with
           no price. An unmapped log name is traffic Ledgerline can&rsquo;t even attribute; that is the
           "silent loss" row, handled in Aliases.
         </li>

@@ -108,14 +108,14 @@ function deltaPct(current: number, previous: number): number | null {
 }
 
 const DAY_SHORT = (iso: string) =>
-  new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", {
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     timeZone: "UTC",
   });
 
 const DAY_FULL = (iso: string) =>
-  new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", {
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -319,7 +319,7 @@ export async function buildRoundupData(kind: RoundupKind, todayOverride?: string
   };
 
   // Movers: biggest absolute revenue swings vs the comparison window.
-  const MOVER_FLOOR = 100; // ignore sub-₹100 noise
+  const MOVER_FLOOR = 1; // ignore sub-$1 noise
   const moves: RoundupMover[] = [];
   const seen = new Set<number>();
   for (const c of accounts) {

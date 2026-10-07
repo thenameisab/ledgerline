@@ -135,7 +135,7 @@ export function AnswerCard({
     // `error`, not `message`, so message can be undefined at runtime.
     const msg =
       result.message ||
-      "I can answer revenue, hits, and unpriced questions — try “revenue for Acme in May”.";
+      "I can answer revenue, units, and unpriced questions — try “revenue for Copperleaf CRM in May”.";
     return <div className="mx-1 mb-1 px-3 py-4 text-center text-xs text-ink-muted">{msg}</div>;
   }
 

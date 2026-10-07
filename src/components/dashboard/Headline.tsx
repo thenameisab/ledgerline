@@ -168,13 +168,13 @@ export function Headline({
           />
           <Stat
             icon={<Activity size={12} strokeWidth={1.5} />}
-            label="API hits"
+            label="Units"
             value={formatNumber(kpis.total_hits)}
             signValue={kpis.total_hits}
           />
         </div>
         <div className="min-w-[200px] max-w-[340px] flex-1 ml-auto">
-          <div className="text-xs text-ink-muted mb-1">Call status</div>
+          <div className="text-xs text-ink-muted mb-1">Usage outcome</div>
           <ApiStatusChart breakdown={kpis.hit_breakdown} size="sm" />
         </div>
       </div>

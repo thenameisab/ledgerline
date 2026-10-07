@@ -29,12 +29,12 @@ export default function Body() {
       <H2 id="what-you-see">What you see</H2>
       <ul>
         <li>
-          <strong>Main</strong> — Dashboard (<Kbd>⌘1</Kbd>), Accounts (<Kbd>⌘2</Kbd>), APIs (
+          <strong>Main</strong> — Dashboard (<Kbd>⌘1</Kbd>), Accounts (<Kbd>⌘2</Kbd>), SKUs (
           <Kbd>⌘3</Kbd>).
         </li>
         <li>
           <strong>Review</strong> (editors and admins) — the work queues, each with the number of
-          open items on it: Aliases, API review, Unpriced, Sandbox billing, Approvals. A queue is
+          open items on it: Aliases, SKU review, Unpriced, Sandbox billing, Approvals. A queue is
           done when its count is zero.
         </li>
         <li>

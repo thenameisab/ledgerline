@@ -50,7 +50,7 @@ export function CostConfidence({
       label: "Not billed",
       n: confidence.not_billed,
       dot: "bg-ok",
-      note: "In-house, or costed on a stitched product's components — ₹0 by decision",
+      note: "In-house, or costed on a stitched product's components. Cost is $0 by decision",
       fix: null as string | null,
     },
     {
@@ -82,7 +82,7 @@ export function CostConfidence({
       label: "No rate",
       n: confidence.unknown,
       dot: "bg-border",
-      note: "Costed as ₹0 — the margin above is overstated by this much traffic",
+      note: "Costed as $0. The margin above is overstated by this much traffic",
       fix: "Set a rate",
     },
   ];
@@ -90,7 +90,7 @@ export function CostConfidence({
   const caption =
     hits === 0
       ? "No traffic this period"
-      : `Cost confirmed on ${formatShare(share)} of hits`;
+      : `Cost confirmed on ${formatShare(share)} of units`;
 
   return (
     <HoverCard.Root openDelay={180} closeDelay={120}>
@@ -119,7 +119,7 @@ export function CostConfidence({
           <div className="px-4 py-3 border-b border-border">
             <div className="text-xs uppercase tracking-widest text-ink-muted">Cost confidence</div>
             <div className="text-sm text-ink mt-[2px] tnum">
-              {hits === 0 ? "No traffic this period" : `${formatNumber(hits)} hits`}
+              {hits === 0 ? "No traffic this period" : `${formatNumber(hits)} units`}
             </div>
           </div>
           <div className="px-4 py-3 space-y-[10px]">

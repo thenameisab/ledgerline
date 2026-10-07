@@ -50,8 +50,8 @@ export default function Body() {
           <strong>Margin bullet</strong> — current margin % tracked against target.
         </li>
         <li>
-          <strong>Secondary stats</strong> — vendor cost, margin (₹ and %), active accounts, and
-          total API hits, plus a compact <em>call status</em> bar showing the
+          <strong>Secondary stats</strong> — vendor cost, margin ($ and %), active accounts, and
+          total units, plus a compact <em>call status</em> bar showing the
           successful / no-data / failed / in-progress mix.
         </li>
         <li>
@@ -72,7 +72,7 @@ export default function Body() {
           accounts. The choice persists in a cookie, so it sticks across visits.
         </li>
         <li>
-          <strong>Drill down</strong> — every account and API row on the page links to its profile;
+          <strong>Drill down</strong> — every account and SKU row on the page links to its profile;
           "All accounts" jumps to the directory.
         </li>
       </ul>

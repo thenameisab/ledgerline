@@ -4,25 +4,26 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Num, Snippet, Label, inr, inrCompact, useInView } from "./ui";
+import { Num, Snippet, Label, usd, usdCompact, useInView } from "./ui";
 
-type Event = { id: number; account: string; code: string; api: string; hits: number; rate: number };
+// `units` is a count of the SKU's own unit; `unit` is its short label.
+type Event = { id: number; account: string; code: string; sku: string; units: number; unit: string; rate: number };
 
 const FEED: Omit<Event, "id">[] = [
-  { account: "Acme Lending Co", code: "KY1001", api: "PAN Verification", hits: 412, rate: 3.2 },
-  { account: "Orbit Cards", code: "FR5001", api: "Credit Bureau Pull", hits: 96, rate: 12 },
-  { account: "Vertex Pay", code: "BV3001", api: "Penny Drop", hits: 238, rate: 3 },
-  { account: "Helios Capital", code: "IN4004", api: "Bank Statement Analysis", hits: 54, rate: 18 },
-  { account: "Orbit Neobank", code: "KY1007", api: "Face Match", hits: 175, rate: 2.5 },
-  { account: "Zenith Payments", code: "BV3003", api: "UPI ID Verification", hits: 320, rate: 1.2 },
-  { account: "Acme Microfinance", code: "KY1002", api: "Aadhaar OTP Verification", hits: 264, rate: 2.8 },
-  { account: "Summit Credit Union", code: "FR5005", api: "AML / PEP Screening", hits: 61, rate: 6 },
+  { account: "Copperleaf CRM", code: "ATL-PRO-IN", sku: "Atlas Pro · input tokens", units: 42, unit: "M tok", rate: 3 },
+  { account: "Quillmark Studio", code: "PRM-VID-1080", sku: "Prism Video · 1080p", units: 380, unit: "sec", rate: 0.25 },
+  { account: "Harbor Freight", code: "MSG-SMS-US", sku: "SMS · United States", units: 12400, unit: "msg", rate: 0.0079 },
+  { account: "Brightline Clinics", code: "VOX-STT-RT", sku: "Speech-to-text · realtime", units: 8600, unit: "min", rate: 0.006 },
+  { account: "Copperleaf Labs", code: "GPU-H100", sku: "H100 GPU · on-demand", units: 24, unit: "GPU-h", rate: 2.49 },
+  { account: "Kestrel Ads", code: "PRM-IMG-HD", sku: "Prism Image · HD", units: 1450, unit: "img", rate: 0.08 },
+  { account: "Quillmark News", code: "AGT-SEARCH", sku: "Web search tool", units: 9, unit: "K calls", rate: 10 },
+  { account: "Copperleaf Support", code: "VOX-AGENT", sku: "Realtime voice agent", units: 1900, unit: "min", rate: 0.06 },
 ];
 
-// Daily revenue for the last 30 days, in thousands. Ends at today.
+// Daily revenue for the last 30 days, in thousands of dollars. Ends at today.
 const SERIES = [
-  41, 44, 39, 47, 52, 49, 38, 36, 51, 55, 58, 54, 46, 43, 57, 61, 59, 63, 52, 50, 62, 66, 64, 69, 58, 55, 67,
-  71, 68, 66,
+  17.4, 18.6, 16.5, 19.8, 21.9, 20.6, 16.0, 15.2, 21.5, 23.1, 24.4, 22.7, 19.3, 18.1, 24.0, 25.6, 24.8, 26.5,
+  21.8, 21.0, 26.0, 27.7, 26.9, 29.0, 24.4, 23.1, 28.1, 29.8, 28.6, 27.7,
 ];
 
 function sparkPath(values: number[], w: number, h: number) {
@@ -37,8 +38,8 @@ function sparkPath(values: number[], w: number, h: number) {
 export function HeroSnippet() {
   const reduce = useReducedMotion();
   const { ref, inView } = useInView<HTMLDivElement>("0px");
-  const [revenue, setRevenue] = useState(310_610);
-  const [hits, setHits] = useState(92_754);
+  const [revenue, setRevenue] = useState(148_620);
+  const [skus, setSkus] = useState(38);
   const [today, setToday] = useState(SERIES[SERIES.length - 1]);
   const [events, setEvents] = useState<Event[]>(() => FEED.slice(0, 4).map((e, i) => ({ ...e, id: -i })));
   const next = useRef(4);
@@ -52,11 +53,11 @@ export function HeroSnippet() {
         const base = FEED[next.current % FEED.length];
         next.current += 1;
         const jitter = 0.7 + ((seq.current * 37) % 60) / 100;
-        const ev: Event = { ...base, hits: Math.round(base.hits * jitter), id: seq.current++ };
-        const amount = ev.hits * ev.rate;
+        const ev: Event = { ...base, units: Math.max(1, Math.round(base.units * jitter)), id: seq.current++ };
+        const amount = ev.units * ev.rate;
         setEvents((prev) => [ev, ...prev].slice(0, 4));
         setRevenue((r) => r + amount);
-        setHits((h) => h + ev.hits);
+        setSkus((n) => Math.min(43, n + (seq.current % 5 === 0 ? 1 : 0)));
         setToday((t) => t + amount / 1000);
       }
       timer = setTimeout(tick, 2600);
@@ -84,14 +85,14 @@ export function HeroSnippet() {
           <div>
             <Label>MTD revenue</Label>
             <div className="mt-1 font-display text-[34px] leading-none tracking-hero text-ink sm:text-[40px]">
-              <Num value={revenue} format={inr} />
+              <Num value={revenue} format={usd} />
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink-faint">
               <span className="inline-flex items-center rounded-full bg-ok-bg px-1.5 py-0.5 font-mono text-[11px] text-ok-ink">
                 +10.0% vs Sep
               </span>
               <span>
-                <Num value={hits} /> hits · margin 54%
+                <Num value={skus} /> SKUs billed · margin 54%
               </span>
             </div>
           </div>
@@ -130,7 +131,7 @@ export function HeroSnippet() {
               />
             </svg>
             <div className="mt-1 text-right font-mono text-[11px] text-ink-faint">
-              today {inrCompact(today * 1000)}
+              today {usdCompact(today * 1000)}
             </div>
           </div>
         </div>
@@ -152,16 +153,18 @@ export function HeroSnippet() {
                   transition={{ type: "spring", bounce: 0, duration: 0.45 }}
                   className={`flex items-center gap-3 rounded px-2 py-2 ${e.id > 0 ? "ll-flash" : ""}`}
                 >
-                  <span className="w-[56px] shrink-0 font-mono text-[11px] text-ink-faint">{e.code}</span>
-                  <span className="min-w-0 flex-1 truncate text-[13px] text-ink" title={`${e.account} · ${e.api}`}>
+                  <span className="w-[92px] shrink-0 truncate font-mono text-[11px] text-ink-faint" title={e.code}>
+                    {e.code}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-[13px] text-ink" title={`${e.account} · ${e.sku}`}>
                     {e.account}
-                    <span className="text-ink-faint"> · {e.api}</span>
+                    <span className="text-ink-faint"> · {e.sku}</span>
                   </span>
                   <span className="hidden shrink-0 font-mono text-[12px] tabular-nums text-ink-faint sm:inline">
-                    +{e.hits.toLocaleString("en-US")} hits
+                    +{e.units.toLocaleString("en-US")} {e.unit}
                   </span>
                   <span className="w-[72px] shrink-0 text-right font-mono text-[12px] tabular-nums text-ink">
-                    {inr(e.hits * e.rate)}
+                    {usd(e.units * e.rate)}
                   </span>
                 </motion.li>
               ))}

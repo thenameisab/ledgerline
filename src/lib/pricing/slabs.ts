@@ -57,7 +57,7 @@ export type SlabRevenue = {
   revenue: Money;
   /**
    * Volume-weighted blended unit price per outcome (Σ tier_share × tier_price).
-   * Exposed so a statement line can show an effective ₹/hit and `hits × price`
+   * Exposed so a statement line can show an effective $/unit and `units × price`
    * reconciles to `revenue`.
    */
   effective: {
@@ -239,7 +239,7 @@ export function validateSlabs(slabs: Slab[]): string | null {
   if (slabs.length === 0) return "Add at least one tier.";
   const sorted = [...slabs].sort((a, b) => a.min_hits - b.min_hits);
 
-  if (sorted[0].min_hits !== 0) return "The first tier must start at 0 hits.";
+  if (sorted[0].min_hits !== 0) return "The first tier must start at 0 units.";
 
   for (let i = 0; i < sorted.length; i++) {
     const s = sorted[i];

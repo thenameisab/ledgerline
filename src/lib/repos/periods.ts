@@ -78,7 +78,7 @@ export function lastNDaysRange(n: number): DateRange {
 
 // "2026-05-01" → "May 2026".
 export function monthLabel(iso: string): string {
-  return new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", {
+  return new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
     month: "long",
     year: "numeric",
     timeZone: "UTC",

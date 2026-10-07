@@ -100,8 +100,8 @@ export const ACTIONS: CmdAction[] = [
   },
   {
     id: "review-api-catalog",
-    label: "Review API catalog",
-    keywords: "api review codes drift accept",
+    label: "Review SKU catalog",
+    keywords: "sku api review codes drift accept",
     icon: ListChecks,
     roles: EDITS,
     kind: "nav",
@@ -109,8 +109,8 @@ export const ACTIONS: CmdAction[] = [
   },
   {
     id: "price-unpriced-pairs",
-    label: "Price unpriced APIs",
-    keywords: "unpriced missing price gap leak zero rate account api pair",
+    label: "Price unpriced SKUs",
+    keywords: "unpriced missing price gap leak zero rate account sku api pair",
     icon: DollarSign,
     roles: ADMIN,
     kind: "nav",

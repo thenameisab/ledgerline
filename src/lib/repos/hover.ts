@@ -38,6 +38,8 @@ export type ApiHoverCard = {
   name: string;
   category: string;
   vendorType: string;
+  /** What one billed unit is, e.g. "1M tokens". */
+  unit: string;
   periodLabel: string;
   revenue: number;
   hits: number;
@@ -101,6 +103,7 @@ export async function getApiHoverCard(
     name: a.name,
     category: a.category,
     vendorType: a.vendor_type,
+    unit: a.unit,
     periodLabel: monthLabel(period.from),
     revenue: a.revenue,
     hits: a.total_hits,

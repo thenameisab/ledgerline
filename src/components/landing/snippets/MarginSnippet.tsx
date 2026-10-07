@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, TriangleAlert, Undo2 } from "lucide-react";
-import { Label, Num, Segmented, Snippet, inr, useInView } from "@/components/landing/ui";
+import { Label, Num, Segmented, Snippet, usd, useInView } from "@/components/landing/ui";
 
 type View = "margin" | "reconcile";
 
-// Margin view data (fictional). Cost on estimated hits comes from a quoted rate.
-const REVENUE = 310_610;
-const COST_CONFIRMED = 113_140;
-const COST_ESTIMATED = 30_140;
+// Margin view data (fictional). Cost on estimated units comes from a quoted rate.
+const REVENUE = 48_210;
+const COST_CONFIRMED = 17_560;
+const COST_ESTIMATED = 4_680;
 const TARGET = 45;
 const COVERAGE = [
   { key: "confirmed", label: "Confirmed", pct: 64, note: "rate card set", cls: "bg-ok" },
@@ -18,7 +18,7 @@ const COVERAGE = [
   { key: "unknown", label: "Unknown", pct: 15, note: "no vendor rate", cls: "bg-border-strong" },
 ] as const;
 
-// Reconcile view data: FR5001 Credit Bureau Pull, our count vs DataBridge's count.
+// Reconcile view data: MSG-SMS-US, our message count vs Northbeam Telecom's count.
 const DAYS: { day: number; ours: number; theirs: number }[] = [
   { day: 17, ours: 10_240, theirs: 10_221 },
   { day: 18, ours: 11_086, theirs: 11_104 },
@@ -42,7 +42,7 @@ const diffOf = (d: (typeof DAYS)[number]) => d.theirs - d.ours;
 const pctOf = (d: (typeof DAYS)[number]) => (d.ours === 0 ? 100 : (Math.abs(diffOf(d)) / d.ours) * 100);
 const isGap = (d: (typeof DAYS)[number]) => pctOf(d) > 0.5;
 const GAP_INDEXES = DAYS.map((d, i) => (isGap(d) ? i : -1)).filter((i) => i >= 0);
-const fmt = (n: number) => n.toLocaleString("en-IN");
+const fmt = (n: number) => n.toLocaleString("en-US");
 const signed = (n: number) => (n > 0 ? `+${fmt(n)}` : n < 0 ? `−${fmt(-n)}` : "0");
 
 export function MarginSnippet() {
@@ -75,7 +75,7 @@ export function MarginSnippet() {
   return (
     <div ref={ref} onPointerDownCapture={touch} onKeyDownCapture={touch} onFocusCapture={touch}>
       <Snippet
-        path="vendors / databridge / reconciliation"
+        path="vendors / northbeam-telecom / reconciliation"
         right={
           <Segmented<View>
             size="sm"
@@ -132,17 +132,17 @@ function MarginView({
 
   return (
     <div className="flex flex-col gap-5 p-4 sm:p-5">
-      <div className="text-[12px] text-ink-muted">DataBridge · all accounts · Sep 2026</div>
+      <div className="text-[12px] text-ink-muted">Northbeam Telecom · all accounts · Sep 2026</div>
 
       <div aria-live="polite" className="grid grid-cols-3 gap-3 border-b border-border pb-4">
-        <Figure label="Revenue" title={inr(REVENUE)}>
-          <Num value={REVENUE} format={inr} />
+        <Figure label="Revenue" title={usd(REVENUE)}>
+          <Num value={REVENUE} format={usd} />
         </Figure>
-        <Figure label="Vendor cost" title={inr(cost)}>
-          <Num value={cost} format={inr} />
+        <Figure label="Vendor cost" title={usd(cost)}>
+          <Num value={cost} format={usd} />
         </Figure>
-        <Figure label="Margin" title={inr(margin)} strong>
-          <Num value={margin} format={inr} />
+        <Figure label="Margin" title={usd(margin)} strong>
+          <Num value={margin} format={usd} />
         </Figure>
       </div>
 
@@ -177,7 +177,7 @@ function MarginView({
 
       <div>
         <div className="flex items-baseline justify-between gap-3">
-          <Label>Cost coverage · share of hits</Label>
+          <Label>Cost coverage · share of units</Label>
         </div>
         <div className="mt-2 flex h-[10px] gap-0.5 overflow-hidden rounded-full" aria-hidden>
           {COVERAGE.map((c) => (
@@ -308,8 +308,8 @@ function ReconcileView({
     <div className="flex flex-col gap-4 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
         <div className="min-w-0">
-          <div className="text-[13px] font-medium text-ink">FR5001 Credit Bureau Pull</div>
-          <div className="text-[12px] text-ink-muted">Our hits vs DataBridge · 17–30 Sep 2026</div>
+          <div className="text-[13px] font-medium text-ink">MSG-SMS-US SMS · United States</div>
+          <div className="text-[12px] text-ink-muted">Our message count vs Northbeam Telecom · 17–30 Sep 2026</div>
         </div>
         <div
           aria-live="polite"
@@ -327,14 +327,14 @@ function ReconcileView({
       <div>
         <div
           role="group"
-          aria-label="Daily hit counts, ours and DataBridge's. Use the arrow keys to move between days."
+          aria-label="Daily message counts, ours and Northbeam Telecom's. Use the arrow keys to move between days."
           className="grid h-[150px] grid-cols-[repeat(14,minmax(0,1fr))] items-end gap-0.5"
         >
           {DAYS.map((day, i) => {
             const g = isGap(day);
             const open = g && !dismissed[i];
             const active = i === selected;
-            const label = `${day.day} Sep: ours ${fmt(day.ours)}, DataBridge ${fmt(day.theirs)}${
+            const label = `${day.day} Sep: ours ${fmt(day.ours)}, Northbeam ${fmt(day.theirs)}${
               open ? ", gap" : g ? ", gap dismissed" : ", matches"
             }`;
             return (
@@ -394,7 +394,7 @@ function ReconcileView({
             <span className="h-2 w-2 rounded-sm bg-accent" aria-hidden /> Ours
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-sm bg-border-strong" aria-hidden /> DataBridge
+            <span className="h-2 w-2 rounded-sm bg-border-strong" aria-hidden /> Northbeam
           </span>
           <span className="flex items-center gap-1.5">
             <TriangleAlert size={11} className="text-warn" aria-hidden /> Gap over 0.5%
@@ -409,7 +409,7 @@ function ReconcileView({
         </div>
         <dl className="mt-2 grid grid-cols-3 gap-2 text-[12px]">
           <Cell label="Ours" value={fmt(d.ours)} />
-          <Cell label="DataBridge" value={fmt(d.theirs)} />
+          <Cell label="Northbeam" value={fmt(d.theirs)} />
           <Cell
             label="Difference"
             value={d.ours === 0 ? signed(diff) : `${signed(diff)} · ${pctOf(d).toFixed(1)}%`}

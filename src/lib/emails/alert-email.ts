@@ -65,7 +65,7 @@ function pill(sev: AlertSeverity): string {
   return `<span style="display:inline-block;padding:2px 8px;border-radius:999px;background-color:${s.bg};font-family:${FONT};font-size:11px;font-weight:600;color:${s.fg};">${s.label}</span>`;
 }
 
-/** "B1 · Failures · Acme · KY1002" */
+/** "B1 · Failures · Copperleaf CRM · ATL-PRO-IN" */
 function metaLine(a: AlertEmailItem): string {
   return [a.rule, groupLabel(ALERT_RULES[a.rule].group), a.accountName, a.apiCode, a.vendor].filter(Boolean).join(" · ");
 }

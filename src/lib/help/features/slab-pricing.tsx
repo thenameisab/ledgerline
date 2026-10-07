@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "slab-pricing",
   title: "Usage-slab pricing",
   summary:
-    "Graduated volume tiers per API: the more hits an account sends in a period, the cheaper each hit — priced marginally on the period's total volume.",
+    "Graduated volume tiers per SKU: the more units an account uses in a period, the cheaper each unit — priced marginally on the period's total volume.",
   group: "Pricing",
   role: "admin",
   routes: ["/accounts"],
@@ -15,23 +15,24 @@ export default function Body() {
   return (
     <>
       <p>
-        Some contracts price an API on volume: the first slice of monthly hits at one rate, the
+        Some contracts price a SKU on volume: the first slice of monthly units at one rate, the
         next slice cheaper, and so on. Usage-slab pricing encodes that directly on an account&rsquo;s
         pricing row. Tiers are <strong>graduated</strong> — like income-tax brackets — over the
-        period&rsquo;s <strong>total hits</strong>: a month of 45,000 hits with tiers 0&ndash;40k at
-        ₹15 and 40k+ at ₹13 bills 40,000&nbsp;×&nbsp;₹15 + 5,000&nbsp;×&nbsp;₹13, not all 45,000 at
-        one rate.
+        period&rsquo;s <strong>total units</strong>: a month of 1.2M SMS messages with tiers
+        0&ndash;1M at $0.0079 per message and 1M+ at $0.0065 bills
+        1,000,000&nbsp;×&nbsp;$0.0079 + 200,000&nbsp;×&nbsp;$0.0065 = $9,200, not all 1.2M at one
+        rate.
       </p>
 
       <H2 id="what-you-see">What you see</H2>
       <ul>
         <li>
-          <strong>A <em>tier</em> toggle</strong> on each API row in the pricing table. A flat row
-          shows the four per-hit rates; a tiered row shows a tier summary (&ldquo;3 tiers · ₹15 →
-          ₹13 → ₹11&rdquo;) and an edit button.
+          <strong>A <em>tier</em> toggle</strong> on each SKU row in the pricing table. A flat row
+          shows the four per-unit rates; a tiered row shows a tier summary (&ldquo;3 tiers · $0.0079 →
+          $0.0065 → $0.0052&rdquo;) and an edit button.
         </li>
         <li>
-          <strong>The tier editor</strong> — a small grid of hit ranges, each with its own price for
+          <strong>The tier editor</strong> — a small grid of unit ranges, each with its own price for
           the four outcomes (successful, no-data, failed, in-progress). Leave a column at 0 when an
           outcome isn&rsquo;t billed.
         </li>
@@ -54,12 +55,12 @@ export default function Body() {
         </li>
         <li>
           <strong>Switch back to flat</strong> — <em>use flat</em> drops the tiers and restores a
-          single per-hit rate.
+          single per-unit rate.
         </li>
       </ul>
 
       <Callout variant="info" title="Bands are on total volume, prices are per outcome">
-        Each tier is selected by the period&rsquo;s total hits across all four outcomes; within a
+        Each tier is selected by the period&rsquo;s total units across all four outcomes; within a
         tier, that band&rsquo;s volume is split across outcomes by the period&rsquo;s mix and priced
         at the tier&rsquo;s per-outcome rate. When only the successful price is set, this reduces to
         the obvious graduated calculation.
@@ -73,18 +74,18 @@ export default function Body() {
           assembled, not day by day.
         </li>
         <li>
-          <strong>Not revenue leak</strong> — a tiered API counts as priced even though its flat
+          <strong>Not revenue leak</strong> — a tiered SKU counts as priced even though its flat
           columns are 0, so it never shows up in the unpriced/leak callouts.
         </li>
         <li>
-          <strong>New APIs add as flat</strong> — add the API first, then toggle it to tiered.
+          <strong>New SKUs add as flat</strong> — add the SKU first, then toggle it to tiered.
         </li>
       </ul>
 
       <Related
         links={[
           { href: "/help/features/account-pricing", label: "Account pricing" },
-          { href: "/help/features/stitched-bundles", label: "Stitched API bundles" },
+          { href: "/help/features/stitched-bundles", label: "Stitched SKU bundles" },
           { href: "/help/guides/set-slab-pricing", label: "Set up tiered pricing" },
           { href: "/help/math#slabs", label: "Slab pricing math" },
         ]}

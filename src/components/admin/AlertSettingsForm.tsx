@@ -29,8 +29,8 @@ const SUFFIX: Record<ThresholdUnit, string> = {
   share: "%",
   points: "points",
   times: "×",
-  hits: "hits",
-  rupees: "₹",
+  hits: "units",
+  rupees: "$",
   count: "",
   days: "days",
   dayOfMonth: "day of month",
@@ -118,7 +118,7 @@ export function AlertSettingsForm({
           {others.length > 0 && <span className="text-ink-faint"> (also used by {others.join(", ")})</span>}
         </label>
         <div className="mt-1 flex items-center gap-2">
-          {meta.unit === "rupees" && <span className="text-sm text-ink-muted">₹</span>}
+          {meta.unit === "rupees" && <span className="text-sm text-ink-muted">$</span>}
           <input
             id={`t-${k}`}
             inputMode="decimal"

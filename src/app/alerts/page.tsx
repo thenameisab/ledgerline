@@ -150,9 +150,9 @@ export default async function AlertsPage({
           {series && (
             <span
               className="hidden items-center gap-2 sm:inline-flex"
-              title={`Daily hits, ${formatDate(shiftISO(hitsTo, -(TREND_DAYS - 1)))} to ${formatDate(hitsTo)}. Last day ${formatNumber(series[series.length - 1])}, daily average ${formatNumber(Math.round(avg))}.`}
+              title={`Daily units, ${formatDate(shiftISO(hitsTo, -(TREND_DAYS - 1)))} to ${formatDate(hitsTo)}. Last day ${formatNumber(series[series.length - 1])}, daily average ${formatNumber(Math.round(avg))}.`}
             >
-              <span className="text-xs text-ink-faint">Hits, {TREND_DAYS} days</span>
+              <span className="text-xs text-ink-faint">Units, {TREND_DAYS} days</span>
               <Sparkline data={series} width={96} height={24} stroke="var(--color-ink-muted)" />
             </span>
           )}
@@ -302,7 +302,7 @@ export default async function AlertsPage({
                     {goodNews.length} alert{goodNews.length === 1 ? "" : "s"}
                     {accountsIn(goodBlocks) > 0 && ` on ${accountsIn(goodBlocks)} account${accountsIn(goodBlocks) === 1 ? "" : "s"}`}
                   </span>
-                  <span className="ms-auto hidden text-xs text-ink-faint sm:inline">Growth, new APIs and tiers reached. No action needed.</span>
+                  <span className="ms-auto hidden text-xs text-ink-faint sm:inline">Growth, new SKUs and tiers reached. No action needed.</span>
                 </summary>
                 <div className="mt-3 space-y-3">{goodBlocks.map(renderBlock)}</div>
               </details>

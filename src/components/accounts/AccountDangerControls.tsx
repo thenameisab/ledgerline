@@ -212,7 +212,7 @@ export function CollisionsPanel({
         })}
       </ul>
       <p className="mt-2 text-[11px] leading-snug text-ink-faint">
-        Both accounts price these APIs from the same date. Pick which price survives — nothing is dropped silently.
+        Both accounts price these SKUs from the same date. Pick which price survives — nothing is dropped silently.
       </p>
     </div>
   );

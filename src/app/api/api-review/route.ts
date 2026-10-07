@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 
   if (body.action === "override") {
     const [api] = await sql`SELECT 1 FROM apis WHERE product_code = ${body.code} AND is_active = 1`;
-    if (!api) return NextResponse.json({ ok: false, error: "target code not found or inactive" }, { status: 404 });
+    if (!api) return NextResponse.json({ ok: false, error: "target SKU code not found or inactive" }, { status: 404 });
     await sql`
       INSERT INTO api_code_overrides (raw_api_name, api_code, created_by)
       VALUES (${body.raw_api_name}, ${body.code}, ${user.id})
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
 
   // acknowledge-drift: append the raw name to the code's known aliases.
   const [row] = await sql`SELECT log_aliases FROM apis WHERE product_code = ${body.code}`;
-  if (!row) return NextResponse.json({ ok: false, error: "api not found" }, { status: 404 });
+  if (!row) return NextResponse.json({ ok: false, error: "SKU not found" }, { status: 404 });
   const aliases = parseAliases((row as any).log_aliases);
   if (!aliases.includes(body.raw_api_name)) aliases.push(body.raw_api_name);
   await sql`UPDATE apis SET log_aliases = ${JSON.stringify(aliases)} WHERE product_code = ${body.code}`;

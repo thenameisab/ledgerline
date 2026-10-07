@@ -60,7 +60,7 @@ export async function specFromLlm(
           {
             role: "system",
             content:
-              "Translate a billing question into a JSON query spec. metric is revenue, hits, or unpriced. entityType is account, group, or all. entityName must be exactly one of the provided names, or null. topN is a positive integer for ranked lists, else null. period is a phrase like 'May 2026', 'last month', or null for this month. Never invent values.",
+              "Translate a billing question into a JSON query spec. metric is revenue, hits, or unpriced; use hits for questions about units, usage or volume. entityType is account, group, or all. entityName must be exactly one of the provided names, or null. topN is a positive integer for ranked lists, else null. period is a phrase like 'May 2026', 'last month', or null for this month. Never invent values.",
           },
           {
             role: "user",

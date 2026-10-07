@@ -3,8 +3,8 @@ import { H2, Steps, Step, Callout, Figure, Related } from "@/components/help/doc
 
 export const meta: GuideMeta = {
   slug: "create-a-stitched-bundle",
-  title: "Create a stitched API bundle",
-  summary: "Bill several APIs as one product: pick the members, mark the anchor, and set one agreed price.",
+  title: "Create a stitched SKU bundle",
+  summary: "Bill several SKUs as one product: pick the members, mark the anchor, and set one agreed price.",
   group: "Pricing",
   role: "admin",
   minutes: 4,
@@ -14,27 +14,30 @@ export default function Body() {
   return (
     <>
       <p>
-        Some contracts price a chain of APIs as a single call — for example a KYC journey that hits
-        three internal APIs but bills once. A <em>stitch</em> models exactly that: usage still logs
-        per API, but the account is billed once per hit of the <strong>anchor</strong> API at the
-        agreed price, and the other members bill ₹0 without counting as revenue leak.
+        Some contracts price several SKUs as a single product. For example, a realtime voice agent
+        uses <code>VOX-STT-RT</code> (speech-to-text) and <code>VOX-AGENT</code> (the agent) for
+        each minute of a call, but the contract bills one price per minute. A <em>stitch</em>{" "}
+        models this. Usage still logs per SKU, but the account is billed once per unit of the{" "}
+        <strong>anchor</strong> SKU at the agreed price. The other members bill $0 and do not
+        count as revenue leak.
       </p>
 
       <H2 id="create">Create the stitch</H2>
       <Steps>
         <Step title="Open the account’s pricing page">
           From the account detail page, click <strong>Manage pricing</strong>. The{" "}
-          <strong>Stitch APIs</strong> button appears once the account has at least two price rows.
+          <strong>Stitch SKUs</strong> button appears once the account has at least two price rows.
         </Step>
-        <Step title="Click “Stitch APIs” and name the bundle">
-          Give it the contract’s name for the product, e.g. “KYC Prefill Combo”.
+        <Step title="Click “Stitch SKUs” and name the bundle">
+          Give it the contract’s name for the product, e.g. “Realtime Voice Agent”.
         </Step>
-        <Step title="Pick the member APIs and mark the anchor">
-          Check at least two APIs, then select the <strong>anchor</strong> radio on the API whose
-          hit count equals one stitched call — usually the entry point of the chain.
+        <Step title="Pick the member SKUs and mark the anchor">
+          Check at least two SKUs, then select the <strong>anchor</strong> radio on the SKU whose
+          unit count equals one stitched unit. In the voice example, the anchor is{" "}
+          <code>VOX-AGENT</code>, because one agent minute is one billed minute.
         </Step>
-        <Step title="Set the agreed price (₹/stitched call)">
-          Four rates (S / ND / F / IP), applied to the anchor API’s hits by status. At least one
+        <Step title="Set the agreed price ($ per stitched unit)">
+          Four rates (S / ND / F / IP), applied to the anchor SKU’s units by status. At least one
           must be non-zero.
         </Step>
         <Step title="Set “Effective from” and click “Create stitch”">
@@ -45,22 +48,22 @@ export default function Body() {
 
       <Figure
         src="/help/shots/account-pricing.png"
-        alt="The pricing table showing a stitched bundle group above the individual API rows"
+        alt="The pricing table showing a stitched bundle group above the individual SKU rows"
         caption="A stitch renders as a header row with the bundle price, members indented beneath it."
       />
 
       <H2 id="after">How a stitch reads afterwards</H2>
       <ul>
         <li>
-          In the pricing table the bundle is one editable row (chip: <em>stitched · N APIs</em>);
-          members show <em>anchor</em> or <em>included</em> chips and “₹0 · in stitch”.
+          In the pricing table the bundle is one editable row (chip: <em>stitched · N SKUs</em>);
+          members show <em>anchor</em> or <em>included</em> chips and “$0 · in stitch”.
         </li>
         <li>
           On invoices the stitch appears as a single line at the bundle price — members are not
           listed separately.
         </li>
         <li>
-          On the API detail page, accounts billed through a bundle carry a <em>stitched</em> chip in
+          On the SKU page, accounts billed through a bundle carry a <em>stitched</em> chip in
           the consumers table.
         </li>
       </ul>

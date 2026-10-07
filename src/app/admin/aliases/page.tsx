@@ -75,7 +75,7 @@ export default async function AliasMapperPage({ searchParams }: { searchParams: 
     <main>
       <StatusBar
         title="Alias mapper"
-        subtitle={`${ucList.length} unmapped account name${ucList.length === 1 ? "" : "s"} · ${uaList.length} unmapped API name${uaList.length === 1 ? "" : "s"}${newApiCount > 0 ? ` (${newApiCount} new)` : ""}`}
+        subtitle={`${ucList.length} unmapped account name${ucList.length === 1 ? "" : "s"} · ${uaList.length} unmapped SKU name${uaList.length === 1 ? "" : "s"}${newApiCount > 0 ? ` (${newApiCount} new)` : ""}`}
       />
 
       <div className="mx-auto w-full max-w-[1200px] px-7 py-6 space-y-5">
@@ -85,7 +85,7 @@ export default async function AliasMapperPage({ searchParams }: { searchParams: 
           style={{ "--i": 0 } as React.CSSProperties}
         >
           <h2 className="text-xs uppercase tracking-widest text-ink-muted">
-            Unattributed hits (all time)
+            Unattributed units (all time)
           </h2>
           <div className="flex items-end gap-3 mt-[6px]">
             <span className="inline-block">
@@ -101,7 +101,7 @@ export default async function AliasMapperPage({ searchParams }: { searchParams: 
           <p className="text-sm text-ink-muted mt-3 max-w-xl leading-normal">
             {unmappedHits > 0 ? (
               <>
-                Hits whose raw log name doesn&apos;t map to a canonical account or API — they
+                Units whose raw log name doesn&apos;t map to a canonical account or SKU. They
                 earn nothing and appear in no report until resolved below.
               </>
             ) : (
@@ -118,7 +118,7 @@ export default async function AliasMapperPage({ searchParams }: { searchParams: 
             href="/admin/aliases?tab=accounts"
           />
           <FilterPill
-            label="APIs"
+            label="SKUs"
             count={uaList.length}
             active={tab === "apis"}
             href="/admin/aliases?tab=apis"
@@ -156,7 +156,7 @@ function DuplicatesPanel({
         <Copy size={20} strokeWidth={1.5} className="text-success mx-auto mb-3" />
         <div className="font-serif text-lg text-ink">No duplicates</div>
         <div className="text-sm text-ink-muted mt-1">
-          Every name and alias in the catalog identifies exactly one API.
+          Every name and alias in the catalog identifies exactly one SKU.
         </div>
       </div>
     );
@@ -165,15 +165,15 @@ function DuplicatesPanel({
   return (
     <div className="elev-1 bg-bg-raised rounded-md overflow-hidden">
       <div className="px-4 py-3 bg-warn-bg text-warn-ink text-sm border-b border-border">
-        These identifiers point at more than one API — the importer resolves them
-        ambiguously. Edit the colliding APIs to remove the overlap.
+        These identifiers point at more than one SKU, so the importer resolves them
+        ambiguously. Edit the colliding SKUs to remove the overlap.
       </div>
       <table className="w-full text-sm">
         <thead className="bg-bg-sunken text-ink-muted text-xs uppercase tracking-wide">
           <tr className="text-left">
             <th className="px-4 py-3 font-medium">Type</th>
             <th className="px-3 py-3 font-medium">Shared identifier</th>
-            <th className="px-4 py-3 font-medium">APIs claiming it</th>
+            <th className="px-4 py-3 font-medium">SKUs claiming it</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">

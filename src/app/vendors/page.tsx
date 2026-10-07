@@ -67,16 +67,16 @@ export default async function VendorLibraryPage({
             </span>
           </div>
           <p className="text-sm text-ink-muted mt-3 max-w-2xl leading-normal">
-            Across {withTraffic} vendor{withTraffic === 1 ? "" : "s"} serving {totalApis} API
+            Across {withTraffic} vendor{withTraffic === 1 ? "" : "s"} serving {totalApis} SKU
             {totalApis === 1 ? "" : "s"} in this period.{" "}
             {totalHits === 0 ? (
               "No traffic in this period."
             ) : coverage >= 99.5 ? (
-              "Every hit is costed at a known rate."
+              "Every unit is costed at a known rate."
             ) : (
               <span className="text-warn-ink">
-                Cost is known on {formatPercent(coverage, 1)} of hits — {pricedApis} of {totalApis}{" "}
-                APIs with traffic have a rate. This total counts only those; the rest are
+                Cost is known on {formatPercent(coverage, 1)} of units — {pricedApis} of {totalApis}{" "}
+                SKUs with traffic have a rate. This total counts only those; the rest are
                 unknown, not free.
               </span>
             )}
@@ -90,15 +90,15 @@ export default async function VendorLibraryPage({
               {worklist.unrated_pairs > 0 && (
                 <>
                   <span className="text-ink">{formatNumber(worklist.unrated_pairs)}</span>{" "}
-                  vendor–API pair{worklist.unrated_pairs === 1 ? "" : "s"} carry{" "}
-                  {formatNumber(worklist.unrated_hits)} hits with a vendor but no rate.{" "}
+                  vendor–SKU pair{worklist.unrated_pairs === 1 ? "" : "s"} carry{" "}
+                  {formatNumber(worklist.unrated_hits)} units with a vendor but no rate.{" "}
                 </>
               )}
               {worklist.unrouted_apis > 0 && (
                 <>
-                  <span className="text-ink">{formatNumber(worklist.unrouted_apis)}</span> API
+                  <span className="text-ink">{formatNumber(worklist.unrouted_apis)}</span> SKU
                   {worklist.unrouted_apis === 1 ? "" : "s"} carry{" "}
-                  {formatNumber(worklist.unrouted_hits)} hits with no vendor at all.{" "}
+                  {formatNumber(worklist.unrouted_hits)} units with no vendor at all.{" "}
                 </>
               )}
               Sandbox traffic is excluded
@@ -108,8 +108,8 @@ export default async function VendorLibraryPage({
                   {" "}
                   A further {formatNumber(worklist.sandbox_only_pairs)} unrated pair
                   {worklist.sandbox_only_pairs === 1 ? "" : "s"} appear only in sandbox
-                  ({formatNumber(worklist.sandbox_only_hits)} hits) — still vendor spend, unless
-                  the vendor&rsquo;s page says it does not charge for sandbox calls.
+                  ({formatNumber(worklist.sandbox_only_hits)} units) — still vendor spend, unless
+                  the vendor&rsquo;s page says it does not charge for sandbox usage.
                 </>
               )}
             </p>
@@ -158,7 +158,7 @@ export default async function VendorLibraryPage({
                     {v.minimum_top_up > 0 && (
                       <div
                         className="text-[10px] text-warn-ink mt-1"
-                        title="A monthly minimum topped light months up to the contracted floor. It belongs to no API, so the rate card rows sum to less than this."
+                        title="A monthly minimum topped light months up to the contracted floor. It belongs to no SKU, so the rate card rows sum to less than this."
                       >
                         incl. {formatMoney(v.minimum_top_up, { compact: true })} minimum
                       </div>
@@ -197,14 +197,14 @@ export default async function VendorLibraryPage({
                 <dl className="grid grid-cols-2 gap-2 text-xs hairline pt-3">
                   <div>
                     <dt className="text-ink-faint text-[10px] uppercase tracking-wide">
-                      APIs priced
+                      SKUs priced
                     </dt>
                     <dd className="font-mono tnum mt-0.5 text-ink">
                       {v.api_count > 0 ? `${v.priced_apis} of ${v.api_count}` : `${v.rated_pairs} on card`}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-ink-faint text-[10px] uppercase tracking-wide">Hits</dt>
+                    <dt className="text-ink-faint text-[10px] uppercase tracking-wide">Units</dt>
                     <dd className="font-mono tnum mt-0.5 text-ink">
                       {v.total_hits > 0 ? formatNumber(v.total_hits) : "—"}
                     </dd>

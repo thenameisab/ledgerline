@@ -5,7 +5,7 @@ export const meta: FeatureMeta = {
   slug: "hover-cards",
   title: "Rich hover cards",
   summary:
-    "Hover any account or API name to see a summary card — revenue, hits, and status — without leaving the page.",
+    "Hover any account or SKU name to see a summary card — revenue, units, and status — without leaving the page.",
   group: "Platform",
   role: "all",
 };
@@ -14,7 +14,7 @@ export default function Body() {
   return (
     <>
       <p>
-        Account and API names throughout Ledgerline are hover targets. Pausing on one opens a compact card
+        Account and SKU names throughout Ledgerline are hover targets. Pausing on one opens a compact card
         with the essentials — so you can confirm which entity a row refers to, or check its headline
         numbers, without navigating away and losing your place.
       </p>
@@ -22,25 +22,25 @@ export default function Body() {
       <H2 id="what-you-see">What&rsquo;s on the card</H2>
       <ul>
         <li>
-          <strong>Account card</strong> — name and logo, revenue, hits, and status for the current
+          <strong>Account card</strong> — name and logo, revenue, units, and status for the current
           window.
         </li>
         <li>
-          <strong>API card</strong> — product code, the same summary metrics, and how widely the API
+          <strong>SKU card</strong> — SKU code, the same summary metrics, and how widely the SKU
           is used.
         </li>
       </ul>
 
       <H2 id="how-it-works">How it works</H2>
       <p>
-        The cards reuse the same cached account and API summaries the dashboard already reads, so they
+        The cards reuse the same cached account and SKU summaries the dashboard already reads, so they
         add no meaningful query cost and always agree with the numbers elsewhere in the app.
       </p>
 
       <Related
         links={[
           { href: "/help/features/account-profile", label: "Account profile" },
-          { href: "/help/features/api-profile", label: "API profile" },
+          { href: "/help/features/sku-page", label: "SKU page" },
           { href: "/help/features/command-palette", label: "Command palette" },
         ]}
       />

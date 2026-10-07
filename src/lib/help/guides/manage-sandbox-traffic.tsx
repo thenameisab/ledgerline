@@ -5,7 +5,7 @@ export const meta: GuideMeta = {
   slug: "manage-sandbox-traffic",
   title: "Classify and bill sandbox traffic",
   summary:
-    "Turn sandbox on or off app-wide, mark a specific account or API as sandbox, and bill sandbox usage up to a per-pair cap.",
+    "Turn sandbox on or off app-wide, mark a specific account or SKU as sandbox, and bill sandbox usage up to a per-pair cap.",
   group: "Sandbox",
   role: "admin",
   minutes: 4,
@@ -16,7 +16,7 @@ export default function Body() {
     <>
       <p>
         Sandbox is test traffic that normally stays out of billable revenue. Ledgerline gives you three
-        levers over it: a single app-wide switch, a per-(account, API) classification for the mixed
+        levers over it: a single app-wide switch, a per-(account, SKU) classification for the mixed
         cases, and a billing cap for when sandbox usage should start earning revenue past a free
         allowance.
       </p>
@@ -24,7 +24,7 @@ export default function Body() {
       <H2 id="app-wide">Turn sandbox on or off everywhere</H2>
       <p>
         The include-sandbox setting is a single, database-backed switch — flip it once and every
-        surface (dashboard, accounts, groups, APIs, invoices) agrees. There is no longer a per-page
+        surface (dashboard, accounts, groups, SKUs, invoices) agrees. There is no longer a per-page
         checkbox to keep in sync.
       </p>
       <Steps>
@@ -38,10 +38,10 @@ export default function Body() {
         </Step>
       </Steps>
 
-      <H2 id="per-pair">Mark one account or API as sandbox</H2>
+      <H2 id="per-pair">Mark one account or SKU as sandbox</H2>
       <p>
-        Some accounts bill most of their APIs but run one in test, or an account is sandbox until a
-        go-live date. A per-(account, API) classification is effective-dated, so it applies only from
+        Some accounts bill most of their SKUs but run one in test, or an account is sandbox until a
+        go-live date. A per-(account, SKU) classification is effective-dated, so it applies only from
         the day you set.
       </p>
       <Callout variant="tip">
@@ -51,8 +51,8 @@ export default function Body() {
 
       <H2 id="capped-billing">Bill sandbox usage up to a cap</H2>
       <p>
-        When a contract says &ldquo;the first N sandbox hits are free, then we bill them,&rdquo; set a
-        per-(account, API) sandbox billing rule with a cap. Usage below the cap stays free; usage above
+        When a contract says &ldquo;the first N sandbox units are free, then we bill them,&rdquo; set a
+        per-(account, SKU) sandbox billing rule with a cap. Usage below the cap stays free; usage above
         it becomes revenue at the account&rsquo;s rate, instead of disappearing as leak.
       </p>
       <Steps>
@@ -60,13 +60,13 @@ export default function Body() {
           Choose the date range you want to price — the view scopes to that window.
         </Step>
         <Step title="Set the cap for the pair">
-          Below the cap, sandbox hits are free; above it, they bill like ordinary usage.
+          Below the cap, sandbox units are free; above it, they bill like ordinary usage.
         </Step>
       </Steps>
 
       <Callout variant="warn">
         Sandbox billing rules and classifications interact — a pair that is billed by a cap is, by
-        definition, revenue. Review the account&rsquo;s API breakdown after setting a rule to confirm
+        definition, revenue. Review the account&rsquo;s SKU breakdown after setting a rule to confirm
         the numbers read the way you expect.
       </Callout>
 

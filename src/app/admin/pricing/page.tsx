@@ -25,8 +25,8 @@ export default async function AdminPricingPage({
         title="Unpriced"
         subtitle={
           unpriced.length === 0
-            ? `Every account·API pair with traffic has a price · ${all.length} priced`
-            : `${unpriced.length} account·API pair${unpriced.length === 1 ? "" : "s"} with traffic and no price · ${all.length} priced`
+            ? `Every account·SKU pair with traffic has a price · ${all.length} priced`
+            : `${unpriced.length} account·SKU pair${unpriced.length === 1 ? "" : "s"} with traffic and no price · ${all.length} priced`
         }
         leading={<CircleDollarSign size={20} strokeWidth={1.75} className="text-ink-muted" />}
       />

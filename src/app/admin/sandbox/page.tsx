@@ -29,7 +29,7 @@ export default async function SandboxBillingPage({
         subtitle={
           cases.length === 0
             ? "No sandbox traffic this period."
-            : `${cases.length} account·API pair${cases.length === 1 ? "" : "s"} using sandbox this period`
+            : `${cases.length} account·SKU pair${cases.length === 1 ? "" : "s"} using sandbox this period`
         }
       />
       <div className="mx-auto w-full max-w-[1100px] px-7 pt-5">
@@ -38,8 +38,8 @@ export default async function SandboxBillingPage({
       <div className="mx-auto w-full max-w-[1100px] px-7 py-6 space-y-5">
         <p className="text-sm text-ink-muted max-w-2xl">
           Live customers sometimes keep calling the sandbox environment. Each pair below can be
-          billed in full, in part (up to a capped number of successful hits per period), or not at
-          all. A per-API rule overrides an account-wide rule, which overrides the app-wide default
+          billed in full, in part (up to a capped number of successful units per period), or not at
+          all. A per-SKU rule overrides an account-wide rule, which overrides the app-wide default
           below. Rules take effect on the next invoice compute.
         </p>
 
@@ -52,7 +52,7 @@ export default async function SandboxBillingPage({
               <thead>
                 <tr className="text-left text-xs text-ink-muted border-b border-border">
                   <th className="px-4 py-2.5 font-medium">Account</th>
-                  <th className="px-4 py-2.5 font-medium">API</th>
+                  <th className="px-4 py-2.5 font-medium">SKU</th>
                   <th className="px-4 py-2.5 font-medium text-right">Sandbox successful</th>
                   <th className="px-4 py-2.5 font-medium">Billing policy</th>
                 </tr>
@@ -73,7 +73,7 @@ export default async function SandboxBillingPage({
                       <span className="text-ink-faint font-mono text-xs">{c.api_code}</span>
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-ink">
-                      {c.sandbox_successful.toLocaleString("en-IN")}
+                      {c.sandbox_successful.toLocaleString("en-US")}
                     </td>
                     <td className="px-4 py-2.5">
                       <SandboxRuleForm

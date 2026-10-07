@@ -186,7 +186,7 @@ export default async function UsersPage({
             We email an invite to the address below; they sign in with that Google account.
             Invites expire after {INVITE_TTL_DAYS} days, resend to re-arm. Members can read
             everything; editors can also edit account pricing and the customisation surfaces
-            (manual entries, aliases, API review, sandbox billing); admins can do everything,
+            (manual entries, aliases, SKU review, sandbox billing); admins can do everything,
             including vendor cost, usage sync, and managing users.
           </p>
           <form action={inviteAction} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_140px_auto] gap-3 items-end">

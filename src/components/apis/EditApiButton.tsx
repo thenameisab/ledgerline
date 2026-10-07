@@ -15,7 +15,7 @@ export function EditApiButton({ api }: { api: ApiFormInitial & { product_code: s
     <>
       <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
         <Pencil size={12} strokeWidth={1.5} />
-        Edit API
+        Edit SKU
       </Button>
       {open && (
         <ApiFormModal

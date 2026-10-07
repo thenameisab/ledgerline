@@ -28,8 +28,8 @@ export type Alert = {
   detail?: string;
 };
 
-// Quantified "money at risk" — health issues reframed as rupees, for the
-// dashboard triage panel. `amount` is positive rupees at stake (a loss the
+// Quantified "money at risk" — health issues reframed as dollars, for the
+// dashboard triage panel. `amount` is positive dollars at stake (a loss the
 // business is incurring). `estimated` flags figures derived from an assumed
 // rate rather than booked numbers (unpriced/unmapped traffic has no price by
 // definition, so its value is modelled from the org's avg revenue-per-hit).
@@ -41,7 +41,7 @@ export type RiskItem = {
   count2?: number;
   /** At-risk hit volume backing the figure. */
   hits: number;
-  /** Rupees at risk (always positive). */
+  /** Dollars at risk (always positive). */
   amount: number;
   /** True when `amount` is modelled from avg rate, not booked. */
   estimated: boolean;

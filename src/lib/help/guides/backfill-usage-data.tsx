@@ -31,7 +31,7 @@ export default function Body() {
         </Step>
         <Step title="Click “Backfill range”">
           The button shows a progress label while it works. Then a toast shows the result, for
-          example “Backfilled 14 days — 92,310 hits”.
+          example “Backfilled 14 days — 92,310 units”.
         </Step>
         <Step title="Verify in the run history">
           Each backfilled day appears as its own run with trigger <code>backfill</code>. Check the

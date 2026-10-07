@@ -63,7 +63,7 @@ async function getKpisImpl(
 
   // Slab APIs price on the period total, so the per-day view counts them as 0.
   // Add their recomputed revenue back before deriving margin. Vendor rates that
-  // change with volume are ₹0 in the view for the same reason, on the cost side.
+  // change with volume are $0 in the view for the same reason, on the cost side.
   //
   // A vendor's monthly minimum tops its month up to the contracted floor. It
   // belongs to no account, API or day, so it is counted here and nowhere
@@ -121,7 +121,7 @@ async function getDailySeriesImpl(opts: {
     GROUP BY date
     ORDER BY date
   `;
-  // Volume-priced vendor rates cost ₹0 per day in the view; the month's blended
+  // Volume-priced vendor rates cost $0 per day in the view; the month's blended
   // rate lands on the days that earned it, so the series still sums to the month.
   const volumeByDate = await vendorVolumeCostByDate({
     from: opts.from,
@@ -174,7 +174,7 @@ export async function getAlerts(opts: { from: string; to: string }): Promise<Ale
   ];
 }
 
-// Quantifies the dashboard's health issues in rupees. Three classes:
+// Quantifies the dashboard's health issues in dollars. Three classes:
 //  - revenue_leak: (account, api) pairs with billable traffic but no price set.
 //    Value is *estimated* — these hits have no price, so we model what they'd
 //    earn at the org's avg revenue-per-billable-hit.
@@ -192,7 +192,7 @@ async function getRiskSummaryImpl(opts: {
   const sandboxCond = opts.includeSandbox ? sql`` : sql`AND COALESCE(v.effective_is_sandbox, 0) = 0`;
 
   // Org avg revenue per billable hit over priced traffic. This is the rate we
-  // apply to unpriced/unmapped volume to model rupees at risk.
+  // apply to unpriced/unmapped volume to model dollars at risk.
   const [rateRow] = await sql`
     SELECT SUM(revenue) AS rev,
            SUM(successful + successful_no_data + failed + in_progress) AS hits
@@ -241,8 +241,8 @@ async function getRiskSummaryImpl(opts: {
   //
   // The per-pair rows come back uncorrected and the test is applied here rather
   // than in a HAVING, because neither side of it is complete in the view: a
-  // volume-priced API earns ₹0 revenue per day and a volume-priced vendor rate
-  // costs ₹0 per day. Both corrections are added to the same pair before it is
+  // volume-priced API earns $0 revenue per day and a volume-priced vendor rate
+  // costs $0 per day. Both corrections are added to the same pair before it is
   // judged, so a pair that is only under water once both land is counted once,
   // not twice or never.
   const pairRows = await sql`

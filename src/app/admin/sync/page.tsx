@@ -52,7 +52,7 @@ export default async function SyncAdminPage() {
                 </h2>
                 <p className="text-sm text-ink-muted mt-1 max-w-2xl leading-normal">
                   These dates have no usage rows — either never pulled, or pulled while the usage log source had
-                  not yet populated the day. Every range spanning them undercounts hits and revenue.
+                  not yet populated the day. Every range spanning them undercounts units and revenue.
                   The next scheduled sync re-pulls them automatically; to fix now, backfill the range
                   below.
                 </p>
@@ -79,7 +79,7 @@ export default async function SyncAdminPage() {
           <p className="text-sm text-ink-muted mt-2 max-w-2xl leading-normal">
             Every morning around 8AM IST a scheduled job pulls the previous day&apos;s usage from
             the usage log source and lands it here, re-checking the last few days for restatements
-            and self-healing any missed dates. Unrecognised account or API names are kept with
+            and self-healing any missed dates. Unrecognised account or SKU names are kept with
             their raw labels and surface in{" "}
             <Link href="/admin/aliases" className="text-accent-ink hover:text-accent">
               Aliases
@@ -115,7 +115,7 @@ export default async function SyncAdminPage() {
                   <th className="px-3 py-3 font-medium">Trigger</th>
                   <th className="px-3 py-3 font-medium">Status</th>
                   <th className="px-3 py-3 font-medium text-right">Rows</th>
-                  <th className="px-3 py-3 font-medium text-right">Hits</th>
+                  <th className="px-3 py-3 font-medium text-right">Units</th>
                   <th className="px-4 py-3 font-medium">Unmapped</th>
                 </tr>
               </thead>
@@ -177,7 +177,7 @@ export default async function SyncAdminPage() {
                             className="text-xs text-warn-ink hover:text-accent-ink"
                           >
                             {r.unmapped_clients ?? 0} account{(r.unmapped_clients ?? 0) === 1 ? "" : "s"} ·{" "}
-                            {r.unmapped_apis ?? 0} API{(r.unmapped_apis ?? 0) === 1 ? "" : "s"}
+                            {r.unmapped_apis ?? 0} SKU{(r.unmapped_apis ?? 0) === 1 ? "" : "s"}
                           </Link>
                         ) : r.status === "success" ? (
                           <span className="text-xs text-ink-faint">all mapped</span>

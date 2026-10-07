@@ -109,7 +109,7 @@ export function GroupCreateModal() {
                 setName(e.target.value);
                 if (error) setError(undefined);
               }}
-              placeholder="Acme Group"
+              placeholder="Copperleaf Software"
               autoFocus
               autoComplete="off"
               className={[

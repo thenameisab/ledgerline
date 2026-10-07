@@ -12,7 +12,7 @@ export type ReconActionResult = { ok: true } | { ok: false; error: string };
  * Accept a reconciliation delta for one month.
  *
  * Deliberately narrower than `leak_dismissals`, which suppresses a pair
- * forever. A delta is a fact about a period: "August's Verisys gap is internal
+ * forever. A delta is a fact about a period: "August's Cumulus Cloud gap is internal
  * test traffic" says nothing about September, and a permanent dismissal would
  * hide the month the gap changes shape. Each month is accepted on its own.
  *
@@ -21,7 +21,7 @@ export type ReconActionResult = { ok: true } | { ok: false; error: string };
  */
 export async function dismissReconDelta(input: {
   vendor: string;
-  /** Null for a vendor-side API name with no catalog match. */
+  /** Null for a vendor-side SKU name with no catalog match. */
   apiCode: string | null;
   /** Set only when apiCode is null — identifies the unmatched name. */
   rawApiName: string | null;
@@ -37,7 +37,7 @@ export async function dismissReconDelta(input: {
   }
   // An unmatched item is identified by its raw name; a matched one by its code.
   const rawName = input.apiCode ? null : (input.rawApiName ?? null);
-  if (!input.apiCode && !rawName) return { ok: false, error: "api required" };
+  if (!input.apiCode && !rawName) return { ok: false, error: "SKU required" };
 
   const sql = getSql();
   await sql`

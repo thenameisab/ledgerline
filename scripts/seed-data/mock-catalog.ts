@@ -8,7 +8,7 @@ export type MockClient = {
   display_name: string;
   account: string;
   billing_entity: string;
-  /** Tax registration number shown on invoices (EIN, VAT or GST number). */
+  /** Tax registration number shown on invoices (EIN, VAT or ABN). */
   tax_id: string;
   status: "active" | "paused" | "sandbox";
   is_sandbox?: boolean;
@@ -91,7 +91,7 @@ export const MOCK_CLIENTS: MockClient[] = [
   // Zenith Robotics group: signed, not live yet, so the group shows $0 revenue.
   { display_name: "Zenith Robotics", account: "Zenith Robotics", billing_entity: "Zenith Robotics Pte Ltd", tax_id: "UEN 202318845K", status: "active", lines: ALL_LINES, skuCount: 0, scale: 0.1 },
   { display_name: "Summit Telehealth", account: "Brightline Health", billing_entity: "Summit Telehealth Inc.", tax_id: "EIN 47-3310592", status: "active", lines: ["Voice", "Models"], skuCount: 5, scale: 0.4 },
-  { display_name: "Pinnacle Markets", account: "Kestrel Commerce", billing_entity: "Pinnacle Markets Pvt Ltd", tax_id: "GST 29AAICP6789G1Z8", status: "active", lines: ["Models", "Data", "Messaging"], skuCount: 8, scale: 0.9 },
+  { display_name: "Pinnacle Markets", account: "Kestrel Commerce", billing_entity: "Pinnacle Markets Pty Ltd", tax_id: "ABN 51 824 753 556", status: "active", lines: ["Models", "Data", "Messaging"], skuCount: 8, scale: 0.9 },
   // Sandbox / internal
   { display_name: "Internal QA", account: "Internal", billing_entity: "Internal", tax_id: "", status: "sandbox", is_sandbox: true, lines: ["Models", "Voice"], skuCount: 4, scale: 0.2 },
   { display_name: "Kestrel Store (Sandbox)", account: "Internal", billing_entity: "Kestrel Commerce Ltd", tax_id: "VAT GB 293 4821 07", status: "sandbox", is_sandbox: true, lines: ["Models", "Data"], skuCount: 3, scale: 0.15 },

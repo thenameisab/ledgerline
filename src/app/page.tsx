@@ -4,9 +4,9 @@ import { Landing } from "@/components/landing/Landing";
 import { DEMO_ACCESS_COOKIE } from "@/lib/demo-access";
 
 export const metadata: Metadata = {
-  title: "Ledgerline · Billing and revenue for API businesses",
+  title: "Ledgerline · Usage-based billing for every SKU",
   description:
-    "Ledgerline turns API usage into priced revenue, invoices and margin. Try the live demo with fictional data.",
+    "Ledgerline prices usage for companies that sell many products, APIs or models, and turns it into invoices and margin. Try the live demo with fictional data.",
 };
 
 export default function LandingPage() {
