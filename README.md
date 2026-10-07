@@ -13,12 +13,13 @@ digests, and an in-app help section. All data is stored in Postgres.
 
 ## Public demo
 
-The public demo is at <https://revu.adityagaur.xyz>.
+The site opens on a landing page with interactive product snippets.
 
-1. Cloudflare Access protects the site. Enter your email address, then enter
-   the one-time code that Cloudflare sends to it.
+1. Fill in the form on the landing page. Submitting it opens the demo.
 2. On the Ledgerline login page, click **Enter as Admin** (full access) or
    **Enter as Member** (read-only view).
+
+Deployment steps are in [DEPLOY.md](DEPLOY.md).
 
 The demo database is reset every night, so changes you make are removed the
 next day. Integrations are simulated (`MOCK_INTEGRATIONS=true`), and no mail
