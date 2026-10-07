@@ -1,0 +1,321 @@
+/**
+ * Design tokens — RazorSense-inspired visual system
+ *
+ * Design language inspired by Razorpay's RazorSense: quiet azure product
+ * chrome over cool neutral surfaces, with a distinct green/aqua accent family
+ * reserved for moments where the system is doing intelligent work for you.
+ *
+ * Every value here is a CSS custom property, so changing a single token
+ * changes every consumer.
+ *
+ * Token *names* are stable across the redesign — components keep addressing
+ * `ink / bg / accent / ok / info / warn / bad / success`, only the values moved.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * COLOUR: SURFACE
+   * Strategy: cool neutral steps, no warmth. Depth comes from three
+   * background lightnesses (page → card → sunken) plus a hairline border,
+   * with a very faint shadow on top — never a shadow ramp alone.
+   * ──────────────────────────────────────────────────────────────────── */
+  --color-bg:        #F7F7F7;  /* page body */
+  --color-bg-raised: #FFFFFF;  /* panels, cards */
+  --color-bg-sunken: #EFF0F1;  /* breakdown panels, hover targets */
+
+  --color-ink:       #050505;  /* primary text */
+  --color-ink-muted: #292F32;  /* secondary labels */
+  --color-ink-faint: #616D75;  /* tertiary, placeholders — 4.8:1 on --color-bg */
+
+  --color-border:        #DEE1E3;  /* hairlines, card edges */
+  --color-border-strong: #C8CDD0;  /* inputs, emphasised edges */
+  --color-overlay:       rgb(5 5 5 / 0.55); /* modal backdrop */
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * COLOUR: ACCENT
+   * Azure. The product primary: chrome, links, focus, the everyday CTA.
+   * Deliberately *not* the intelligence colour — see --color-ai-* below.
+   * ──────────────────────────────────────────────────────────────────── */
+  --color-accent:     #1364F1;  /* primary interactive */
+  --color-accent-bg:  #E9F1FE;  /* tinted surface variant (~9% azure) */
+  --color-accent-ink: #0E54CD;  /* hover fill + on-tint readable text */
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * COLOUR: AI ACCENT
+   * The expressive layer's signature. Mint → spring → aqua → emerald.
+   * Reserved for genuinely intelligent surfaces: ask-a-number answers, the
+   * briefing panel, variance explanations, hover summaries, sync "thinking".
+   * Spraying it on ordinary chrome dilutes the grammar — azure does chrome,
+   * green means the system is working for you.
+   * ──────────────────────────────────────────────────────────────────── */
+  --color-ai-mint:    #AEF4D4;
+  --color-ai-spring:  #4FE19E;
+  --color-ai-aqua:    #4EF8E8;
+  --color-ai-emerald: #01C071;
+  --color-ai-ink:     #056E44;  /* on-tint readable text, 5.6:1 on ai-bg */
+  --color-ai-bg:      #E6FBF1;  /* faint intelligence surface tint */
+
+  --gradient-ai: linear-gradient(
+    120deg,
+    var(--color-ai-mint) 0%,
+    var(--color-ai-spring) 34%,
+    var(--color-ai-aqua) 67%,
+    var(--color-ai-emerald) 100%
+  );
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * COLOUR: STATUS
+   * Blade feedback palette. Each status keeps its four derived tokens:
+   *   base       — icon, dot, progress fill
+   *   -bg        — full-row surface tint
+   *   -bg-hover  — a step darker for hover state
+   *   -ink       — on-tint text, WCAG AA verified
+   *
+   * Status is expressed as SURFACE (row tints), not just chip pixels.
+   * azure       → ok      (progress, healthy, complete)
+   * information → info    (neutral, informational)
+   * notice      → warn    (needs attention)
+   * negative    → bad     (blocked, broken)
+   * positive    → success (positive outcomes, use sparingly)
+   * ──────────────────────────────────────────────────────────────────── */
+  --color-ok:               #1364F1;
+  --color-ok-bg:            #E9F1FE;
+  --color-ok-bg-hover:      #DCE9FD;
+  --color-ok-ink:           #0E54CD;
+
+  --color-info:             #008BD1;
+  --color-info-bg:          #E3F4FC;
+  --color-info-bg-hover:    #D3EDFA;
+  --color-info-ink:         #00648F;
+
+  --color-warn:             #E05E00;
+  --color-warn-bg:          #FDF0E6;
+  --color-warn-bg-hover:    #FBE5D5;
+  --color-warn-ink:         #9C4100;
+
+  --color-bad:              #D01E11;
+  --color-bad-bg:           #FBEAE8;
+  --color-bad-bg-hover:     #F8DCD9;
+  --color-bad-ink:          #91150C;
+
+  --color-success:          #008F47;
+  --color-success-bg:       #E5F5ED;
+  --color-success-bg-hover: #D6EFE1;
+  --color-success-ink:      #006432;
+
+  /* Legacy alias — `text-muted` callsites stay valid */
+  --color-muted: var(--color-ink-faint);
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * TYPOGRAPHY
+   * Three families with specific roles — mixing them creates hierarchy:
+   *
+   *   TASA Orbiter    → display headings, landmark numbers, lede text
+   *   Inter           → body, labels, UI microcopy (default family)
+   *   JetBrains Mono  → IDs, codes, numeric values, data-adjacent text
+   *
+   * Bold (weight 700+) is banned. Emphasis comes from SCALE, not weight.
+   * TASA Orbiter 600 at --text-5xl is the primary visual landmark, set with
+   * negative tracking (−1.3%, −3.3% at hero size) so display type reads as
+   * one dense object rather than spaced letters.
+   *
+   * `--font-serif` is kept as an alias of the display family so the existing
+   * `font-serif` landmark call sites resolve to display type unchanged.
+   * ──────────────────────────────────────────────────────────────────── */
+  --font-display: "TASA Orbiter", "TASA Orbiter Deck", ui-sans-serif,
+                  -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif:   var(--font-display);
+  --font-sans:    Inter, -apple-system, "Segoe UI", Roboto,
+                  "Helvetica Neue", sans-serif;
+  --font-mono:    "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, Consolas,
+                  "Liberation Mono", monospace;
+
+  --tracking-display: -0.013em;  /* −1.3% — display headings, landmarks */
+  --tracking-hero:    -0.033em;  /* −3.3% — the one hero lede per page */
+
+  /* Type scale — 1.125 ratio (minor third) at body sizes;
+     1.265 ratio at landmark sizes (4xl–6xl). */
+  --text-xs:   0.75rem;    /*  12px — labels, captions */
+  --text-sm:   0.875rem;   /*  14px — body text */
+  --text-base: 1rem;       /*  16px — secondary headings */
+  --text-lg:   1.125rem;   /*  18px — section titles */
+  --text-xl:   1.266rem;   /* ~20px — primary headings */
+  --text-2xl:  1.424rem;   /* ~23px — page titles */
+  --text-3xl:  1.602rem;   /* ~26px — sub-tab section heads */
+  --text-4xl:  1.802rem;   /* ~29px — secondary landmarks */
+  --text-5xl:  2.281rem;   /* ~37px — primary landmark (one per section) */
+  --text-6xl:  2.887rem;   /* ~46px — org-level lede (one per page) */
+
+  --leading-tight:   1.2;  /* headings */
+  --leading-normal:  1.5;  /* body */
+  --leading-relaxed: 1.7;  /* long-form prose */
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * SPACING
+   * 8px base unit. Use these instead of arbitrary values.
+   * ──────────────────────────────────────────────────────────────────── */
+  --space-px: 1px;
+  --space-1:  0.25rem;  /*  4px */
+  --space-2:  0.5rem;   /*  8px */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.5rem;   /* 24px */
+  --space-6:  2rem;     /* 32px */
+  --space-8:  3rem;     /* 48px */
+  --space-10: 4rem;     /* 64px */
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * MOTION
+   * Durations run 80 → 960ms (2xquick … 2xgentle). Five easing curves,
+   * each with a job:
+   *   entrance   — decelerate in; things arriving
+   *   exit       — accelerate out; things leaving
+   *   standard   — the default two-sided state change
+   *   emphasized — a state change that should be noticed
+   *   overshoot  — toasts and pills that pop past their mark
+   * All durations collapse to 0ms under prefers-reduced-motion.
+   * ──────────────────────────────────────────────────────────────────── */
+  --motion-duration-instant: 80ms;   /* status pulses */
+  --motion-duration-fast:    160ms;  /* hover, focus, tooltip */
+  --motion-duration-base:    280ms;  /* tab switches, modals, standard */
+  --motion-duration-slow:    480ms;  /* page replace, View Transitions */
+  --motion-duration-gentle:  960ms;  /* ambient loops, shimmer sweeps */
+  --motion-stagger:          80ms;   /* per-item stagger interval for lists */
+
+  --motion-ease-entrance:   cubic-bezier(0, 0, 0.2, 1);
+  --motion-ease-exit:       cubic-bezier(0.17, 0, 1, 1);
+  --motion-ease-standard:   cubic-bezier(0.3, 0, 0.2, 1);
+  --motion-ease-emphasized: cubic-bezier(0.5, 0, 0, 1);
+  --motion-ease-overshoot:  cubic-bezier(0.5, 0, 0.3, 1.5);
+
+  /* Aliases — existing call sites keep working: `ease` for state changes,
+     `ease-soft` for content reveals. */
+  --motion-ease:      var(--motion-ease-emphasized);
+  --motion-ease-soft: var(--motion-ease-entrance);
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * ELEVATION
+   * Depth reads from borders and background steps first; the shadow is a
+   * whisper on top of that, never the whole story.
+   * ──────────────────────────────────────────────────────────────────── */
+  --elevation-low:  0 2px 4px hsl(200 10% 18% / 0.06);
+  --elevation-mid:  0 4px 10px -2px hsl(200 10% 18% / 0.08),
+                    0 1px 3px -1px hsl(200 10% 18% / 0.06);
+  --elevation-high: 0 16px 40px -12px hsl(200 10% 18% / 0.18),
+                    0 4px 12px -4px hsl(200 10% 18% / 0.10);
+
+  /* Legacy alias — cards that asked for elevation-1 now get border + whisper. */
+  --elevation-1: var(--elevation-low);
+
+  /* Button bevel: a darker bottom edge and a light top catch, so solid fills
+     read as physical without a drop shadow. */
+  --bevel-solid: inset 0 -1.5px 0 rgb(0 0 0 / 0.18),
+                 inset 0 1.5px 0 rgb(255 255 255 / 0.22);
+  --bevel-quiet: inset 0 -1.5px 0 rgb(5 5 5 / 0.05),
+                 inset 0 1.5px 0 rgb(255 255 255 / 0.60);
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * ICONOGRAPHY SIZING
+   * All icons from lucide-react. Stroke weight 1.5px (Lucide default 2
+   * reads heavy alongside Inter at small sizes).
+   * ──────────────────────────────────────────────────────────────────── */
+  --icon-xs: 12px;  /* inline with 12px body text */
+  --icon-sm: 14px;  /* inline with labels, menus */
+  --icon-md: 16px;  /* button affordances */
+  --icon-lg: 20px;  /* nav rail items, section headers */
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * DARK MODE
+ * Paired values for every surface, accent, and status token. The azure
+ * primary lifts to azure-300 so it stays legible on dark cards, and the
+ * feedback ramps lighten to match. Everything downstream reads tokens, so
+ * charts, glass, and row washes come along for free.
+ * ──────────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* The surface steps invert their *direction* in dark, not their meaning.
+     `bg` is still the ground and `bg-raised` still the card, but `bg-sunken` —
+     which the product uses for hover targets and recessed tracks — has to be a
+     step *lighter* than the card here. In a dark theme, closer means brighter;
+     darkening on hover reads as the control switching off. */
+  --color-bg:        #141517;
+  --color-bg-raised: #1F2123;
+  --color-bg-sunken: #2A2D30;
+
+  --color-ink:       #F7F7F7;
+  --color-ink-muted: #C3C9CC;
+  --color-ink-faint: #8E979C;
+
+  --color-border:        #33383B;
+  --color-border-strong: #474D51;
+  --color-overlay:       rgb(0 0 0 / 0.66);
+
+  --color-accent:     #75AAFF;
+  --color-accent-bg:  #16233A;
+  --color-accent-ink: #A8C8FF;
+
+  --color-ai-mint:    #AEF4D4;
+  --color-ai-spring:  #4FE19E;
+  --color-ai-aqua:    #4EF8E8;
+  --color-ai-emerald: #24D98A;
+  --color-ai-ink:     #7DEFB8;
+  --color-ai-bg:      #0F251C;
+
+  --color-ok:               #75AAFF;
+  --color-ok-bg:            #16233A;
+  --color-ok-bg-hover:      #1B2C48;
+  --color-ok-ink:           #A8C8FF;
+
+  --color-info:             #4FB6E8;
+  --color-info-bg:          #10262F;
+  --color-info-bg-hover:    #143039;
+  --color-info-ink:         #8FD3F3;
+
+  --color-warn:             #FF9A4D;
+  --color-warn-bg:          #2B1B0E;
+  --color-warn-bg-hover:    #362111;
+  --color-warn-ink:         #FFC08C;
+
+  --color-bad:              #FF7166;
+  --color-bad-bg:           #2E1614;
+  --color-bad-bg-hover:     #3A1B18;
+  --color-bad-ink:          #FFA9A1;
+
+  --color-success:          #3FD48A;
+  --color-success-bg:       #0F251C;
+  --color-success-bg-hover: #143024;
+  --color-success-ink:      #7DEFB8;
+
+  /* Shadows read as almost nothing on dark surfaces — deepen them and let the
+     border carry the edge. */
+  --elevation-low:  0 2px 4px rgb(0 0 0 / 0.32);
+  --elevation-mid:  0 4px 10px -2px rgb(0 0 0 / 0.40),
+                    0 1px 3px -1px rgb(0 0 0 / 0.32);
+  --elevation-high: 0 16px 40px -12px rgb(0 0 0 / 0.60),
+                    0 4px 12px -4px rgb(0 0 0 / 0.40);
+
+  --bevel-solid: inset 0 -1.5px 0 rgb(0 0 0 / 0.28),
+                 inset 0 1.5px 0 rgb(255 255 255 / 0.14);
+  --bevel-quiet: inset 0 -1.5px 0 rgb(0 0 0 / 0.24),
+                 inset 0 1.5px 0 rgb(255 255 255 / 0.06);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * REDUCED MOTION
+ * All durations collapse to 0ms. Components still reach their final
+ * visual state — only the transition is removed.
+ * ──────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-instant: 0ms;
+    --motion-duration-fast:    0ms;
+    --motion-duration-base:    0ms;
+    --motion-duration-slow:    0ms;
+    --motion-duration-gentle:  0ms;
+    --motion-stagger:          0ms;
+  }
+}

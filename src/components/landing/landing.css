@@ -1,0 +1,292 @@
+/* Landing page styles. Colors, fonts and durations come from the app tokens
+   (src/styles/design-tokens.css), so light and dark mode follow the app. */
+
+.ll-landing {
+  /* Strong ease-out for UI responses; ease-in-out for things moving on screen. */
+  --ll-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ll-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ll-header-h: 60px;
+  /* Paper: warm off-white with a faint dot grid. */
+  --ll-paper: #faf8f3;
+  --ll-paper-dot: rgba(70, 58, 30, 0.13);
+  --ll-card-shadow: 0 1px 0 rgba(60, 45, 20, 0.04), 0 18px 40px -18px rgba(60, 45, 20, 0.28);
+  --ll-glass: color-mix(in srgb, var(--ll-paper) 78%, transparent);
+  /* Artifact papers. Each has a fill and an ink that reads on it. */
+  --a-cream: #f4ebcb;
+  --a-cream-ink: #4a4128;
+  --a-sage: #c5d3ba;
+  --a-sage-ink: #2c3a27;
+  --a-mustard: #e6d48b;
+  --a-mustard-ink: #4a3f12;
+  --a-blue: #a6b9d3;
+  --a-blue-ink: #1d2c42;
+  --a-terra: #c98c6e;
+  --a-terra-ink: #3e1e10;
+  --a-lilac: #c9c0e7;
+  --a-lilac-ink: #2e2650;
+  --a-slate: #6e7f8e;
+  --a-slate-ink: #f2f4f6;
+  --a-azure: #1f5fd6;
+  --a-azure-ink: #ffffff;
+  --a-white: #ffffff;
+  --a-white-ink: #2b2b2b;
+  /* Drop shadows follow each piece's shape (tags, seals, notches). */
+  --a-shadow: drop-shadow(0 1px 1px rgba(60, 45, 20, 0.1)) drop-shadow(0 6px 10px rgba(60, 45, 20, 0.16));
+  --a-shadow-lift: drop-shadow(0 2px 2px rgba(60, 45, 20, 0.1)) drop-shadow(0 18px 22px rgba(60, 45, 20, 0.24));
+  --a-tone: brightness(1);
+  background-color: var(--ll-paper);
+  background-image: radial-gradient(var(--ll-paper-dot) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  color: var(--color-ink);
+  min-height: 100dvh;
+}
+
+/* Dark mode: a dark desk. The paper objects stay paper, slightly dimmed. */
+:root[data-theme="dark"] .ll-landing {
+  --ll-paper: #161513;
+  --ll-paper-dot: rgba(255, 250, 235, 0.08);
+  --ll-card-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+  --a-shadow: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+  --a-shadow-lift: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5)) drop-shadow(0 18px 22px rgba(0, 0, 0, 0.6));
+  --a-tone: brightness(0.86) saturate(0.92);
+}
+
+.ll-glass {
+  background: var(--ll-glass);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ll-glass {
+    background: var(--ll-paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Paper card for snippets and the form. */
+.ll-card {
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--ll-card-shadow);
+}
+
+/* Artifact paper details. */
+.ll-artifact {
+  filter: var(--a-tone) var(--a-shadow);
+  transition: filter 200ms var(--ll-ease-out);
+}
+.ll-artifact[data-lifted="true"] {
+  filter: var(--a-tone) var(--a-shadow-lift);
+}
+/* Perforated top edge (invoice slip). */
+.ll-perf-top {
+  -webkit-mask: radial-gradient(circle 3px at 6px 0, transparent 98%, #000) 0 0 / 12px 100% repeat-x;
+  mask: radial-gradient(circle 3px at 6px 0, transparent 98%, #000) 0 0 / 12px 100% repeat-x;
+}
+/* Torn zigzag bottom edge (receipt). */
+.ll-zigzag {
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100%;
+}
+/* Ticket notches on both long sides. */
+.ll-notch {
+  -webkit-mask: radial-gradient(circle 9px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle 9px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+  mask: radial-gradient(circle 9px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle 9px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+}
+/* Price tag: pointed left end. */
+.ll-tag {
+  clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%);
+}
+
+/* Pressable: instant feedback on pointer-down. */
+.ll-press {
+  transition:
+    transform 160ms var(--ll-ease-out),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+.ll-press:active {
+  transform: scale(0.97);
+}
+
+/* Reveal on scroll. Opacity always; movement only when motion is allowed. */
+.ll-reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 520ms var(--ll-ease-out),
+    transform 520ms var(--ll-ease-out);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.ll-reveal[data-in="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero headline words rise in, one after another. */
+.ll-rise {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.35em);
+  filter: blur(4px);
+  animation: ll-rise 700ms var(--ll-ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 45ms + 80ms);
+}
+@keyframes ll-rise {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* A row that just changed: a short accent wash that fades out. */
+.ll-flash {
+  animation: ll-flash 1200ms var(--ll-ease-out);
+}
+@keyframes ll-flash {
+  from {
+    background-color: var(--color-accent-bg);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+/* Blinking caret for the typed palette query. */
+.ll-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: var(--color-accent);
+  animation: ll-caret 1s steps(1) infinite;
+}
+@keyframes ll-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Live dot. */
+.ll-pulse {
+  position: relative;
+}
+.ll-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-success);
+  animation: ll-pulse 2.4s var(--ll-ease-out) infinite;
+}
+@keyframes ll-pulse {
+  from {
+    opacity: 0.7;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* Native range input styled to the tokens. */
+.ll-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+.ll-range:active {
+  cursor: grabbing;
+}
+.ll-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--color-accent) 0 var(--fill, 0%),
+    var(--color-bg-sunken) var(--fill, 0%) 100%
+  );
+}
+.ll-range::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-bg-sunken);
+}
+.ll-range::-moz-range-progress {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+}
+.ll-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border-radius: 9999px;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--elevation-low);
+  transition: transform 160ms var(--ll-ease-out);
+}
+.ll-range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+.ll-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--elevation-low);
+}
+.ll-range:focus-visible {
+  outline: none;
+}
+.ll-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--color-accent-bg), 0 0 0 4px var(--color-accent);
+}
+.ll-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px var(--color-accent-bg), 0 0 0 4px var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ll-reveal {
+    transform: none;
+    transition: opacity 200ms ease;
+    transition-delay: 0ms;
+  }
+  .ll-rise {
+    transform: none;
+    filter: none;
+    animation: ll-fade 200ms ease forwards;
+    animation-delay: 0ms;
+  }
+  .ll-pulse::after,
+  .ll-caret {
+    animation: none;
+  }
+  .ll-flash {
+    animation-duration: 600ms;
+  }
+  .ll-press:active {
+    transform: none;
+  }
+}
+@keyframes ll-fade {
+  to {
+    opacity: 1;
+  }
+}

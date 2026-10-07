@@ -1,0 +1,242 @@
+/**
+ * Animations, effects and prose styles. Pure CSS (no @apply), so it imports
+ * cleanly from globals.css.
+ */
+
+/* ── View Transitions ──────────────────────────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--motion-duration-base);
+  animation-timing-function: var(--motion-ease);
+}
+
+/* ── List stagger entrance ─────────────────────────────────────────────── */
+@keyframes list-item-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+.list-item {
+  animation: list-item-enter var(--motion-duration-base) var(--motion-ease-soft) both;
+  animation-delay: calc(var(--item-index, 0) * var(--motion-stagger));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-item { animation: none; }
+}
+
+/* ── Loading shimmer ───────────────────────────────────────────────────── */
+@keyframes loading-shimmer {
+  from { opacity: 0.5; }
+  to   { opacity: 1;   }
+}
+
+.loading-shimmer {
+  animation: loading-shimmer 1s var(--motion-ease-soft) infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-shimmer { animation: none; opacity: 0.7; }
+}
+
+/* ── Modal/panel entrance ──────────────────────────────────────────────── */
+@keyframes modal-enter {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+
+.modal-enter {
+  animation: modal-enter var(--motion-duration-base) var(--motion-ease-soft) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-enter { animation: none; }
+}
+
+/* ── Floating panel entrance (assistant panel, popovers) ──────────────── */
+@keyframes panel-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+.panel-rise {
+  animation: panel-rise 0.26s var(--motion-ease-soft) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-rise { animation: none; }
+}
+
+/* ── Rich hover card entrance (account / API name hovers) ───────────────── */
+/* Scales up from the Radix-computed transform origin so the card grows out of
+   the trigger edge. Open only — Radix unmounts on close after closeDelay. */
+@keyframes hovercard-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+.hovercard-content[data-state="open"] {
+  animation: hovercard-in var(--motion-duration-fast) var(--motion-ease-soft) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hovercard-content[data-state="open"] { animation: none; }
+}
+
+/* ── Streaming content: "generating" state ───────────────────────────────
+   Content being composed is an intelligence state, so its travelling border and
+   caret come from the AI accent family rather than the azure product chrome. */
+.content-generating {
+  position: relative;
+  background-image:
+    linear-gradient(var(--color-bg-raised), var(--color-bg-raised)),
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, var(--color-ai-spring) 60%, transparent),
+      color-mix(in srgb, var(--color-ai-aqua) 18%, transparent) 40%,
+      color-mix(in srgb, var(--color-ai-emerald) 60%, transparent) 80%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-size: 100% 100%, 220% 100%;
+  animation: content-sheen 2.2s linear infinite;
+}
+
+@keyframes content-sheen {
+  from { background-position: 0 0, 0% 0;    }
+  to   { background-position: 0 0, 220% 0;  }
+}
+
+.stream-caret {
+  margin-left: 1px;
+  color: var(--color-ai-emerald);
+  animation: stream-blink 1s steps(2, start) infinite;
+}
+
+@keyframes stream-blink {
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content-generating { animation: none; }
+  .stream-caret       { animation: none; }
+}
+
+/* ── Toast / notification banner ──────────────────────────────────────── */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(calc(100% + 1.5rem)); }
+  to   { opacity: 1; transform: translateX(0);                   }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0);                   }
+  to   { opacity: 0; transform: translateX(calc(100% + 1.5rem)); }
+}
+
+.toast-enter { animation: toast-in  var(--motion-duration-base) var(--motion-ease) both; }
+.toast-exit  { animation: toast-out var(--motion-duration-fast)  var(--motion-ease) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter, .toast-exit { animation: none; }
+}
+
+/* ── Prose styles: long-form content ──────────────────────────────────── */
+.prose {
+  color: var(--color-ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-display);
+  color: var(--color-ink);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.prose h1 { font-size: 1.6rem; margin: 0.4em 0 0.5em; }
+.prose h2 {
+  font-size: 1.25rem;
+  margin: 1.4em 0 0.5em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--color-border);
+}
+.prose h3 { font-size: 1.05rem; margin: 1.1em 0 0.4em; }
+.prose p  { margin: 0.6em 0; }
+
+.prose ul { margin: 0.5em 0; padding-left: 1.25em; list-style: disc; }
+.prose ol { margin: 0.5em 0; padding-left: 1.25em; list-style: decimal; }
+.prose li { margin: 0.25em 0; }
+.prose li > ul { margin: 0.2em 0; }
+
+.prose strong { font-weight: 600; }
+.prose em     { font-style: italic; color: var(--color-ink-muted); }
+
+.prose a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+.prose a:hover { text-decoration: underline; }
+
+.prose hr { border: 0; border-top: 1px solid var(--color-border); margin: 1.2em 0; }
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--color-bg-sunken);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  font-size: 0.92em;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--color-border);
+  padding: 0.45em 0.7em;
+  text-align: left;
+  vertical-align: top;
+}
+.prose th {
+  background: var(--color-bg-sunken);
+  font-weight: 600;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+}
+
+/* Compact variant for tight spaces (assistant panel, inline annotations) */
+.prose-compact {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.prose-compact h1,
+.prose-compact h2,
+.prose-compact h3 { font-family: var(--font-display); letter-spacing: var(--tracking-display); font-weight: 600; color: var(--color-ink); }
+.prose-compact h1 { font-size: 1rem; margin: 0.3em 0; }
+.prose-compact h2 { font-size: 0.9rem; margin: 0.5em 0 0.3em; }
+.prose-compact h3 { font-size: 0.85rem; margin: 0.4em 0 0.2em; }
+.prose-compact p  { margin: 0.35em 0; }
+.prose-compact ul { margin: 0.3em 0; padding-left: 1.1em; list-style: disc; }
+.prose-compact ol { margin: 0.3em 0; padding-left: 1.1em; list-style: decimal; }
+.prose-compact li { margin: 0.15em 0; }
+.prose-compact code {
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--color-bg);
+}
+.prose-compact table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+.prose-compact th,
+.prose-compact td { padding: 0.25em 0.5em; border: 1px solid var(--color-border); }
+.prose-compact th { font-weight: 600; text-transform: uppercase; color: var(--color-ink-muted); }

@@ -1,0 +1,825 @@
+@import "./tokens.css";
+@import "./ds-effects.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    /* macOS renders text heavier than intended by default; antialias at the
+       root so all three families render crisp and thin. No-op off macOS. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "tnum", "ss01";
+    /* Block browser-synthesised bold/italic. All three families (TASA Orbiter,
+       Inter, JetBrains Mono) ship the weights we ask for — 400/500/600 — so a
+       faux-bold can only ever mean a weight we didn't intend, which would also
+       contradict DESIGN.md §2.3 (emphasis is *scale*, not weight). */
+    font-synthesis: none;
+  }
+
+  body {
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-bg);
+    color: var(--color-accent-ink);
+  }
+
+  /* Even line lengths on short headings; no orphaned last words in prose.
+     balance is browser-capped to short blocks, so it no-ops on long text. */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  p, li, figcaption, blockquote {
+    text-wrap: pretty;
+  }
+
+  /* Tabular figures everywhere by default; numerics never wobble between rows */
+  .tnum, table, td, th {
+    font-variant-numeric: tabular-nums;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@layer utilities {
+  /* Display type always carries its negative tracking — TASA Orbiter at
+     landmark sizes reads as one dense object only when the letters close up.
+     `.font-serif` is the legacy alias for the same thing (no serif remains). */
+  .font-display,
+  .font-serif {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-display);
+  }
+  /* The one hero lede per page — tighter still. */
+  .font-hero {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-hero);
+  }
+  .font-sans  { font-family: var(--font-sans); letter-spacing: normal; }
+  .font-mono  { font-family: var(--font-mono); letter-spacing: normal; }
+
+  .ease-expo  { transition-timing-function: var(--motion-ease); }
+  .ease-quint { transition-timing-function: var(--motion-ease-soft); }
+}
+
+/* Hairline horizontal rule used across data tables and section breaks */
+.hairline {
+  border-top: 1px solid var(--color-border);
+}
+
+/* Card elevation: a real hairline plus a whisper of shadow. The border still
+   does most of the work — the shadow only lifts the card off the grey page. */
+.elev-1 {
+  box-shadow: inset 0 0 0 1px var(--color-border), var(--elevation-low);
+}
+
+/* Toasts arrive on the overshoot curve — they pop just past their mark and
+   settle. It's the one place in the product where motion is allowed to be
+   playful, because a toast is a thing that *arrived*. */
+[data-sonner-toast] {
+  transition-timing-function: var(--motion-ease-overshoot);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-sonner-toast] {
+    transition-timing-function: linear;
+  }
+}
+
+/* Cell-edit popover (vendor rate card). Spec: 150ms ease-out, 0.97 -> 1, origin
+   at the cell. The panel's right edge is anchored to the cell, so it grows from
+   its top-right corner rather than drifting in from an unrelated point. */
+@keyframes popover-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.popover-in {
+  animation: popover-in 150ms var(--motion-ease-soft, ease-out) both;
+  transform-origin: top right;
+}
+
+/* Command palette open/close animations */
+@keyframes cmdk-in {
+  from { opacity: 0; transform: translate(-50%, -6px) scale(0.97); }
+  to   { opacity: 1; transform: translate(-50%, 0)    scale(1); }
+}
+@keyframes cmdk-out {
+  from { opacity: 1; transform: translate(-50%, 0)    scale(1); }
+  to   { opacity: 0; transform: translate(-50%, -4px) scale(0.97); }
+}
+
+/* The palette grows for a chart or a table (see cmd/CommandPalette PANEL). The
+   resize is a transition, not a keyframe, so it interrupts cleanly when the
+   answer changes shape mid-flight. */
+@media (prefers-reduced-motion: reduce) {
+  .cmd-panel,
+  .cmd-list {
+    transition: none;
+  }
+}
+
+/* Per-row stagger entrance */
+@keyframes row-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.row-enter {
+  animation: row-enter var(--motion-duration-base) var(--motion-ease-soft) both;
+}
+
+/* One-shot cell tint after a state-changing action (e.g. Finalize). */
+@keyframes success-pulse {
+  0%   { background-color: var(--color-success-bg); }
+  100% { background-color: transparent; }
+}
+
+.success-pulse {
+  animation: success-pulse 1200ms var(--motion-ease-exit) both;
+}
+
+/* Skip-to-content link — visually hidden until focused. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-200%);
+  background-color: var(--color-ink);
+  color: var(--color-bg-raised);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0 0 0.375rem 0;
+  z-index: 100;
+  transition: transform var(--motion-duration-fast) var(--motion-ease);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ─── Dashboard reimagining ─────────────────────────────────────────────────
+   Load choreography, staggered by --i. Numbers never animate to a value
+   (counter-ups stay banned) — but their *reveal* is expressive: the landmark
+   wipes in from under a baseline, panels rise with a slight settle, bars
+   overshoot ~3% then relax. Transform/opacity/clip-path only; no layout work.
+   Reduced-motion gets a quick single fade, not a dead screen.
+
+   Timings come from the motion tokens now: things that arrive use the entrance
+   curve, the stagger is one --motion-stagger step per item, and the whole
+   sequence lands inside --motion-duration-slow rather than the ~800ms it used
+   to take. Faster, and one scale instead of five hand-picked numbers. */
+@keyframes dash-rise {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.992); }
+  70%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+.dash-enter {
+  animation: dash-rise var(--motion-duration-slow) var(--motion-ease-entrance) both;
+  animation-delay: calc(var(--i, 0) * var(--motion-stagger));
+}
+
+/* Landmark number: wipe up from the baseline, with a 1px rail that draws
+   across underneath as the figure lands. */
+@keyframes landmark-wipe {
+  from { opacity: 0; transform: translateY(0.18em); clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; transform: none;               clip-path: inset(-0.1em 0 -0.1em 0); }
+}
+.landmark-wipe {
+  animation: landmark-wipe var(--motion-duration-gentle) var(--motion-ease-emphasized) var(--motion-duration-fast) both;
+}
+@keyframes rail-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.landmark-rail {
+  transform-origin: left center;
+  animation: rail-draw var(--motion-duration-gentle) var(--motion-ease-emphasized) var(--motion-duration-slow) both;
+}
+
+/* Bar fills: grow with a slight overshoot, then settle. */
+@keyframes bar-grow {
+  0%   { transform: scaleX(0); }
+  78%  { transform: scaleX(1.03); }
+  100% { transform: scaleX(1); }
+}
+.bar-grow {
+  transform-origin: left center;
+  /* The overshoot lives in the keyframes, so the curve stays emphasized —
+     stacking the overshoot easing on top of it double-bounces the bar. */
+  animation: bar-grow var(--motion-duration-gentle) var(--motion-ease-emphasized) both;
+  animation-delay: calc(var(--i, 0) * var(--motion-stagger) + var(--motion-duration-base));
+}
+
+/* Risk rows: slide in from the left with the tint blooming behind. */
+@keyframes risk-in {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: none; }
+}
+.risk-enter {
+  animation: risk-in var(--motion-duration-slow) var(--motion-ease-entrance) both;
+  animation-delay: calc(var(--i, 0) * var(--motion-stagger) + var(--motion-duration-fast));
+}
+
+/* The at-risk total: one deliberate attention pulse after everything lands.
+   Two beats, then still — drama proportional to status, not a heartbeat. */
+@keyframes risk-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+.risk-pulse {
+  animation: risk-pulse var(--motion-duration-gentle) var(--motion-ease-standard) 1300ms 2;
+}
+
+/* Sticky pricing save bar: rise into place when the first edit lands. */
+@keyframes save-bar-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.save-bar-enter {
+  animation: save-bar-rise var(--motion-duration-base) var(--motion-ease) both;
+}
+
+/* Scroll box for data tables. A `sticky top-0` thead sticks to its nearest
+   scroll container. A plain `overflow-x-auto` wrapper is that container but
+   never scrolls vertically, so the header scrolled away with the page. This
+   box scrolls on both axes and is capped below the viewport height, so the
+   header stays visible while the rows scroll. */
+.table-scroll {
+  overflow: auto;
+  max-height: calc(100vh - 120px);
+}
+
+/* Interactive lift for risk rows + top-list rows: cheap transform hover. */
+.lift-row {
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease),
+    background-color var(--motion-duration-fast) var(--motion-ease);
+}
+.lift-row:hover { transform: translateX(3px); }
+
+/* Heatmap cells: fade in week by week, oldest → newest, so the 90-day
+   history reads as time passing. --i is the week column index. */
+@keyframes heat-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.heat-in {
+  animation: heat-in var(--motion-duration-base) var(--motion-ease-entrance) both;
+  animation-delay: calc(var(--i, 0) * 26ms + var(--motion-duration-fast));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-enter, .landmark-wipe, .risk-enter {
+    animation: dash-rise 1ms both;
+  }
+  .heat-in { animation: heat-in 1ms both; animation-delay: 0ms !important; }
+  /* row-enter's stagger delay is set inline per row — !important so the
+     reduced fallback actually wins and rows don't pop in one by one. */
+  .row-enter { animation: row-enter 1ms both; animation-delay: 0ms !important; }
+  .bar-grow, .landmark-rail { animation: rail-draw 1ms both; }
+  .save-bar-enter { animation: save-bar-rise 1ms both; }
+  .risk-pulse { animation: none; }
+  .popover-in { animation: popover-in 1ms both; }
+  .lift-row, .lift-row:hover { transition: none; transform: none; }
+}
+
+/* ─── Threshold CTA ──────────────────────────────────────────────────────────
+   Used on the expanded AccountCard. Three coordinated effects:
+   1. Ink rail under the serif verbiage draws left → right on hover (180ms).
+   2. Arrow micro-shifts up-right by ~3px and the token fills with accent.
+   3. The whole row hairline-tints. No gradient, no bounce — ease-out-expo only.
+   The rail is the signature: a serif "underline" drawn on demand, the
+   typographic equivalent of a curtain rising. Single moment of drama per
+   expanded card.
+*/
+.threshold-rail {
+  width: 0;
+  transition: width var(--motion-duration-base) var(--motion-ease);
+}
+.threshold-cta:hover .threshold-rail,
+.threshold-cta:focus-visible .threshold-rail {
+  width: 100%;
+}
+.threshold-arrow {
+  transition: transform var(--motion-duration-base) var(--motion-ease);
+}
+.threshold-cta:hover .threshold-arrow,
+.threshold-cta:focus-visible .threshold-arrow {
+  transform: translate(2px, -2px);
+}
+.threshold-token {
+  transition: background-color var(--motion-duration-base) var(--motion-ease),
+              border-color var(--motion-duration-base) var(--motion-ease),
+              color var(--motion-duration-base) var(--motion-ease),
+              transform var(--motion-duration-base) var(--motion-ease);
+}
+.threshold-cta:hover .threshold-token,
+.threshold-cta:focus-visible .threshold-token {
+  transform: scale(1.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  .threshold-rail,
+  .threshold-arrow,
+  .threshold-token {
+    transition: none;
+  }
+  .threshold-cta:hover .threshold-rail,
+  .threshold-cta:focus-visible .threshold-rail {
+    width: 100%;
+  }
+}
+
+/* ─── Period banner (glow pill) ───────────────────────────────────────────────
+   Signals that the dashboard has opened on last month because the current one
+   has just begun. A slowly drifting accent gradient forms a glowing 1px border
+   (gradient layer + inset raised surface), with a soft breathing halo so the
+   notice reads as "informational, live" rather than "error". */
+@keyframes glow-pill-drift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes glow-pill-halo {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
+}
+.glow-pill {
+  position: relative;
+  border-radius: 9px;
+  padding: 1px; /* the gradient border thickness */
+  background: linear-gradient(
+    110deg,
+    var(--color-accent) 0%,
+    var(--color-accent-bg) 35%,
+    var(--color-accent) 65%,
+    var(--color-accent-bg) 100%
+  );
+  background-size: 220% 100%;
+  animation: glow-pill-drift 7s var(--motion-ease-soft) infinite;
+}
+.glow-pill::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 12px;
+  background: var(--color-accent);
+  filter: blur(9px);
+  opacity: 0.35;
+  z-index: -1;
+  animation: glow-pill-halo 4.5s var(--motion-ease-soft) infinite;
+}
+.glow-pill-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-radius: 8px;
+  background: var(--color-bg-raised);
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+}
+.glow-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 0 var(--color-accent);
+  animation: risk-pulse 2.4s var(--motion-ease-soft) infinite;
+  flex: none;
+}
+.glow-pill-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: var(--color-accent-ink);
+  background: var(--color-accent-bg);
+  white-space: nowrap;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease),
+              transform var(--motion-duration-fast) var(--motion-ease);
+}
+.glow-pill-action:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  transform: translateX(2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow-pill { animation: none; }
+  .glow-pill::before { animation: none; }
+  .glow-pill-dot { animation: none; }
+  .glow-pill-action:hover { transform: none; }
+}
+
+/* ─── Login flutes ───────────────────────────────────────────────────────────
+   The brand panel: blurred light ribbons drifting behind fluted glass. Deep
+   azure ground so the green/aqua AI stops have something to glow against.
+   Deliberately dark in both themes — it's a hero, not a surface.
+   ─────────────────────────────────────────────────────────────────────────── */
+.login-flutes {
+  background:
+    radial-gradient(120% 90% at 15% 0%, #123A86 0%, transparent 60%),
+    radial-gradient(110% 80% at 95% 100%, #06251F 0%, transparent 62%),
+    linear-gradient(165deg, #0A1E44 0%, #061024 55%, #04101C 100%);
+}
+
+.login-ribbon {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 26%;
+  border-radius: 999px;
+  filter: blur(64px);
+  will-change: transform;
+  pointer-events: none;
+}
+.login-ribbon-1 {
+  top: 4%;
+  background: linear-gradient(90deg, transparent, var(--color-ai-aqua), transparent);
+  opacity: 0.34;
+  transform: rotate(-14deg);
+  animation: ribbon-drift-a 34s var(--motion-ease-standard) infinite;
+}
+.login-ribbon-2 {
+  top: 28%;
+  background: linear-gradient(90deg, transparent, #3B7FF5, transparent);
+  opacity: 0.46;
+  transform: rotate(-6deg);
+  animation: ribbon-drift-b 27s var(--motion-ease-standard) infinite;
+}
+.login-ribbon-3 {
+  top: 54%;
+  background: linear-gradient(90deg, transparent, var(--color-ai-spring), transparent);
+  opacity: 0.3;
+  transform: rotate(8deg);
+  animation: ribbon-drift-a 41s var(--motion-ease-standard) infinite reverse;
+}
+.login-ribbon-4 {
+  top: 74%;
+  height: 34%;
+  background: linear-gradient(90deg, transparent, var(--color-ai-emerald), transparent);
+  opacity: 0.26;
+  transform: rotate(-3deg);
+  animation: ribbon-drift-b 48s var(--motion-ease-standard) infinite;
+}
+@keyframes ribbon-drift-a {
+  0%, 100% { transform: rotate(-12deg) translate3d(-6%, 0, 0); }
+  50%      { transform: rotate(-4deg)  translate3d(8%, 4%, 0); }
+}
+@keyframes ribbon-drift-b {
+  0%, 100% { transform: rotate(-5deg) translate3d(6%, 0, 0); }
+  50%      { transform: rotate(6deg)  translate3d(-8%, -4%, 0); }
+}
+
+/* The glass itself: vertical flutes that split the light behind into bands,
+   plus a wide vignette so the panel's edges settle into the page. */
+.login-flute-glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.07) 0px,
+      rgb(255 255 255 / 0.07) 1px,
+      rgb(255 255 255 / 0.02) 2px,
+      transparent 7px,
+      rgb(0 0 0 / 0.10) 15px,
+      transparent 16px
+    ),
+    /* A scrim weighted to the bottom, where the wordmark sits — the copy needs
+       a floor to read against, and the ribbons drift, so it can't be left to
+       chance. Kept off the upper two-thirds so the light still shows. */
+    linear-gradient(to top, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.18) 34%, transparent 62%),
+    radial-gradient(130% 90% at 50% 40%, transparent 52%, rgb(0 0 0 / 0.22) 100%);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-ribbon { animation: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .login-flute-glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* ─── The AI accent layer ────────────────────────────────────────────────────
+   Everything in this block belongs to the intelligence grammar: green/aqua,
+   never azure. It marks the moments the system produced something rather than
+   just displaying it. Used sparingly on purpose — the meaning only survives
+   while it stays rare (AiReveal, the thinking state, working-state text).
+
+   Reduced motion keeps the *colour* and drops the movement: the green is what
+   carries the meaning, the animation only makes it feel alive.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.ai-reveal {
+  position: relative;
+  border-radius: var(--ai-reveal-radius, 12px);
+}
+
+/* 1. The gradient ring — two counter-rotating conic sweeps traced onto the
+   content's own edge (masked to a 1.5px band), spinning once then fading. */
+.ai-reveal-ring,
+.ai-reveal-ring::after {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: calc(var(--ai-reveal-radius, 12px) + 1.5px);
+  padding: 1.5px;
+  pointer-events: none;
+  /* Keep only the padding band — the classic gradient-border mask. */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+.ai-reveal-ring {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    var(--color-ai-aqua) 3%,
+    var(--color-ai-spring) 5%,
+    var(--color-ai-emerald) 7%,
+    transparent 11%,
+    transparent 100%
+  );
+  animation:
+    ai-ring-spin 1s linear,
+    ai-ring-fade 3s var(--motion-ease-exit) forwards;
+}
+.ai-reveal-ring::after {
+  inset: 0;
+  padding: 1.5px;
+  background: conic-gradient(
+    from 180deg,
+    transparent 0%,
+    var(--color-ai-mint) 3%,
+    var(--color-ai-spring) 5%,
+    var(--color-ai-aqua) 7%,
+    transparent 11%,
+    transparent 100%
+  );
+  animation: ai-ring-spin-reverse 1s linear;
+}
+@keyframes ai-ring-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ai-ring-spin-reverse {
+  to { transform: rotate(-360deg); }
+}
+@keyframes ai-ring-fade {
+  0%, 33%  { opacity: 1; }
+  100%     { opacity: 0; }
+}
+
+/* 2. The diagonal reveal — a 135° mask three times the element's size, slid
+   from its transparent end to its opaque end so the content arrives
+   edge-first. Ends fully opaque, so the mask is inert once it lands. */
+.ai-reveal-body {
+  -webkit-mask-image: linear-gradient(135deg, #000 0%, #000 40%, transparent 62%, transparent 100%);
+  mask-image: linear-gradient(135deg, #000 0%, #000 40%, transparent 62%, transparent 100%);
+  -webkit-mask-size: 300% 300%;
+  mask-size: 300% 300%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: ai-diagonal-reveal 2s var(--motion-ease-entrance) both;
+}
+@keyframes ai-diagonal-reveal {
+  from { -webkit-mask-position: 100% 100%; mask-position: 100% 100%; }
+  to   { -webkit-mask-position: 0% 0%;     mask-position: 0% 0%; }
+}
+
+/* 3. The wash — one green sweep across the surface, then gone. */
+.ai-reveal-wash {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-ai-spring) 30%, transparent) 45%,
+    transparent 72%
+  );
+  background-size: 260% 100%;
+  background-repeat: no-repeat;
+  animation: ai-wash-sweep 1.5s var(--motion-ease-standard) forwards;
+}
+@keyframes ai-wash-sweep {
+  from { background-position: -70% 0; opacity: 1; }
+  to   { background-position: 170% 0; opacity: 0; }
+}
+
+/* ── The thinking state ──────────────────────────────────────────────────────
+   The glyph turning over a breathing field of the four AI stops. This replaces
+   the spinner wherever the system is composing an answer — a spinner says
+   "waiting", the glyph says "working". */
+.ai-thinking {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 60% at 25% 30%, color-mix(in srgb, var(--color-ai-aqua) 55%, transparent), transparent 70%),
+    radial-gradient(55% 55% at 75% 35%, color-mix(in srgb, var(--color-ai-spring) 50%, transparent), transparent 70%),
+    radial-gradient(70% 70% at 50% 80%, color-mix(in srgb, var(--color-ai-emerald) 45%, transparent), transparent 72%),
+    var(--color-ai-bg);
+  background-size: 180% 180%, 170% 170%, 190% 190%, 100% 100%;
+  animation: ai-breathe 12s var(--motion-ease-standard) infinite;
+}
+@keyframes ai-breathe {
+  0%   { background-position: 10% 20%, 80% 10%, 40% 90%, 0 0; }
+  33%  { background-position: 70% 60%, 20% 70%, 80% 20%, 0 0; }
+  66%  { background-position: 30% 80%, 60% 30%, 10% 60%, 0 0; }
+  100% { background-position: 10% 20%, 80% 10%, 40% 90%, 0 0; }
+}
+.ai-thinking-glyph {
+  animation: ai-glyph-turn 2.4s var(--motion-ease-standard) infinite;
+}
+@keyframes ai-glyph-turn {
+  0%, 12%   { transform: rotate(0deg); }
+  50%, 62%  { transform: rotate(180deg); }
+  100%      { transform: rotate(360deg); }
+}
+
+/* ── Working-state text shimmer ──────────────────────────────────────────────
+   A green highlight sweeping through a label while the system is mid-task,
+   with a beat of rest between passes so it reads as breathing rather than
+   spinning. Pairs with RollingText's working state. */
+.ai-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-ink) 38%,
+    var(--color-ai-emerald) 50%,
+    var(--color-ink) 62%
+  );
+  background-size: 260% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ai-shimmer-sweep 1.44s var(--motion-ease-standard) infinite;
+}
+@keyframes ai-shimmer-sweep {
+  0%        { background-position: 130% 0; }
+  /* 960ms of sweep, then 480ms of rest at the far edge. */
+  66%, 100% { background-position: -30% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-reveal-ring,
+  .ai-reveal-ring::after,
+  .ai-reveal-wash {
+    animation: none;
+    opacity: 0;
+  }
+  .ai-reveal-body {
+    /* Never leave content behind a mask that isn't going to animate open. */
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: none;
+  }
+  .ai-thinking,
+  .ai-thinking-glyph,
+  .ai-shimmer {
+    animation: none;
+  }
+  .ai-shimmer {
+    background-image: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--color-ai-ink);
+  }
+}
+
+/* ─── Liquid-glass tray ──────────────────────────────────────────────────────
+   A floating translucent material for popovers/trays (notifications). The
+   blurred, saturated backdrop lets page content read through it while the
+   bright top edge catches light like a real pane of glass. Enter/exit
+   materialises (blur + scale + opacity together) from the top-right anchor,
+   never a flat fade — the surface should feel like it arrives, not blinks in.
+
+   Accessibility: prefers-reduced-transparency drops the blur to a solid
+   surface; prefers-reduced-motion drops the transform/blur transition to a
+   plain cross-fade. */
+.glass-tray {
+  transform-origin: top right;
+  background: color-mix(in srgb, var(--color-bg-raised) 72%, transparent);
+  /* The fluted-glass recipe: a short blur with the saturation pushed up, so
+     content behind the pane stays legible and *coloured* rather than smeared
+     into grey. The second declaration adds a turbulence displacement for the
+     refraction; browsers that can't take a filter reference in
+     backdrop-filter keep the first declaration and just lose the ripple. */
+  backdrop-filter: blur(6px) saturate(139%);
+  -webkit-backdrop-filter: blur(6px) saturate(139%);
+  backdrop-filter: blur(6px) saturate(139%) url(#glass-refraction);
+  -webkit-backdrop-filter: blur(6px) saturate(139%) url(#glass-refraction);
+  border: 1px solid var(--color-border);
+  border-top-color: rgb(255 255 255 / 0.75);
+  box-shadow:
+    var(--elevation-high),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.35);
+  transition:
+    opacity 200ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 200ms cubic-bezier(0.23, 1, 0.32, 1),
+    filter 200ms ease-out;
+}
+.glass-tray[data-state="closed"] {
+  opacity: 0;
+  transform: scale(0.96) translateY(-6px);
+  filter: blur(4px);
+}
+.glass-tray[data-state="open"] {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+}
+/* A faint sheen along the very top of the pane. */
+.glass-tray::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 40%;
+  border-radius: inherit;
+  background: linear-gradient(rgb(255 255 255 / 0.28), transparent);
+  pointer-events: none;
+}
+/* On dark surfaces the sheen and the light top edge would read as a scratch —
+   the pane is smoked glass, so both drop to a whisper. */
+[data-theme="dark"] .glass-tray {
+  background: color-mix(in srgb, var(--color-bg-raised) 76%, transparent);
+  border-top-color: rgb(255 255 255 / 0.14);
+  box-shadow:
+    var(--elevation-high),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.08);
+}
+[data-theme="dark"] .glass-tray::before {
+  background: linear-gradient(rgb(255 255 255 / 0.06), transparent);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass-tray {
+    background: var(--color-bg-raised);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glass-tray::before { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-tray {
+    transition: opacity 160ms ease;
+  }
+  .glass-tray[data-state="closed"] { transform: none; filter: none; }
+  .glass-tray[data-state="open"] { transform: none; filter: none; }
+}
+
+/* ─── Popover panel ──────────────────────────────────────────────────────────
+   A solid raised surface for header popovers (notifications). Layered shadows
+   give it elevation; the border marks its edge. It enters from its top-right
+   anchor with a small scale and fade, and exits the same way.
+   prefers-reduced-motion keeps only the fade. */
+.popover-panel {
+  transform-origin: top right;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--elevation-high);
+  transition-property: opacity, transform;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+.popover-panel[data-state="closed"] {
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
+}
+.popover-panel[data-state="open"] {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .popover-panel { transition-property: opacity; }
+  .popover-panel[data-state="closed"] { transform: none; }
+}

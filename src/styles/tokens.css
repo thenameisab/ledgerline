@@ -1,0 +1,63 @@
+/* Design tokens. The base tokens are in design-tokens.css (azure accent,
+   green AI accent family, TASA Orbiter / Inter / JetBrains Mono, feedback
+   palette, motion, light + dark pairs). This file imports them, then adds
+   the app-specific tokens (heatmap ramp, chart families, radius).
+   Edit base tokens in design-tokens.css, not here. */
+
+@import "./design-tokens.css";
+
+:root {
+  /* Heatmap intensity ramp — anchored to the azure accent so the ramp belongs
+     to the palette. Consumed by ActivityHeatmap (fill-heat-0..4). Not part of
+     the shared design system; lives here until promoted (changelog D5). */
+  --color-heat-0: var(--color-bg-sunken);
+  --color-heat-1: #DCE9FD;
+  --color-heat-2: #A9C8FB;
+  --color-heat-3: #4F8BF4;
+  --color-heat-4: #0E4BB8;
+
+  /* Categorical chart families, in priority order: blue, green, gold, purple,
+     orange, pink, sky, red, gray. Series pick from the top of this list, so
+     a two-series chart is always azure + emerald. Each family has a faint
+     partner for stacked/secondary marks. */
+  --color-viz-1: #1364F1;  --color-viz-1-faint: #C7DCFD;
+  --color-viz-2: #01A862;  --color-viz-2-faint: #BEEBD6;
+  --color-viz-3: #C08A00;  --color-viz-3-faint: #F2E2B8;
+  --color-viz-4: #7A5AF0;  --color-viz-4-faint: #DCD3FB;
+  --color-viz-5: #E05E00;  --color-viz-5-faint: #F9D9BF;
+  --color-viz-6: #D4408F;  --color-viz-6-faint: #F6CFE3;
+  --color-viz-7: #008BD1;  --color-viz-7-faint: #C0E4F6;
+  --color-viz-8: #D01E11;  --color-viz-8-faint: #F6C9C5;
+  --color-viz-9: #7A868C;  --color-viz-9-faint: #D9DEE0;
+
+  /* Radius scale — app-specific shape tokens (design system expresses radius
+     via Tailwind borderRadius utilities, not CSS vars). Controls 8px, cards
+     12px; nothing in the product rounds past 16px. */
+  --radius-sm: 0.25rem;   /*  4px — chips, inline tokens */
+  --radius-default: 0.5rem; /* 8px — controls, buttons, inputs */
+  --radius-md: 0.75rem;   /* 12px — cards, panels */
+  --radius-lg: 0.75rem;   /* 12px — cards (was 16px) */
+  --radius-xl: 1rem;      /* 16px — modals, trays */
+  --radius-full: 9999px;
+}
+
+[data-theme="dark"] {
+  /* heat-0 tracks bg-sunken, which is lighter than the card in dark mode — the
+     ramp needs its own floor so an empty cell still reads as empty. */
+  --color-heat-0: #1A1D20;
+  --color-heat-1: #16233A;
+  --color-heat-2: #21406E;
+  --color-heat-3: #3D74C9;
+  --color-heat-4: #8DB9FF;
+
+  /* Chart families lift for dark surfaces; faint partners darken instead. */
+  --color-viz-1: #75AAFF;  --color-viz-1-faint: #1E3556;
+  --color-viz-2: #3FD48A;  --color-viz-2-faint: #163A2C;
+  --color-viz-3: #E3B341;  --color-viz-3-faint: #3B2F11;
+  --color-viz-4: #A28BFF;  --color-viz-4-faint: #2A2350;
+  --color-viz-5: #FF9A4D;  --color-viz-5-faint: #3A2312;
+  --color-viz-6: #F07AB8;  --color-viz-6-faint: #3D1B2E;
+  --color-viz-7: #4FB6E8;  --color-viz-7-faint: #12303C;
+  --color-viz-8: #FF7166;  --color-viz-8-faint: #3A1B18;
+  --color-viz-9: #9AA4A9;  --color-viz-9-faint: #2B3033;
+}

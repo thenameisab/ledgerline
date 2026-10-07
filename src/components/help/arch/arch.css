@@ -1,0 +1,493 @@
+/* -----------------------------------------------------------------------------
+   Ledgerline architecture — "live system map"
+   On-brand (cool neutral surface, azure accent), light and dark. Real DOM nodes
+   on a scaled coordinate grid with an SVG edge overlay. Hover/focus a node to light
+   its connections and reveal a rich card; pick a flow to trace it with a
+   traveling pulse. No glass, no dark canvas.
+----------------------------------------------------------------------------- */
+
+.arch-root {
+  /* Lane hues, taken from the categorical chart families in priority order so
+     the map belongs to the same palette as every chart: azure, purple, green,
+     sky, pink. */
+  --lane-a: 264; /* browser  — azure  */
+  --lane-b: 290; /* edge     — purple */
+  --lane-c: 160; /* server   — green  */
+  --lane-d: 240; /* database — sky    */
+  --lane-e: 350; /* external — pink   */
+  /* Lane label lightness. Dark surfaces need a light label, so this flips with
+     the theme rather than being baked into every rule below. */
+  --lane-ink-l: 0.45;
+  --flow: var(--color-accent);
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 90% at 12% 0%, oklch(0.98 0.02 264 / 0.6), transparent 60%),
+    var(--color-bg-sunken);
+  padding: 18px 18px 20px;
+  overflow: hidden;
+}
+
+/* faint engineering grid */
+.arch-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, oklch(0.5 0.02 250 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.5 0.02 250 / 0.045) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(130% 100% at 50% 0%, #000 55%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ── Flow chips ─────────────────────────────────────────────────────────── */
+.arch-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.arch-flows-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  margin-right: 2px;
+}
+.arch-flowchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-raised);
+  color: var(--color-ink-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-ease),
+    color var(--motion-duration-fast) var(--motion-ease),
+    background var(--motion-duration-fast) var(--motion-ease),
+    box-shadow var(--motion-duration-fast) var(--motion-ease);
+}
+.arch-flowchip:hover {
+  color: var(--color-ink);
+  border-color: color-mix(in oklch, var(--chip) 55%, var(--color-border));
+}
+.arch-flowchip.is-on {
+  color: var(--color-ink);
+  border-color: color-mix(in oklch, var(--chip) 70%, transparent);
+  background: color-mix(in oklch, var(--chip) 14%, var(--color-bg-raised));
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--chip) 30%, transparent);
+}
+.arch-flowdot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--chip) 22%, transparent);
+}
+.arch-reset {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-ink-faint);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.arch-reset:hover { color: var(--color-ink); background: var(--color-bg-raised); }
+
+/* ── Stage ──────────────────────────────────────────────────────────────── */
+.arch-stagewrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  /* The canvas always scales to fit the width, so no scrolling is needed —
+     and `overflow` must stay visible so the floating detail card is never
+     clipped (overflow-x:auto would force overflow-y:auto and cut it off). */
+  overflow: visible;
+}
+.arch-fit {
+  position: relative;
+  margin: 0 auto;
+}
+.arch-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+/* lane bands */
+.arch-lane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 12px;
+  background: color-mix(in oklch, oklch(0.6 0.06 var(--lh)) 6%, var(--color-bg-raised));
+  border: 1px solid color-mix(in oklch, oklch(0.6 0.06 var(--lh)) 14%, var(--color-border));
+}
+.arch-lane-head {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  pointer-events: none;
+}
+.arch-lane-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(var(--lane-ink-l) 0.09 var(--lh));
+}
+.arch-lane-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: var(--color-ink-faint);
+}
+
+/* ── SVG edges ──────────────────────────────────────────────────────────── */
+.arch-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.arch-edge {
+  fill: none;
+  stroke: oklch(0.55 0.02 250 / 0.28);
+  stroke-width: 1.4;
+  transition:
+    stroke var(--motion-duration-base) var(--motion-ease),
+    stroke-width var(--motion-duration-base) var(--motion-ease),
+    opacity var(--motion-duration-base) var(--motion-ease);
+}
+.arch-edge--dim { stroke: oklch(0.6 0.01 250 / 0.1); }
+.arch-edge--lit {
+  stroke: color-mix(in oklch, var(--flow) 55%, transparent);
+  stroke-width: 2;
+}
+.arch-edge--active {
+  stroke: var(--flow);
+  stroke-width: 2.4;
+}
+/* neighbour-highlight (explore mode) uses the accent */
+.arch-edge--near {
+  stroke: color-mix(in oklch, var(--color-accent) 70%, transparent);
+  stroke-width: 2.2;
+}
+
+/* traveling comet pulse along an active edge */
+.arch-pulse {
+  fill: none;
+  stroke: var(--flow);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.14 0.86;
+  filter: drop-shadow(0 0 3px color-mix(in oklch, var(--flow) 60%, transparent));
+  animation: arch-comet 1.5s linear infinite;
+}
+.arch-pulse.is-rev { animation-direction: reverse; }
+@keyframes arch-comet {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Nodes ──────────────────────────────────────────────────────────────── */
+.arch-node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 9px 12px;
+  text-align: left;
+  border-radius: 11px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-raised);
+  box-shadow: 0 1px 2px oklch(0.4 0.02 250 / 0.06);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-ease),
+    box-shadow var(--motion-duration-base) var(--motion-ease),
+    transform var(--motion-duration-base) var(--motion-ease),
+    opacity var(--motion-duration-base) var(--motion-ease),
+    filter var(--motion-duration-base) var(--motion-ease);
+}
+.arch-node::before {
+  /* lane hue rail as a soft top glow, not a side-stripe */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 2px 0 color-mix(in oklch, oklch(0.6 0.1 var(--lh)) 40%, transparent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.arch-node:hover,
+.arch-node:focus-visible {
+  outline: none;
+  border-color: color-mix(in oklch, var(--color-accent) 55%, var(--color-border));
+  box-shadow:
+    0 4px 14px oklch(0.4 0.02 250 / 0.1),
+    0 0 0 3px var(--color-accent-bg);
+  transform: translateY(-1px);
+  z-index: 5;
+}
+.arch-node.is-hot {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 6px 18px oklch(0.4 0.02 250 / 0.12),
+    0 0 0 3px var(--color-accent-bg);
+  transform: translateY(-1px);
+  z-index: 6;
+}
+.arch-node.is-lit {
+  border-color: color-mix(in oklch, var(--color-accent) 45%, var(--color-border));
+}
+.arch-node.is-dim {
+  opacity: 0.42;
+  filter: saturate(0.6);
+}
+.arch-node-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.15;
+}
+.arch-node-sub {
+  font-size: 11px;
+  color: var(--color-ink-faint);
+  line-height: 1.2;
+}
+.arch-node-sub.is-mono {
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.arch-node-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 4px;
+}
+.arch-node-chip {
+  font-size: 9.5px;
+  font-weight: 500;
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  background: var(--color-bg-sunken);
+  border: 1px solid var(--color-border);
+  color: var(--color-ink-muted);
+}
+
+/* ── Floating detail card ───────────────────────────────────────────────── */
+.arch-card {
+  position: absolute;
+  z-index: 20;
+  width: 300px;
+  max-width: min(300px, 78vw);
+  max-height: min(72vh, 460px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-raised);
+  box-shadow:
+    0 12px 34px oklch(0.35 0.03 250 / 0.16),
+    0 2px 8px oklch(0.35 0.03 250 / 0.08);
+  padding: 14px 15px 15px;
+}
+.arch-card-lane {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: oklch(var(--lane-ink-l) 0.09 var(--lh));
+}
+.arch-card-lane::before {
+  content: "";
+  width: 7px; height: 7px; border-radius: 50%;
+  background: oklch(0.6 0.12 var(--lh));
+}
+.arch-card-title {
+  margin: 5px 0 0;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.15;
+}
+.arch-card-sub {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--color-ink-faint);
+}
+.arch-card-sub.is-mono { font-family: var(--font-mono); }
+.arch-card-desc {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-ink-muted);
+}
+.arch-card-sectlabel {
+  margin: 13px 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.arch-card-conns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.arch-conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--color-accent-bg);
+  color: var(--color-accent-ink);
+  border: 1px solid color-mix(in oklch, var(--color-accent) 22%, transparent);
+  cursor: pointer;
+}
+.arch-conn:hover { border-color: var(--color-accent); }
+.arch-conn-dir { opacity: 0.6; font-size: 10px; }
+.arch-card-files {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.arch-card-files li {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--color-ink-muted);
+  background: var(--color-bg-sunken);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 3px 7px;
+  overflow-wrap: anywhere;
+}
+.arch-card-pin {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Narration under the stage ──────────────────────────────────────────── */
+.arch-caption { position: relative; z-index: 2; margin-top: 14px; }
+.arch-hint {
+  font-size: 12.5px;
+  color: var(--color-ink-faint);
+  line-height: 1.5;
+  max-width: 62ch;
+}
+.arch-hint kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 1px 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  background: var(--color-bg-raised);
+  color: var(--color-ink-muted);
+}
+.arch-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.arch-stepbtn {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 9px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--color-ink-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: background var(--motion-duration-fast) var(--motion-ease),
+    color var(--motion-duration-fast) var(--motion-ease),
+    border-color var(--motion-duration-fast) var(--motion-ease);
+}
+.arch-stepbtn:hover { background: var(--color-bg-raised); color: var(--color-ink); }
+.arch-stepbtn.is-now {
+  background: color-mix(in oklch, var(--flow) 12%, var(--color-bg-raised));
+  border-color: color-mix(in oklch, var(--flow) 40%, transparent);
+  color: var(--color-ink);
+}
+.arch-stepnum {
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--flow) 55%, var(--color-ink));
+  background: color-mix(in oklch, var(--flow) 16%, var(--color-bg-raised));
+}
+.arch-stepbtn.is-now .arch-stepnum {
+  color: var(--color-bg-raised);
+  background: var(--flow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arch-pulse { animation: none; stroke-dasharray: none; opacity: 0.9; }
+}
+
+/* ── Dark mode ────────────────────────────────────────────────────────────
+   The map is built from lane hues plus surface tokens, so dark mostly lands on
+   its own. Two things don't: the lane labels (a dark tint on a dark band) and
+   the engineering grid (a near-black line on near-black). Both flip here. */
+[data-theme="dark"] .arch-root {
+  --lane-ink-l: 0.82;
+  background:
+    radial-gradient(120% 90% at 12% 0%, oklch(0.45 0.06 264 / 0.35), transparent 60%),
+    var(--color-bg-sunken);
+}
+[data-theme="dark"] .arch-root::before {
+  background-image:
+    linear-gradient(to right, oklch(0.95 0.01 250 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.95 0.01 250 / 0.06) 1px, transparent 1px);
+}

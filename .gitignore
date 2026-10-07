@@ -1,0 +1,19 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next
+/out
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# local env
+.env.local
+.env*.local
+
+# embedded postgres data + binaries (created on first `npm run dev`)
+/.pgdata
+
+# os
+.DS_Store
+/.preview
