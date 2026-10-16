@@ -1,7 +1,7 @@
 # Deploy Ledgerline (Vercel Hobby + Neon)
 
 Ledgerline runs on Vercel with a Neon Postgres database. The landing page is at
-`/`. Visitors submit the Tally form on it, and then open the demo sign-in.
+`/`. Its **Open the demo** buttons go to the demo sign-in.
 
 Keep deployment values in `.env.deploy.local` at the repository root. The file
 is gitignored (`.env*.local`) and stays on your machine.
@@ -81,19 +81,12 @@ Do not set:
 ## 5. Check the deployment
 
 1. Open the deployment URL. The landing page appears.
-2. Submit the Tally form. The page moves to the sign-in page.
+2. Click **Open the demo**. The sign-in page appears.
 3. Click **Enter as Admin**. The dashboard shows month-to-date revenue.
-4. Open a signed-out private window and go to `/dashboard`. It returns you to the
-   form on the landing page.
+4. Open a signed-out private window and go to `/dashboard`. It goes to the
+   sign-in page.
 
-## 6. Tally form settings
-
-- Turn off **Redirect on completion**. The landing page reacts to the submit
-  itself.
-- Optional: set the button color to `#1364F1` and the font to Inter so the form
-  matches the page.
-
-## 7. Custom domain (optional)
+## 6. Custom domain (optional)
 
 In Vercel, open **Settings → Domains** and add the domain. Vercel shows the DNS
 record to create at your DNS provider. If the DNS provider is Cloudflare, set

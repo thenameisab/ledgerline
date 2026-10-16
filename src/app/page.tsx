@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { Landing } from "@/components/landing/Landing";
-import { DEMO_ACCESS_COOKIE } from "@/lib/demo-access";
 
 export const metadata: Metadata = {
   title: "Ledgerline · Usage-based billing for every SKU",
@@ -10,6 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function LandingPage() {
-  const hasAccess = cookies().get(DEMO_ACCESS_COOKIE)?.value === "1";
-  return <Landing hasAccess={hasAccess} />;
+  return <Landing />;
 }

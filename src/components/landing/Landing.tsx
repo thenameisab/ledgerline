@@ -4,7 +4,6 @@ import "./landing.css";
 import { useEffect, useState } from "react";
 import { ArrowRight, ArrowDown } from "lucide-react";
 import { Glyph } from "@/components/ui/Glyph";
-import { AccessForm } from "./AccessForm";
 import { Desk } from "./Desk";
 import { HeroSnippet } from "./HeroSnippet";
 import { Reveal } from "./ui";
@@ -89,7 +88,7 @@ const SECTIONS: Section[] = [
     facts: [
       ["Rules", "Volume · failures · revenue"],
       ["Baseline", "Four weeks, same weekday"],
-      ["Delivery", "In-app and email"],
+      ["Delivery", "In-app"],
     ],
     Snippet: AlertsSnippet,
   },
@@ -272,9 +271,9 @@ const btnPrimary =
 const btnQuiet =
   "ll-press inline-flex items-center gap-2 rounded border border-border-strong bg-bg-raised text-ink outline-none hover:bg-bg-sunken focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
 
-export function Landing({ hasAccess }: { hasAccess: boolean }) {
+export function Landing() {
   const scrolled = useScrolled();
-  const demoHref = hasAccess ? "/login" : "#access";
+  const demoHref = "/login";
 
   return (
     <div className="ll-landing">
@@ -338,7 +337,7 @@ export function Landing({ hasAccess }: { hasAccess: boolean }) {
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
               <a href={demoHref} className={`${btnPrimary} h-[42px] px-4 text-[14px]`}>
-                {hasAccess ? "Open the demo" : "Get demo access"} <ArrowRight size={15} aria-hidden />
+                Open the demo <ArrowRight size={15} aria-hidden />
               </a>
               <a href="#who" className={`${btnQuiet} h-[42px] px-4 text-[14px]`}>
                 See how it works <ArrowDown size={15} aria-hidden />
@@ -400,8 +399,8 @@ export function Landing({ hasAccess }: { hasAccess: boolean }) {
         ))}
 
         <section
-          id="access"
-          aria-labelledby="access-title"
+          id="demo"
+          aria-labelledby="demo-title"
           className="scroll-mt-[var(--ll-header-h)] px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16"
         >
           <div className="mx-auto grid max-w-[76rem] grid-cols-1 gap-8 lg:grid-cols-[19rem_minmax(0,1fr)] lg:gap-12">
@@ -413,14 +412,13 @@ export function Landing({ hasAccess }: { hasAccess: boolean }) {
                 <span className="h-px flex-1 border-t border-dashed border-border-strong" aria-hidden />
               </div>
               <h2
-                id="access-title"
+                id="demo-title"
                 className="mt-4 font-display text-[clamp(1.75rem,3vw,2.375rem)] font-medium leading-[1.08] tracking-display text-ink"
               >
                 Open the demo
               </h2>
               <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">
-                Fill in the form to open the demo. You enter as an admin or a member of a fictional
-                company. You can change anything; the data resets every night.
+                You enter as an admin or a member of a fictional company, and you can change anything.
               </p>
               <dl className="mt-5 font-mono text-[12px]">
                 {[
@@ -437,6 +435,9 @@ export function Landing({ hasAccess }: { hasAccess: boolean }) {
                   </div>
                 ))}
               </dl>
+              <a href={demoHref} className={`${btnPrimary} mt-6 h-[42px] px-4 text-[14px]`}>
+                Open the demo <ArrowRight size={15} aria-hidden />
+              </a>
             </div>
             <div className="relative pt-3">
               <span
@@ -444,21 +445,21 @@ export function Landing({ hasAccess }: { hasAccess: boolean }) {
                 style={{ background: "var(--a-azure)", color: "var(--a-azure-ink)" }}
                 aria-hidden
               >
-                Request access
+                Waitlist
               </span>
               <div className="ll-card rounded-md p-5 pt-7 sm:p-7 sm:pt-8">
-                <AccessForm hasAccess={hasAccess} />
-                <p className="mt-4 border-t border-dashed border-border-strong pt-3 text-[12px] leading-relaxed text-ink-faint">
-                  Tally stores your answers. They are used only to see who is interested and, if you ask,
-                  to contact you. To have your answers removed, get in touch through{" "}
-                  <a
-                    href="https://adityagaur.xyz"
-                    className="text-ink-muted underline underline-offset-2 outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-accent"
-                  >
-                    adityagaur.xyz
-                  </a>
-                  .
+                <h3 className="font-display text-[clamp(1.25rem,2vw,1.5rem)] font-medium leading-[1.15] tracking-display text-ink">
+                  Join the waitlist
+                </h3>
+                <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">
+                  Tilth sends one email when Ledgerline is available.
                 </p>
+                <a
+                  href="https://tilthsoftware.com/ledgerline"
+                  className={`${btnQuiet} mt-5 h-[42px] px-4 text-[14px]`}
+                >
+                  Join the waitlist <ArrowRight size={15} aria-hidden />
+                </a>
               </div>
             </div>
           </div>
@@ -469,15 +470,15 @@ export function Landing({ hasAccess }: { hasAccess: boolean }) {
         <div className="mx-auto flex max-w-[76rem] flex-wrap items-center justify-between gap-3 text-[12px] text-ink-faint">
           <span className="flex items-center gap-2">
             <Glyph size={14} />
-            Ledgerline · fictional data, reset nightly
+            Ledgerline · fictional data
           </span>
           <span>
             Built by{" "}
             <a
-              href="https://adityagaur.xyz"
+              href="https://tilthsoftware.com"
               className="text-ink-muted underline-offset-2 outline-none hover:text-ink hover:underline focus-visible:ring-2 focus-visible:ring-accent"
             >
-              Aditya Gaur
+              Tilth
             </a>
           </span>
         </div>
